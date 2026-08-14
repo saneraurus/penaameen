@@ -47,7 +47,7 @@ The goals below are based only on existing discovery evidence and current projec
 | PHASE 4 | Data Architecture | COMPLETE |
 | PHASE 5 | Design System | COMPLETE |
 | PHASE 6 | Implementation Constitution | COMPLETE |
-| PHASE 7 | Application Implementation | READY |
+| PHASE 7 | Application Implementation | PARTIAL |
 | PHASE 8 | QA / Acceptance | NOT STARTED |
 | PHASE 9 | Migration | NOT STARTED |
 | PHASE 10 | Production Launch | NOT STARTED |
@@ -125,6 +125,7 @@ Future requirements and tasks must use these states consistently:
 | CONFIRMED | Verified by source evidence or explicit client confirmation. |
 | APPROVED | Accepted as a decision for implementation by the appropriate authority/source-of-truth level. |
 | BLOCKED | Cannot proceed because a dependency, unknown, or decision is unresolved. |
+| PARTIAL | Work is materially implemented or documented, but defined exit criteria are not fully evidenced. |
 | UNKNOWN | Not verified; must not be implemented as fact. |
 | DEPRECATED | Previously valid but intentionally retired by an approved decision. |
 
@@ -138,13 +139,13 @@ Future requirements and tasks must use these states consistently:
 ## Project Status
 
 Current Phase:
-PHASE 6 — COMPLETE
+PHASE 7 — PARTIAL
 
 Current Objective:
-The implementation constitution now governs repository structure, code organization, language, frontend/backend/API/domain/data access, authorization, security, provider boundaries, media/search/SEO, accessibility, performance, recovery, observability, configuration, dependencies, testing, migration, deployment, CI/CD, Git/review, gates, risks, decisions, and definition of done. Client/provider/data/brand/migration gates remain explicit.
+The authorized non-provider, non-migration, non-production foundation has been implemented: executable Next.js/TypeScript shell, semantic presentation foundation, strict configuration, domain/application/port boundaries, error/logging/audit/idempotency/authorization primitives, abstract repositories, provider-neutral contracts, tests, security baseline, and local developer tooling. Browser E2E validation is blocked by environment tooling and CI platform configuration remains client-gated.
 
 Next Phase:
-PHASE 7 — Application Implementation (READY; not started)
+PHASE 8 — QA / Acceptance (NOT STARTED; Phase 7 exit criteria are not fully evidenced)
 
 Current blockers:
 
@@ -154,5 +155,7 @@ Current blockers:
 - Payment provider unknown
 - Shipping provider unknown
 - Client data pending
+- Browser E2E runtime unavailable in the current foundation environment
+- CI platform ownership/configuration remains client-gated
 
-These blockers did not prevent Phase 1 product discovery, Phase 2 information-architecture planning, Phase 3 provider-agnostic technical architecture, Phase 4 logical data architecture, Phase 5 semantic design governance, or Phase 6 implementation governance. They still block provider-specific, data-specific, SEO-sensitive, privacy-sensitive, brand-asset-dependent, source-migration, and production implementation decisions until resolved or explicitly deferred. T007 is READY only for constitution-governed, gate-assessed implementation sequencing; G7, G10, and G11 restrictions remain binding.
+These blockers did not prevent Phase 1 product discovery, Phase 2 information-architecture planning, Phase 3 provider-agnostic technical architecture, Phase 4 logical data architecture, Phase 5 semantic design governance, Phase 6 implementation governance, or the authorized Phase 7 foundation. They block provider-specific, data-specific, SEO-sensitive, privacy-sensitive, brand-asset-dependent, source-migration, production implementation, and full Phase 7 exit evidence until resolved or explicitly deferred. G7, G10, and G11 restrictions remain binding.

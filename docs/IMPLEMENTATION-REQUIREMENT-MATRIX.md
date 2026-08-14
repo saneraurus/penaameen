@@ -199,3 +199,22 @@
 - Requirement, IA, architecture, data, and design source statuses remain authoritative.
 - A mapped Phase 6 rule is mandatory for future code but does not resolve provider/client/source-data decisions.
 - New implementation rule or feature must update this matrix and all affected contract/decision/risk/test documents.
+
+## 4. Phase 7 Foundation Implementation Evidence
+
+The following entries identify real foundation code and tests. They do **not** mark the related product requirement complete; product, provider, source-data, and policy scope remains deferred or blocked.
+
+| Foundation unit | Requirement support | IA / architecture boundary | Implementation location | Tests / validation evidence | Status |
+|---|---|---|---|---|---|
+| Configuration validation | REQ-NFR-004, REQ-NFR-008 | Server configuration boundary | `src/application/config/config.ts` | `tests/unit/config.test.ts`; typecheck/build | IMPLEMENTED FOUNDATION |
+| Error/result model | REQ-NFR-006, REQ-NFR-007 | API/error recovery boundary | `src/application/errors/application-error.ts` | `tests/unit/application-error.test.ts` | IMPLEMENTED FOUNDATION |
+| Authorization primitives | REQ-USR-002, REQ-USR-003, REQ-ADM-011, REQ-ACC-010 | Customer ownership and staff capability boundary | `src/application/authorization/authorization-service.ts` | `tests/security/authorization.test.ts` | IMPLEMENTED FOUNDATION |
+| Idempotency boundary | REQ-COM-005, REQ-PAY-009, REQ-SHP-009 | Order/payment/shipment reliability boundary | `src/application/idempotency/idempotent-command.ts` | `tests/integration/idempotent-command.test.ts` | IMPLEMENTED FOUNDATION |
+| Provider-neutral ports | REQ-PAY-001, REQ-SHP-008, REQ-NTF-006, REQ-SRH-006 | Port/adapter boundaries | `src/application/ports/*` | `tests/contract/provider-ports.test.ts`; TEST ONLY doubles | IMPLEMENTED FOUNDATION; adapters BLOCKED |
+| Security helpers | REQ-NFR-004, REQ-SEO-006, REQ-SEO-011 | Redirect/upload/log redaction boundary | `src/application/security/*`, `src/application/observability/redaction.ts` | `tests/security/security-boundaries.test.ts`; regression tests | IMPLEMENTED FOUNDATION |
+| Observability primitives | REQ-NFR-007, REQ-ANL-003 | Correlation/log/audit/job boundary | `src/application/observability/*`, `src/domain/audit/*`, `src/application/services/job-context.ts` | typecheck/lint/manual health response inspection | IMPLEMENTED FOUNDATION |
+| Public shell/state components | REQ-NFR-003, REQ-NFR-005, REQ-PAG-001, REQ-PAG-019 | Public route/design state boundary | `src/app/*`, `src/presentation/*` | component/accessibility/performance/build/manual smoke tests | IMPLEMENTED FOUNDATION |
+| Safe SEO foundation | REQ-NFR-002, REQ-SEO-003, REQ-SEO-011 | Metadata/noindex foundation boundary | `src/presentation/foundation-metadata.ts`, route metadata | `tests/performance/foundation-metadata.test.ts`; build | IMPLEMENTED FOUNDATION; production metadata BLOCKED |
+| Migration validation primitive | REQ-SEO-001, REQ-MVP-004 | Import/quarantine boundary | `src/application/services/migration-validation.ts` | `tests/migration/import-validation.test.ts` | IMPLEMENTED FOUNDATION; migration BLOCKED |
+| Health/API delivery boundary | REQ-NFR-006, REQ-NFR-007 | Versioned API/correlation boundary | `src/app/api/v1/health/route.ts`, service | unit test/build/manual HTTP smoke | IMPLEMENTED FOUNDATION |
+| Test/tooling foundation | REQ-NFR-008, REQ-MVP-004 | Quality/CI preparation boundary | `package.json`, `vitest.config.ts`, test suites | 28 Vitest tests; lint/typecheck/build/audit | IMPLEMENTED FOUNDATION; CI provider BLOCKED |
