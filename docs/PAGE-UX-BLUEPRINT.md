@@ -1,0 +1,61 @@
+# PENA AMEEN Page UX Blueprint
+
+**Phase:** 5 — Design System & UX Blueprint
+
+**Status:** UX governance for Phase 2 routes. This document defines task hierarchy and states, not visual mockups, layouts in pixels, components in code, or provider-specific flows.
+
+## 1. Public/customer-visible route patterns
+
+| Route ID / path | Page purpose and user intent | Required hierarchy/content | Primary CTA | Secondary CTA | Trust/commerce/SEO elements | Responsive behavior | Required states | Dependencies |
+|---|---|---|---|---|---|---|---|---|
+| R-PUB-001 `/` | Orient visitor to PENA AMEEN, Shop, Education, Branches, and Help | Brand/method context → discovery paths → approved trust/community → support | Explore Shop | Explore Education | Approved brand phrase, methods, selected products/content, canonical metadata | Stack primary paths; preserve direct Shop/Search/Cart access | loading; partial content; missing media; error | Approved brand/content/media/SEO |
+| R-PUB-002 `/shop/` | Browse eligible PENA AMEEN catalog | Shop identity → category/search/refinement → product results | View product | Search/refine | Product cards, retained categories, honest availability, SEO archive context | Product grid/list adapts; filters remain reachable | loading; empty; no result; unavailable; error | Catalog/taxonomy/inventory/search |
+| R-PUB-003 `/product-category/[slug]/` | Browse a meaningful retained category | Category identity/context → product list → relevant education link | View product | Browse Shop | Category description/SEO, product count only if validated, legacy route context | Grid/list and filter context stack | loading; empty; archived/redirect; error | Category treatment, catalog, SEO |
+| R-PUB-004 `/product/[slug]/` | Evaluate and add an eligible product | Identity → media → price/availability → selection/package → action → context | Add to cart | View category/education | Approved images, product data, price/sale context, category, SEO, policy/help | Gallery/decision details stack in task order | loading; unavailable; option incomplete; price changed; add error | Product/media/inventory/variant/package/SEO |
+| R-PUB-005 `/product-tag/[slug]/` | Serve approved retained tag intent only | Tag identity or redirect/merge context | Browse relevant target | Shop | Explicit archive/redirect/noindex treatment | Simple context/recovery; no tag cloud overload | empty; unavailable; redirected | Tag decision/SEO mapping |
+| R-PUB-006 `/search/` | Search public product/content context | Query → result types → refinement → direct destination | Submit search | Browse Shop/Education | Non-indexable query state; type labels; safe result context | Query/results/filter access remains visible compact | empty query; loading; no result; error | Search scope/relevance/data |
+| R-PUB-007 `/education/` | Orient learning/education discovery | Education purpose → AL-BARQY/ACM → articles/resources → related commerce | Explore a hub | Browse articles | Approved education context, semantic internal links, SEO hub metadata | Sequential resource sections compact | loading; empty; partial; error | Hub content/brand/SEO approval |
+| R-PUB-008 `/education/al-barqy/` | Explain AL-BARQY and route to relevant resources/products | Method context → resources/articles → retained product category/products | Explore AL-BARQY products | Read article | Distinct hub role; no duplicate category grid; approved claims | Context/resources/products stack | loading; unavailable; partial; error | CDR-027, content/product relations, SEO |
+| R-PUB-009 `/education/acm/` | Explain ACM and route to approved resources/products | Method context → resources/articles → product family context | Explore ACM resources/products | Read article | Distinct hub; no unsupported ACM category claim | Context/resources/products stack | loading; unavailable; partial; error | CDR-027, catalog relation, SEO |
+| R-PUB-010 `/blog/` | Browse retained educational articles | Archive identity → categories/context → article list | Read article | Explore Education | Article metadata/context, pagination, SEO archive | Cards/list stack; filters secondary | loading; empty; error | Content inventory/category decision |
+| R-PUB-011 `/[article-slug]/` | Read a retained article | Title/context → body/media → related hub/article/product → support | Continue learning | Explore relevant product/category | Root route preservation, author/date if approved, internal links, metadata | Readable measure; rails become inline | loading; missing media; error; archived redirect | Article body/media/SEO source |
+| R-PUB-012 `/category/[slug]/` | Serve retained article category archive | Category identity → article list → related education context | Read article | Explore hub | Explicit archive indexability/merge treatment | List/card stack | empty; redirected; error | Category archive decision/SEO |
+| R-PUB-013 `/tag/[slug]/` | Serve approved article tag legacy intent | Tag identity or redirect/merge context | Relevant target | Blog/Education | No duplicate tag/hub SEO treatment | Simple recovery layout | empty; redirected; unavailable | Tag decision/SEO |
+| R-PUB-014 `/author/[slug]/` | Serve approved author archive only | Author identity/context → eligible articles | Read article | Blog | Author visibility/indexability decision | Compact archive layout | empty; redirected; unavailable | Author policy/content export |
+| R-PUB-015 `/branches/` | Find approved active branches | Branch index/context → branch cards/contact | View branch | Contact | Active/status/local SEO context, no false service claim | List/card stack | loading; empty; unavailable; error | Branch directory/active data |
+| R-PUB-016 `/branches/[slug]/` | Understand approved branch/local context | Branch identity → approved address/contact/context → support links | Contact / view branch context | Explore related approved content | Local data/SEO, media rights, active status | Details stack, map/media optional | loading; inactive/redirect; missing data; error | Branch data/rights/SEO |
+| R-PUB-017 `/events/` | Discover retained approved events | Archive identity → event cards/status/date context | View event | Explore branches | Conditional event SEO/content treatment | List/card stack | loading; empty; unavailable | Event continuation decision |
+| R-PUB-018 `/events/[slug]/` | Understand approved event/recap | Event title/status/date/location → content/media → related context | Approved event action | Back to events/branches | Verified event facts/media/SEO only | Single-column task/content | loading; archived; missing data; error | Event data/rights/route decision |
+| R-PUB-019 `/galeri-kegiatan/` | View approved activity/gallery context | Gallery identity → curated media/captions → related context | Explore branches/events | Contact | Media rights/consent/captions/legacy route treatment | Responsive media sequence, not essential text in image | loading; empty; missing rights; error | Gallery data/rights/SEO |
+| R-PUB-020 `/profile/` | Understand PENA AMEEN organization/profile | Identity → approved story/method/community context → help | Explore Shop/Education | Contact | Preserve route despite About label; approved claims/metadata | Readable content hierarchy compact | loading; partial; error | Source content/brand approval |
+| R-PUB-021 `/contact/` | Reach verified support/contact path | Contact purpose → approved channels/process → privacy/help | Contact PENA AMEEN | FAQ/tracking | Verified channels/hours/policy only | Direct, single-task compact layout | unavailable; error | Support/contact policy |
+| R-PUB-022 `/faq/` | Resolve approved common questions | Topic groups → question/answer → task/help link | Follow relevant task | Contact | Valid FAQ content/structured data only if approved | Expand/collapse must be accessible; readable compact | loading; empty; error | FAQ/policy approval |
+| R-PUB-023 `/legal/privacy/` | Present approved privacy policy | Policy title/version → readable content → support | Read policy | Contact | Legal content/version/effective context when supplied | Readable measure/print-friendly context | unavailable; error | Legal policy |
+| R-PUB-024 `/legal/terms/` | Present approved terms | Policy title/version → readable content → support | Read terms | Contact | Legal content/version/effective context when supplied | Readable measure | unavailable; error | Legal policy |
+| R-PUB-025 `/legal/shipping/` | Present approved shipping policy | Policy title → approved service/handling guidance → support | Read shipping policy | Contact/tracking | No provider/service/time promise without policy | Readable measure | unavailable; error | Shipping/legal policy |
+| R-PUB-026 `/legal/returns-refunds/` | Present approved return/refund policy | Policy title → process/eligibility guidance → support | Read policy | Contact/order support | No refund/return promise without policy | Readable measure | unavailable; error | Legal/return policy |
+| R-PUB-027 `/cart/` | Review/edit intended purchase | Items → quantity/remove → summary → checkout readiness | Proceed to checkout | Continue shopping | Accurate item snapshot/summary; non-indexable task | Items then summary compact | empty; changed; unavailable; loading; error | Cart/catalog/inventory/pricing |
+| R-PUB-028 `/checkout/` | Submit valid purchase intent | Customer → address → shipping → payment → review | Initiate payment/order | Edit cart/support | Policy/help, truthful state; non-indexable | Focused single-task layout compact | invalid; rate unavailable; processing; retry; session error | Checkout/payment/shipping/account/legal |
+| R-PUB-029 `/order/confirmation/[secure-reference]/` | Understand created/pending/verified outcome | Reference → current state → next fulfillment/tracking/support action | Track order | Continue shopping/support | Verified state only; private/non-indexable | Status/action first compact | pending; success; failed; expired; error | Order/payment/notification/access policy |
+| R-PUB-030 `/tracking/` | Start approved order/shipment lookup | Lookup purpose → approved verification input → support | Find tracking | Contact | Private/non-indexable; no guessable disclosure | Focused lookup form compact | invalid; unavailable; rate limited; error | Lookup/security/order policy |
+| R-PUB-031 `/tracking/[secure-reference]/` | View authorized tracking result | Shipment/order status → timeline/context → support | Contact / view order context | Back to Shop | Verified normalized tracking; private/non-indexable | Status first, timeline/detail follows | loading; processing; unavailable; exception; error | Shipment/tracking/access policy |
+
+## 2. Account UX coverage — 8 private route patterns
+
+| Route family | Purpose and core UX | States/dependencies |
+|---|---|---|
+| `/account/`, `/account/login/`, `/account/register/`, `/account/password-reset/` | Account entry, sign-in, conditional registration/recovery, private overview | Signed out, invalid, session expired, recovery, policy/account provider unknown |
+| `/account/orders/`, `/account/orders/[order-reference]/` | Authorized history/detail and tracking context | Empty history, unauthorized, pending/payment/shipment exception; historical migration conditional |
+| `/account/profile/`, `/account/addresses/` | Approved profile/address self-service | Loading, invalid, saving, success, privacy/retention policy unknown |
+
+## 3. Admin UX coverage — 24 private route patterns
+
+The 24 Phase 2 admin destinations use the task model in `docs/ADMIN-UX.md`: dashboard; products/editor; categories/tags; inventory; orders/detail; fulfillment; payments; customers/detail; content/editor/taxonomy; SEO/redirects; media; branches; events; promotions; analytics; settings/access. Each requires authorization, data ownership, normalized state, validation, audit, error/recovery, and responsive table/form behavior.
+
+## 4. Human-facing page pattern count
+
+- Public/customer-visible patterns: **31**.
+- Account private patterns: **8**.
+- Admin private patterns: **24**.
+- Human-facing UX route patterns covered: **63**.
+- Crawler/system routes (`/sitemap.xml`, `/robots.txt`) are governed by SEO technical architecture and do not require human page UX.

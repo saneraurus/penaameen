@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --surface-canvas: Canvas;
+  --surface-default: Canvas;
+  --surface-subtle: ButtonFace;
+  --text-primary: CanvasText;
+  --text-muted: GrayText;
+  --border-default: GrayText;
+  --interactive-default: LinkText;
+  --interactive-focus: Highlight;
+  --status-success: CanvasText;
+  --status-warning: CanvasText;
+  --status-error: CanvasText;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--interactive-default);
+}
+
+:focus-visible {
+  outline: 3px solid var(--interactive-focus);
+  outline-offset: 3px;
+}
+
+.foundation-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.foundation-container {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+}
+
+.foundation-surface {
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  background: var(--surface-default);
+  padding: 1rem;
+}
+
+.foundation-nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 1rem 0;
+}
+
+.foundation-stack {
+  display: grid;
+  gap: 1rem;
+  padding-block: 2rem;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+}
+
+.skip-link:focus-visible {
+  top: 1rem;
+  z-index: 1;
+  background: var(--surface-default);
+  padding: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
