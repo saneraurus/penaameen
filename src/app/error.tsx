@@ -1,23 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { Container } from "@/presentation/components/foundation/container";
 import { StatusMessage } from "@/presentation/components/foundation/status-message";
 
 type ErrorBoundaryProps = Readonly<{
-  error: Error & { digest?: string };
   reset: () => void;
 }>;
 
-export default function GlobalError({ error, reset }: ErrorBoundaryProps) {
-  useEffect(() => {
-    console.error("foundation_route_error", {
-      name: error.name,
-      digest: error.digest,
-    });
-  }, [error.digest, error.name]);
-
+export default function GlobalError({ reset }: ErrorBoundaryProps) {
   return (
     <Container>
       <div className="foundation-stack">

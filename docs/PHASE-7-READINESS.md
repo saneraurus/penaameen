@@ -45,3 +45,7 @@ The authorized foundation is real, executable, buildable, and tested at all runn
 2. Resolve/authorize CI platform ownership under CDR-028 or explicitly accept local-only validation for this stage.
 3. Review Phase 7 foundation against the applicable G7 restrictions before any expansion.
 4. Do not start Phase 8; provider/migration/production scope remains blocked.
+
+## Completion audit update
+
+The completion audit reran repository validation, package-lock installation, lint, typecheck, unit/integration/contract/component/security/accessibility/performance/migration/regression tests, build, audit, local HTTP smoke, route/SEO header checks, browser discovery, Playwright E2E, and Playwright browser installation. All runnable foundation validation passed. E2E remains `BLOCKED_ENVIRONMENT` because no local compatible browser exists and the browser download repeatedly failed with TLS connection resets. See `docs/PHASE-7-COMPLETION-AUDIT.md`.
