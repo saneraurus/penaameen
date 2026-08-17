@@ -80,7 +80,7 @@ export default function CheckoutAddressPage() {
       user?.fullName ||
       (user?.firstName
         ? `${user.firstName} ${user.lastName || ""}`.trim()
-        : "Pelanggan");
+        : "Ihsan Abdil Haq");
 
     const dynamicDefaultAddress: Address = {
       id: "addr-default-1",
@@ -118,15 +118,15 @@ export default function CheckoutAddressPage() {
         const localSaved = localStorage.getItem("penaameen_checkout_addresses");
         if (localSaved) {
           const parsed: Address[] = JSON.parse(localSaved);
-          if (parsed.length > 0 && parsed[0]) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             setAddresses(parsed);
-            setSelectedAddressId(parsed[0].id);
+            setSelectedAddressId(parsed[0]?.id || dynamicDefaultAddress.id);
             setIsLoadingAddresses(false);
             return;
           }
         }
       } catch {
-        // Use default starter address
+        // Fallback
       }
 
       // Default dynamic address for the active user
@@ -138,7 +138,7 @@ export default function CheckoutAddressPage() {
     loadAddresses();
   }, [isSignedIn, user]);
 
-  // 3. Load Shipping Rates when Address changes
+  // 3. Load Shipping Rates when Address or Cart changes
   useEffect(() => {
     if (!selectedAddressId) {
       setRates([]);
@@ -150,11 +150,31 @@ export default function CheckoutAddressPage() {
       setIsLoadingRates(true);
       setError(null);
       try {
+        const selectedAddr = addresses.find((a) => a.id === selectedAddressId);
+
         const res = await fetch("/api/shipping/rates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ addressId: selectedAddressId }),
+          body: JSON.stringify({
+            addressId: selectedAddressId,
+            destination: selectedAddr
+              ? {
+                  city: selectedAddr.city,
+                  province: selectedAddr.province,
+                  postalCode: selectedAddr.postalCode,
+                }
+              : {
+                  city: "Surabaya",
+                  province: "Jawa Timur",
+                  postalCode: "60238",
+                },
+            items: cartItems.map((item) => ({
+              productId: item.product.id,
+              quantity: item.quantity,
+            })),
+          }),
         });
+
         const data = await res.json();
         const availableRates: ShippingRate[] = data.rates ?? [];
         setRates(availableRates);
@@ -162,14 +182,14 @@ export default function CheckoutAddressPage() {
           setSelectedRate(availableRates[0]);
         }
       } catch {
-        setError("Gagal memuat ongkos kirim");
+        setError("Gagal memuat ongkos kirim. Silakan coba kembali.");
       } finally {
         setIsLoadingRates(false);
       }
     }
 
     loadRates();
-  }, [selectedAddressId]);
+  }, [selectedAddressId, addresses, cartItems]);
 
   // Handle Add Address
   const handleAddAddress = async (e: React.FormEvent) => {
@@ -192,8 +212,8 @@ export default function CheckoutAddressPage() {
       addressLine1: form.addressLine1,
       addressLine2: form.addressLine2 || null,
       city: form.city,
-      province: form.province || "Indonesia",
-      postalCode: form.postalCode || "00000",
+      province: form.province || "Jawa Timur",
+      postalCode: form.postalCode || "60238",
       country: "Indonesia",
       isDefault: addresses.length === 0,
     };
@@ -236,10 +256,30 @@ export default function CheckoutAddressPage() {
       return;
     }
 
+    const selectedAddr = addresses.find((a) => a.id === selectedAddressId);
+
+    // Save selected shipping rate and address to local storage
+    try {
+      localStorage.setItem(
+        "penaameen_checkout_selected_rate",
+        JSON.stringify(selectedRate),
+      );
+      if (selectedAddr) {
+        localStorage.setItem(
+          "penaameen_checkout_selected_address",
+          JSON.stringify(selectedAddr),
+        );
+      }
+    } catch {
+      // Ignore
+    }
+
     const params = new URLSearchParams({
       addressId: selectedAddressId,
-      shippingMethod: `${selectedRate.courier}-${selectedRate.service}`,
+      shippingMethod: `${selectedRate.courierName} - ${selectedRate.service}`,
       shippingCost: String(selectedRate.cost),
+      courierCode: selectedRate.courier,
+      etd: selectedRate.etd,
     });
 
     router.push(`/checkout/payment?${params.toString()}`);
@@ -247,6 +287,21 @@ export default function CheckoutAddressPage() {
 
   const shippingCost = selectedRate?.cost ?? 0;
   const grandTotal = cartTotal + shippingCost;
+
+  const getCourierBadge = (courier: string) => {
+    switch (courier.toLowerCase()) {
+      case "jne":
+        return { bg: "bg-red-50 text-red-700 border-red-200", label: "JNE" };
+      case "jnt":
+        return { bg: "bg-red-600 text-white", label: "J&T" };
+      case "sicepat":
+        return { bg: "bg-amber-500 text-white", label: "SiCepat" };
+      case "pos":
+        return { bg: "bg-orange-600 text-white", label: "POS" };
+      default:
+        return { bg: "bg-primary-100 text-primary-800", label: courier.toUpperCase() };
+    }
+  };
 
   if (!isLoaded || isLoadingAddresses) {
     return (
@@ -291,11 +346,11 @@ export default function CheckoutAddressPage() {
 
             {/* Stepper */}
             <div className="flex items-center gap-2 sm:gap-4 text-xs font-semibold">
-              <div className="flex items-center gap-2 text-primary-700">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white text-[11px] font-bold shadow-xs">
+              <div className="flex items-center gap-2 text-emerald-700">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold shadow-xs">
                   1
                 </span>
-                <span>Alamat & Kurir</span>
+                <span>Alamat &amp; Kurir</span>
               </div>
               <div className="w-6 sm:w-10 h-[2px] bg-supporting-200" />
               <div className="flex items-center gap-2 text-supporting-400">
@@ -316,35 +371,29 @@ export default function CheckoutAddressPage() {
         </div>
       </div>
 
-      <div className="container px-4 mx-auto py-8">
-        {/* Error Alert */}
+      <main className="container px-4 mx-auto mt-8 max-w-6xl">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center justify-between text-sm shadow-xs">
-            <div className="flex items-center gap-2.5">
-              <span className="text-base">⚠️</span>
-              <span>{error}</span>
-            </div>
+          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-center justify-between">
+            <span>{error}</span>
             <button
               onClick={() => setError(null)}
-              className="text-red-500 hover:text-red-700 text-xs font-bold"
+              className="text-red-500 hover:text-red-700 font-bold ml-2"
             >
               ✕
             </button>
           </div>
         )}
 
-        {/* Empty Cart Warning */}
-        {itemCount === 0 ? (
-          <div className="max-w-md mx-auto py-20 text-center bg-white rounded-3xl border border-supporting-200 p-8 shadow-xs">
-            <div className="w-16 h-16 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center mx-auto mb-4 text-2xl">
+        {cartItems.length === 0 ? (
+          <div className="max-w-md mx-auto my-16 bg-white rounded-3xl border border-supporting-200 p-8 text-center shadow-sm">
+            <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-primary-100">
               🛒
             </div>
             <h2 className="text-xl font-serif font-bold text-primary-950 mb-2">
               Keranjang Anda Masih Kosong
             </h2>
             <p className="text-supporting-600 text-sm mb-6 leading-relaxed">
-              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari
-              katalog kami terlebih dahulu.
+              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari katalog kami terlebih dahulu.
             </p>
             <Link
               href="/produk"
@@ -356,7 +405,7 @@ export default function CheckoutAddressPage() {
         ) : (
           <div className="grid gap-8 lg:grid-cols-12 items-start">
             {/* Left Section: Address & Shipping Selection (7 cols) */}
-            <div className="lg:col-span-7 space-y-8">
+            <div className="lg:col-span-7 space-y-6">
               {/* 1. Address Section */}
               <div className="bg-white rounded-3xl border border-supporting-200/90 p-6 md:p-8 shadow-xs">
                 <div className="flex items-center justify-between mb-6">
@@ -377,7 +426,7 @@ export default function CheckoutAddressPage() {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(true)}
-                    className="px-3.5 py-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 text-xs font-semibold rounded-lg border border-primary-200/80 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 text-xs font-semibold rounded-lg border border-primary-200/80 transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>+</span> Tambah Alamat
                   </button>
@@ -392,7 +441,7 @@ export default function CheckoutAddressPage() {
                         key={addr.id}
                         className={`group relative flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                           isSelected
-                            ? "border-primary-600 bg-primary-50/40 shadow-xs ring-1 ring-primary-500/20"
+                            ? "border-emerald-600 bg-emerald-50/40 shadow-xs ring-1 ring-emerald-500/20"
                             : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
                         }`}
                       >
@@ -402,7 +451,7 @@ export default function CheckoutAddressPage() {
                           value={addr.id}
                           checked={isSelected}
                           onChange={() => setSelectedAddressId(addr.id)}
-                          className="mt-1 text-primary-600 focus:ring-primary-500"
+                          className="mt-1 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                         />
 
                         <div className="flex-1 min-w-0">
@@ -432,33 +481,38 @@ export default function CheckoutAddressPage() {
                 </div>
               </div>
 
-              {/* 2. Courier Section */}
+              {/* 2. Courier Selection Section */}
               <div className="bg-white rounded-3xl border border-supporting-200/90 p-6 md:p-8 shadow-xs">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-700 font-bold text-sm border border-primary-100">
-                    🚚
-                  </span>
-                  <div>
-                    <h2 className="text-lg font-serif font-bold text-primary-950">
-                      Pilihan Kurir & Ekspedisi
-                    </h2>
-                    <p className="text-xs text-supporting-500">
-                      Pilih kurir pengiriman yang Anda inginkan
-                    </p>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-700 font-bold text-sm border border-primary-100">
+                      🚚
+                    </span>
+                    <div>
+                      <h2 className="text-lg font-serif font-bold text-primary-950">
+                        Pilihan Kurir &amp; Ekspedisi
+                      </h2>
+                      <p className="text-xs text-supporting-500">
+                        Pilih kurir pengiriman yang Anda inginkan
+                      </p>
+                    </div>
                   </div>
+
+                  <span className="text-[11px] font-semibold text-supporting-500 bg-supporting-100 px-2.5 py-1 rounded-md hidden sm:inline">
+                    Asal: Surabaya (Penerbit Pena Ameen)
+                  </span>
                 </div>
 
                 {isLoadingRates ? (
-                  <div className="py-8 text-center space-y-3">
-                    <div className="animate-spin rounded-full h-8 w-8 border-3 border-primary-600 border-t-transparent mx-auto" />
-                    <p className="text-xs text-supporting-500 font-medium">
-                      Menghitung ongkos kirim terbaik...
+                  <div className="py-10 text-center space-y-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-3 border-emerald-600 border-t-transparent mx-auto" />
+                    <p className="text-xs text-supporting-600 font-semibold">
+                      Menghitung tarif kurir &amp; estimasi terbaik...
                     </p>
                   </div>
                 ) : rates.length === 0 ? (
-                  <div className="p-6 bg-supporting-50 rounded-2xl text-center text-xs text-supporting-600">
-                    Silakan pilih alamat di atas untuk melihat tarif kurir yang
-                    tersedia.
+                  <div className="p-6 bg-supporting-50 rounded-2xl text-center text-xs text-supporting-600 space-y-2">
+                    <p>Silakan pilih alamat di atas untuk melihat tarif kurir yang tersedia.</p>
                   </div>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -468,12 +522,14 @@ export default function CheckoutAddressPage() {
                         selectedRate?.courier === rate.courier &&
                         selectedRate?.service === rate.service;
 
+                      const badge = getCourierBadge(rate.courier);
+
                       return (
                         <label
                           key={key}
                           className={`relative flex flex-col justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                             isSelected
-                              ? "border-primary-600 bg-primary-50/50 shadow-xs ring-1 ring-primary-500/20"
+                              ? "border-emerald-600 bg-emerald-50/40 shadow-xs ring-2 ring-emerald-500/20"
                               : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
                           }`}
                         >
@@ -485,30 +541,40 @@ export default function CheckoutAddressPage() {
                                   name="courierRate"
                                   checked={isSelected}
                                   onChange={() => setSelectedRate(rate)}
-                                  className="text-primary-600 focus:ring-primary-500"
+                                  className="text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                                 />
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.bg}`}>
+                                  {badge.label}
+                                </span>
                                 <span className="text-xs font-bold text-primary-950 uppercase tracking-wide">
                                   {rate.courierName}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary-100/70 text-primary-800">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary-100 text-primary-800">
                                 {rate.service}
                               </span>
                             </div>
 
-                            <p className="text-xs text-supporting-500 line-clamp-1 mb-1">
+                            <p className="text-xs text-supporting-600 line-clamp-1 mb-1">
                               {rate.description || "Layanan Reguler"}
                             </p>
-                            <p className="text-[11px] text-supporting-400 font-medium flex items-center gap-1">
-                              ⏱️ Estimasi: {rate.etd} hari
-                            </p>
+                            <div className="flex items-center justify-between text-[11px] text-supporting-500">
+                              <span className="flex items-center gap-1 font-medium">
+                                ⏱️ Estimasi: {rate.etd} hari
+                              </span>
+                              {rate.note && (
+                                <span className="text-[10px] text-emerald-700 bg-emerald-100/80 px-1.5 py-0.2 rounded font-semibold">
+                                  {rate.note}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           <div className="mt-3 pt-2.5 border-t border-supporting-100/80 flex items-center justify-between">
-                            <span className="text-[10px] text-supporting-400 font-medium">
-                              Ongkos Kirim
+                            <span className="text-[10px] text-supporting-400 font-semibold uppercase tracking-wider">
+                              Ongkir
                             </span>
-                            <span className="text-sm font-bold text-primary-800">
+                            <span className="text-sm font-bold text-emerald-700 font-serif">
                               Rp{rate.cost.toLocaleString("id-ID")}
                             </span>
                           </div>
@@ -545,34 +611,32 @@ export default function CheckoutAddressPage() {
                           }
                           alt={item.product.name}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-semibold text-primary-950 truncate">
+                        <h4 className="text-xs font-bold text-primary-950 truncate mb-1">
                           {item.product.name}
                         </h4>
-                        <p className="text-[11px] text-supporting-500">
-                          Rp{Number(item.product.price).toLocaleString("id-ID")}{" "}
-                          x {item.quantity}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-supporting-500 font-medium">
+                            Rp{item.product.price.toLocaleString("id-ID")} x {item.quantity}
+                          </span>
+                        </div>
 
                         {/* Quantity controls */}
                         <div className="flex items-center gap-2 mt-1.5">
-                          <div className="flex items-center border border-supporting-200 rounded-md overflow-hidden bg-background-50">
+                          <div className="flex items-center border border-supporting-200 rounded-lg overflow-hidden">
                             <button
                               type="button"
-                              onClick={() => {
-                                if (item.quantity > 1) {
-                                  updateQuantity(
-                                    item.product.id,
-                                    item.quantity - 1,
-                                  );
-                                } else {
-                                  removeFromCart(item.product.id);
-                                }
-                              }}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.product.id,
+                                  Math.max(1, item.quantity - 1),
+                                )
+                              }
                               className="px-2 py-0.5 text-xs text-supporting-600 hover:bg-supporting-200 transition-colors"
                             >
                               -
@@ -624,7 +688,7 @@ export default function CheckoutAddressPage() {
 
                   <div className="flex justify-between text-supporting-600">
                     <span>Biaya Pengiriman</span>
-                    <span className="font-semibold text-primary-950">
+                    <span className="font-semibold text-emerald-700">
                       {shippingCost > 0
                         ? `Rp${shippingCost.toLocaleString("id-ID")}`
                         : "Pilih kurir"}
@@ -644,10 +708,10 @@ export default function CheckoutAddressPage() {
                         Total Pembayaran
                       </span>
                       <span className="text-[10px] text-supporting-400">
-                        Sudah termasuk PPN & Ongkir
+                        Sudah termasuk PPN &amp; Ongkir
                       </span>
                     </div>
-                    <span className="text-xl font-bold text-primary-700">
+                    <span className="text-xl font-bold text-emerald-700 font-serif">
                       Rp{grandTotal.toLocaleString("id-ID")}
                     </span>
                   </div>
@@ -658,180 +722,165 @@ export default function CheckoutAddressPage() {
                   type="button"
                   onClick={handleContinueToPayment}
                   disabled={!selectedAddressId || !selectedRate}
-                  className="w-full mt-6 py-3.5 px-6 bg-primary-600 hover:bg-primary-700 disabled:bg-supporting-300 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-2xl transition-all shadow-md shadow-primary-900/10 active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full mt-6 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-supporting-300 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
                   <span>Lanjut ke Pembayaran</span>
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
+                  <span>→</span>
                 </button>
 
                 {/* Trust Badges */}
-                <div className="mt-6 pt-4 border-t border-supporting-100 space-y-2">
-                  <div className="flex items-center gap-2 text-[11px] text-supporting-500">
+                <div className="mt-4 pt-4 border-t border-supporting-100/80 space-y-1.5 text-[11px] text-supporting-500">
+                  <div className="flex items-center gap-2">
                     <span>🔒</span>
-                    <span>Transaksi aman & terverifikasi oleh Midtrans</span>
+                    <span>Transaksi aman &amp; terverifikasi oleh Midtrans / QRIS</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-supporting-500">
-                    <span>📦</span>
-                    <span>Produk resmi bergaransi Pena Ameen</span>
+                  <div className="flex items-center gap-2">
+                    <span>🛡️</span>
+                    <span>Produk resmi bergaransi Penerbit Pena Ameen</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Add Address Modal */}
+      {/* Modal Add Address */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-supporting-100">
-              <h3 className="text-lg font-serif font-bold text-primary-950">
-                Tambah Alamat Baru
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-supporting-100">
+              <h3 className="text-base font-bold text-primary-950 font-serif">
+                Tambah Alamat Pengiriman Baru
               </h3>
               <button
+                type="button"
                 onClick={() => setShowAddModal(false)}
-                className="text-supporting-400 hover:text-supporting-600 text-lg font-bold"
+                className="w-7 h-7 rounded-full bg-supporting-100 hover:bg-supporting-200 text-supporting-700 flex items-center justify-center text-xs font-bold cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleAddAddress} className="space-y-4">
+            <form onSubmit={handleAddAddress} className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                  Label Alamat
+                <label className="block text-supporting-700 font-semibold mb-1">
+                  Label Alamat (cth: Rumah, Kantor)
                 </label>
                 <input
                   type="text"
-                  placeholder="Contoh: Rumah, Kantor, Toko"
                   value={form.label}
                   onChange={(e) => setForm({ ...form, label: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
-                  required
+                  placeholder="Rumah"
+                  className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                    Nama Penerima
+                  <label className="block text-supporting-700 font-semibold mb-1">
+                    Nama Penerima *
                   </label>
                   <input
                     type="text"
-                    placeholder="Nama lengkap"
+                    required
                     value={form.recipientName}
                     onChange={(e) =>
                       setForm({ ...form, recipientName: e.target.value })
                     }
-                    className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
-                    required
+                    placeholder="Nama Lengkap"
+                    className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                    Nomor Telepon / WhatsApp
+                  <label className="block text-supporting-700 font-semibold mb-1">
+                    No. WhatsApp/HP *
                   </label>
                   <input
                     type="tel"
-                    placeholder="08123456789"
-                    value={form.phone}
-                    onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
-                    }
-                    className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
                     required
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="08123456789"
+                    className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                  Alamat Lengkap
+                <label className="block text-supporting-700 font-semibold mb-1">
+                  Alamat Lengkap *
                 </label>
                 <textarea
+                  required
                   rows={2}
-                  placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan"
                   value={form.addressLine1}
                   onChange={(e) =>
                     setForm({ ...form, addressLine1: e.target.value })
                   }
-                  className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none resize-none"
-                  required
+                  placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan/kecamatan"
+                  className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                    Kota/Kab
+                  <label className="block text-supporting-700 font-semibold mb-1">
+                    Kota/Kab *
                   </label>
                   <input
                     type="text"
-                    placeholder="Surabaya"
+                    required
                     value={form.city}
                     onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    className="w-full px-3 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
-                    required
+                    placeholder="Surabaya"
+                    className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
-                    Provinsi
+                  <label className="block text-supporting-700 font-semibold mb-1">
+                    Provinsi *
                   </label>
                   <input
                     type="text"
-                    placeholder="Jawa Timur"
+                    required
                     value={form.province}
                     onChange={(e) =>
                       setForm({ ...form, province: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
-                    required
+                    placeholder="Jawa Timur"
+                    className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                  <label className="block text-supporting-700 font-semibold mb-1">
                     Kode Pos
                   </label>
                   <input
                     type="text"
-                    placeholder="60238"
                     value={form.postalCode}
                     onChange={(e) =>
                       setForm({ ...form, postalCode: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
-                    required
+                    placeholder="60238"
+                    className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-3 border-t border-supporting-100">
-                <button
-                  type="submit"
-                  className="flex-1 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
-                >
-                  Simpan Alamat
-                </button>
+              <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-5 py-2.5 border border-supporting-300 text-supporting-600 hover:bg-supporting-50 text-xs font-semibold rounded-xl transition-colors"
+                  className="px-4 py-2 rounded-xl text-supporting-600 hover:bg-supporting-100 font-semibold cursor-pointer"
                 >
                   Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer"
+                >
+                  Simpan Alamat
                 </button>
               </div>
             </form>

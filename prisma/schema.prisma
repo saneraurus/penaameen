@@ -21,6 +21,7 @@ model User {
   addresses     Address[]
   orders        Order[]
   cart          Cart?
+  chatSessions  ChatSession[]
 }
 
 model Address {
@@ -302,4 +303,27 @@ model Testimonial {
   isActive       Boolean @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String?       @unique
+  user      User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String        @unique // stable UUID shared with the client
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String // user | assistant
+  content   String
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
 }

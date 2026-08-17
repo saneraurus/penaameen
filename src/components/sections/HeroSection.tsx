@@ -125,7 +125,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-24 md:pb-28 bg-primary-950 text-white border-b border-supporting-200/40">
+    <section className="relative overflow-hidden pt-8 pb-12 sm:pt-12 sm:pb-16 md:pt-16 md:pb-20 bg-primary-950 text-white border-b border-supporting-200/40">
       {/* Background Image with Dark Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -142,30 +142,30 @@ export function HeroSection() {
 
       <div className="container relative z-10 px-4 sm:px-6 mx-auto max-w-5xl">
         {/* Main Headline & Subtitle */}
-        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8 pt-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-3 border border-white/15 backdrop-blur-md">
+        <div className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 pt-1">
+          <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 text-emerald-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2.5 border border-white/15 backdrop-blur-md">
             Penerbit Resmi • Sejak 1995
           </span>
 
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white tracking-tight leading-[1.15] mb-3 drop-shadow-md">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white tracking-tight leading-[1.18] mb-2.5 drop-shadow-md">
             Kuasai Membaca &amp; Mengaji.{" "}
-            <span className="block mt-1 bg-gradient-to-r from-emerald-300 via-amber-200 to-emerald-200 bg-clip-text text-transparent">
+            <span className="block mt-0.5 bg-gradient-to-r from-emerald-300 via-amber-200 to-emerald-200 bg-clip-text text-transparent">
               Lebih Cepat, Tepat &amp; Anti-Lupa.
             </span>
           </h1>
 
-          <p className="text-xs sm:text-sm md:text-base text-white/85 leading-relaxed max-w-2xl mx-auto font-normal">
+          <p className="text-xs sm:text-sm text-white/85 leading-relaxed max-w-2xl mx-auto font-normal">
             Metode resmi <strong className="text-amber-300 font-semibold">AL-BARQY (200 Menit)</strong> dan <strong className="text-amber-300 font-semibold">ACM (Tanpa Mengeja)</strong> dari Penerbit Pena Ameen. Teruji membimbing jutaan santri, siswa, dan keluarga di Indonesia.
           </p>
         </div>
 
         {/* Action Buttons & Search */}
-        <div className="flex flex-col items-center gap-3.5 max-w-lg mx-auto mb-8 sm:mb-12">
+        <div className="flex flex-col items-center gap-2.5 max-w-lg mx-auto mb-6 sm:mb-8">
           {/* Primary Action Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
             <Link
               href="/produk"
-              className="w-full py-3 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
+              className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
             >
               <span>Jelajahi Paket &amp; Produk</span>
               <span>→</span>
@@ -173,7 +173,7 @@ export function HeroSection() {
 
             <Link
               href="/metode"
-              className="w-full py-3 px-5 bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-bold rounded-xl border border-white/25 backdrop-blur-md transition-all flex items-center justify-center text-center"
+              className="w-full py-2.5 px-4 bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-bold rounded-xl border border-white/25 backdrop-blur-md transition-all flex items-center justify-center text-center"
             >
               Pelajari 2 Metode
             </Link>
@@ -193,10 +193,10 @@ export function HeroSection() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari paket Al-Barqy, ACM, Flashcard..."
-              className="w-full pl-10 pr-20 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder-white/60 border border-white/20 rounded-xl text-xs sm:text-sm backdrop-blur-md outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
+              className="w-full pl-9 pr-18 py-2 sm:py-2.5 bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder-white/60 border border-white/20 rounded-xl text-xs sm:text-sm backdrop-blur-md outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
             />
             <svg
-              className="absolute left-3.5 top-3 sm:top-3.5 h-4 w-4 text-emerald-300 pointer-events-none"
+              className="absolute left-3 top-2.5 sm:top-3 h-4 w-4 text-emerald-300 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -210,7 +210,7 @@ export function HeroSection() {
             </svg>
             <button
               type="submit"
-              className="absolute right-1.5 top-1.5 bottom-1.5 px-3.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center cursor-pointer"
+              className="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center cursor-pointer"
             >
               Cari
             </button>
@@ -220,14 +220,14 @@ export function HeroSection() {
         {/* Interactive Showcase Tabs Component */}
         <div className="max-w-4xl mx-auto">
           {/* Scrollable Tab Navigation */}
-          <div className="flex items-center justify-start sm:justify-center gap-1.5 p-1 bg-primary-900/80 backdrop-blur-md border border-white/15 rounded-2xl mb-5 overflow-x-auto scrollbar-none">
+          <div className="flex items-center justify-start sm:justify-center gap-1.5 p-1 bg-primary-900/80 backdrop-blur-md border border-white/15 rounded-2xl mb-4 overflow-x-auto scrollbar-none">
             {showcaseTabs.map((tab) => {
               const isActive = tab.id === activeTabId;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTabId(tab.id)}
-                  className={`relative px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 cursor-pointer flex-shrink-0 ${
+                  className={`relative px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 cursor-pointer flex-shrink-0 ${
                     isActive
                       ? "text-primary-950 font-bold shadow-xs"
                       : "text-white/80 hover:text-white hover:bg-white/10"
@@ -244,7 +244,7 @@ export function HeroSection() {
                       }}
                     />
                   )}
-                  <span className="relative z-10 text-sm">{tab.icon}</span>
+                  <span className="relative z-10 text-xs sm:text-sm">{tab.icon}</span>
                   <span className="relative z-10">{tab.label}</span>
                 </button>
               );
@@ -259,31 +259,31 @@ export function HeroSection() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: shouldReduceMotion ? 0.01 : 0.25, ease: "easeOut" }}
-              className="bg-primary-900/90 backdrop-blur-xl border border-white/20 rounded-3xl p-5 sm:p-7 md:p-8 shadow-2xl overflow-hidden"
+              className="bg-primary-900/90 backdrop-blur-xl border border-white/20 rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 shadow-2xl overflow-hidden"
             >
-              <div className="grid gap-6 lg:grid-cols-12 lg:gap-8 items-center">
+              <div className="grid gap-4 sm:gap-6 lg:grid-cols-12 items-center">
                 {/* Left Showcase Copy & Highlights */}
                 <div className="lg:col-span-7 flex flex-col justify-between">
                   <div>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold mb-2.5">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] sm:text-[11px] font-bold mb-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       {activeTab.badge}
                     </span>
 
-                    <h2 className="text-lg sm:text-2xl font-serif font-bold text-white mb-2 leading-snug">
+                    <h2 className="text-base sm:text-xl md:text-2xl font-serif font-bold text-white mb-1.5 leading-snug">
                       {activeTab.title}
                     </h2>
 
-                    <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+                    <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-3">
                       {activeTab.description}
                     </p>
 
                     {/* Feature Highlights Pills */}
-                    <div className="flex flex-wrap gap-1.5 mb-5">
+                    <div className="flex flex-wrap gap-1.5 mb-3.5">
                       {activeTab.highlights.map((highlight, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-[11px] sm:text-xs text-white/90 font-medium"
+                          className="flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-lg bg-white/10 border border-white/15 text-[10px] sm:text-xs text-white/90 font-medium"
                         >
                           <span className="text-emerald-400 font-bold">✓</span>
                           <span>{highlight}</span>
@@ -293,10 +293,10 @@ export function HeroSection() {
                   </div>
 
                   {/* Tab Action CTAs */}
-                  <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-white/10">
+                  <div className="flex flex-wrap items-center gap-2 pt-2.5 border-t border-white/10">
                     <Link
                       href={activeTab.ctaHref}
-                      className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-primary-950 text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5"
+                      className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-primary-950 text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5"
                     >
                       <span>{activeTab.ctaText}</span>
                       <span>→</span>
@@ -304,7 +304,7 @@ export function HeroSection() {
 
                     <Link
                       href={activeTab.secondaryCtaHref}
-                      className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium rounded-xl border border-white/20 transition-colors"
+                      className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium rounded-xl border border-white/20 transition-colors"
                     >
                       {activeTab.secondaryCtaText}
                     </Link>
@@ -313,7 +313,7 @@ export function HeroSection() {
 
                 {/* Right Showcase Visual Image */}
                 <div className="lg:col-span-5">
-                  <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden border border-white/25 shadow-lg bg-primary-800/80">
+                  <div className="relative aspect-[16/10] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden border border-white/25 shadow-lg bg-primary-800/80">
                     <Image
                       src={`${activeTab.image}?v=20260817b`}
                       alt={activeTab.imageAlt}
@@ -322,11 +322,11 @@ export function HeroSection() {
                       priority
                       className="object-cover"
                     />
-                    <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-primary-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 flex items-center justify-between text-xs text-white">
-                      <span className="font-semibold text-emerald-300 text-[11px] truncate">
+                    <div className="absolute bottom-2 left-2 right-2 bg-primary-950/90 backdrop-blur-md px-2.5 py-1 rounded-lg sm:rounded-xl border border-white/20 flex items-center justify-between text-xs text-white">
+                      <span className="font-semibold text-emerald-300 text-[10px] sm:text-[11px] truncate">
                         {activeTab.label}
                       </span>
-                      <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded text-white font-bold">
+                      <span className="text-[9px] sm:text-[10px] bg-white/20 px-1.5 py-0.5 rounded text-white font-bold">
                         Orisinal
                       </span>
                     </div>

@@ -311,7 +311,13 @@ function calculateStandardIndonesianRates(
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
+    let userId: string | null = null;
+    try {
+      const authObj = await auth();
+      userId = authObj?.userId ?? null;
+    } catch {
+      // Unauthenticated / public rates calculation
+    }
 
     const body = await request.json();
     const parsed = shippingRateSchema.parse(body);
@@ -321,12 +327,16 @@ export async function POST(request: Request) {
 
     // 1. Resolve address destination if addressId was provided
     if (parsed.addressId) {
-      const address = await prisma.address.findFirst({
-        where: { id: parsed.addressId },
-      });
-      if (address) {
-        destinationCity = destinationCity || address.city;
-        destinationProvince = destinationProvince || address.province;
+      try {
+        const address = await prisma.address.findFirst({
+          where: { id: parsed.addressId },
+        });
+        if (address) {
+          destinationCity = destinationCity || address.city;
+          destinationProvince = destinationProvince || address.province;
+        }
+      } catch {
+        // Ignore DB lookup error
       }
     }
 
@@ -366,10 +376,19 @@ export async function POST(request: Request) {
     }
 
     // 3. Check Live RajaOngkir API Configuration
-    const settings = getApiSettings();
-    const apiKey = settings.rajaongkir?.apiKey || process.env.RAJAONGKIR_API_KEY;
-    const originCityId = settings.rajaongkir?.originCityId || "444"; // 444 = Surabaya
-    const enabledCouriers = (settings.rajaongkir?.enabledCouriers || ["jne", "jnt", "pos"]).filter(Boolean);
+    let apiKey = process.env.RAJAONGKIR_API_KEY || "";
+    let originCityId = "444"; // 444 = Surabaya
+    let enabledCouriers = ["jne", "jnt", "pos", "sicepat"];
+    try {
+      const settings = getApiSettings();
+      apiKey = settings.rajaongkir?.apiKey || apiKey;
+      originCityId = settings.rajaongkir?.originCityId || originCityId;
+      if (settings.rajaongkir?.enabledCouriers && settings.rajaongkir.enabledCouriers.length > 0) {
+        enabledCouriers = settings.rajaongkir.enabledCouriers.filter(Boolean);
+      }
+    } catch {
+      // Ignore settings file error
+    }
 
     // If API key exists, attempt live API fetch
     if (apiKey && apiKey.length > 10) {
@@ -437,7 +456,7 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
-    console.error("Error in shipping rates API:", error);
+    console.error("SHIPPING_RATE_ERROR:", error instanceof Error ? error.stack : error);
 
     // Ultimate fallback so checkout never breaks
     const fallbackRates = calculateStandardIndonesianRates(
