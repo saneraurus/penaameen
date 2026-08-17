@@ -25,6 +25,9 @@ describe("clerk-auth capability mapping", () => {
     expect(caps.has("orders:transition")).toBe(true);
     expect(caps.has("access:write")).toBe(true);
     expect(caps.has("audit:read")).toBe(true);
+    expect(caps.has("notifications:read")).toBe(true);
+    expect(caps.has("notifications:write")).toBe(true);
+    expect(caps.has("system:control")).toBe(true);
   });
 
   it("product_manager cannot read orders", () => {

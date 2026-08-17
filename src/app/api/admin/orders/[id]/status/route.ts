@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
 import { auditStore } from "@/infrastructure/audit";
 import { recordStaffAudit } from "@/application/audit/audit-store";
-import { getOrderById, registerLiveOrder } from "@/lib/admin/orders";
+import { getOrderById } from "@/lib/admin/orders";
 import { prisma } from "@/lib/prisma";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
@@ -101,11 +101,8 @@ export async function PATCH(
         },
       });
     } catch {
-      // DB unavailable: file store below remains the source of truth.
+      // DB unavailable - status change cannot be persisted
     }
-
-    // Save to persistent file store
-    registerLiveOrder(order);
 
     await recordStaffAudit(auditStore, actor, {
       action: "order.status",

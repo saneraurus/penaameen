@@ -31,13 +31,17 @@ const CONTROLS_FILE = path.join(
   "src/data/system_controls.json",
 );
 
-function loadFileControls(): Partial<Record<SystemControlKey, boolean>> {
+type StoredControl =
+  | boolean
+  | { value: boolean; updatedById?: string | null; updatedAt?: string | null };
+
+function loadFileControls(): Partial<Record<SystemControlKey, StoredControl>> {
   try {
     if (fs.existsSync(CONTROLS_FILE)) {
       const raw = fs.readFileSync(CONTROLS_FILE, "utf-8");
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === "object") {
-        return parsed as Partial<Record<SystemControlKey, boolean>>;
+        return parsed as Partial<Record<SystemControlKey, StoredControl>>;
       }
     }
   } catch (e) {
@@ -47,7 +51,7 @@ function loadFileControls(): Partial<Record<SystemControlKey, boolean>> {
 }
 
 function saveFileControls(
-  values: Partial<Record<SystemControlKey, boolean>>,
+  values: Partial<Record<SystemControlKey, StoredControl>>,
 ): void {
   try {
     const dir = path.dirname(CONTROLS_FILE);
@@ -77,16 +81,28 @@ export async function getSystemControls(): Promise<SystemControlState[]> {
 
   return SYSTEM_CONTROL_KEYS.map((key) => {
     const row = rows.find((r) => r.key === key);
+    const stored = fileValues[key];
+    const storedValue =
+      typeof stored === "object" && stored !== null
+        ? stored.value
+        : (stored as boolean | undefined);
     const value =
-      row !== undefined
-        ? row.value
-        : (fileValues[key] ?? false);
+      row !== undefined ? row.value : (storedValue ?? false);
     return {
       key,
       label: SYSTEM_CONTROL_LABELS[key],
       value,
-      updatedById: row?.updatedById ?? null,
-      updatedAt: row?.updatedAt ? row.updatedAt.toISOString() : null,
+      updatedById:
+        row?.updatedById ??
+        (typeof stored === "object" && stored !== null
+          ? stored.updatedById ?? null
+          : null),
+      updatedAt:
+        row?.updatedAt
+          ? row.updatedAt.toISOString()
+          : typeof stored === "object" && stored !== null
+            ? stored.updatedAt ?? null
+            : null,
     };
   });
 }
@@ -116,7 +132,7 @@ export async function setSystemControl(
   }
 
   const values = loadFileControls();
-  values[key] = value;
+  values[key] = { value, updatedById, updatedAt: new Date().toISOString() };
   saveFileControls(values);
   return {
     key,

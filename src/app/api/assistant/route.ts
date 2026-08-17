@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { loadFileOrders } from "@/lib/admin/orders";
 import { buildWebsiteKnowledge } from "@/lib/assistant/knowledge";
 
 export const runtime = "nodejs";
@@ -109,7 +108,6 @@ async function fetchUserOrders(userId: string): Promise<
     status: string;
     total: string;
     createdAt: string;
-    trackingNumber?: string | undefined;
     items: Array<{ name: string; quantity: number }>;
   }>
 > {
@@ -141,34 +139,10 @@ async function fetchUserOrders(userId: string): Promise<
       }
     }
   } catch {
-    // DB unavailable - fall back to file store below
+    // DB unavailable - assistant cannot verify order information
   }
 
-  try {
-    const clerkUser = await currentUser();
-    const email = clerkUser?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
-    if (!email) return [];
-
-    return loadFileOrders()
-      .filter((o) => o.customerEmail.toLowerCase() === email)
-      .slice(0, 10)
-      .map((o) => ({
-        orderNumber: o.orderNumber,
-        status: ORDER_STATUS_LABELS[o.paymentStatus === "paid" ? "PAID" : "PENDING_PAYMENT"] ?? "Diproses",
-        total: String(o.totalAmount),
-        createdAt: new Date(o.createdAt).toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-        ...(o.fulfillmentHistory?.[0]?.trackingNumber
-          ? { trackingNumber: o.fulfillmentHistory[0].trackingNumber }
-          : {}),
-        items: o.items.map((i) => ({ name: i.productName, quantity: i.quantity })),
-      }));
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 function buildSystemPrompt(input: {
@@ -183,7 +157,7 @@ function buildSystemPrompt(input: {
       ? input.orders
           .map((o) => {
             const items = o.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
-            return `- No. Pesanan: ${o.orderNumber} | Status: ${o.status} | Tanggal: ${o.createdAt} | Total: Rp${Number(o.total).toLocaleString("id-ID")} | Item: ${items}${o.trackingNumber ? ` | Resi: ${o.trackingNumber}` : ""}`;
+            return `- No. Pesanan: ${o.orderNumber} | Status: ${o.status} | Tanggal: ${o.createdAt} | Total: Rp${Number(o.total).toLocaleString("id-ID")} | Item: ${items}`;
           })
           .join("\n")
       : "(tidak ada pesanan yang terhubung)";

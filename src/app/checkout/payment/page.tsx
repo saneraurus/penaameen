@@ -15,16 +15,31 @@ declare global {
   }
 }
 
+interface CheckoutAddress {
+  id: string;
+  recipientName?: string;
+  phone?: string;
+  email?: string;
+  addressLine1?: string;
+  addressLine2?: string | null;
+  city?: string;
+  province?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 async function loadSnapScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.snap) return resolve();
-    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true";
+    const isProduction =
+      process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true";
     const snapUrl = isProduction
       ? "https://app.midtrans.com/snap/snap.js"
       : "https://app.sandbox.midtrans.com/snap/snap.js";
     const script = document.createElement("script");
     script.src = snapUrl;
-    script.dataset.clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
+    script.dataset.clientKey =
+      process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
     script.onload = () => resolve();
     script.onerror = () => reject(new Error("Failed to load Midtrans"));
     document.body.appendChild(script);
@@ -38,29 +53,37 @@ function CheckoutPaymentPage() {
   const params = useSearchParams();
   const { items: cartItems, total: cartTotal, clearCart } = useCart();
 
-  const addressId = params.get("addressId") || "addr-default-1";
-  const shippingMethod = params.get("shippingMethod") || "jne-REG";
-  const shippingCost = Number(params.get("shippingCost") || 18000);
+  const addressId = params.get("addressId");
+  const shippingMethod = params.get("shippingMethod");
+  const shippingCostRaw = params.get("shippingCost");
+  const shippingCost = Number(shippingCostRaw ?? 0);
+
+  const checkoutIncomplete =
+    !addressId || !shippingMethod || !shippingCostRaw || Number.isNaN(shippingCost);
 
   const [paymentMethod, setPaymentMethod] = useState<"midtrans" | "manual">("midtrans");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [addressData, setAddressData] = useState<any>(null);
+  const [addressData, setAddressData] = useState<CheckoutAddress | null>(null);
 
   // Auth Guard
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      router.push("/sign-in?redirect_url=" + encodeURIComponent(window.location.pathname + window.location.search));
+      router.push(
+        "/sign-in?redirect_url=" +
+          encodeURIComponent(window.location.pathname + window.location.search),
+      );
     }
   }, [isLoaded, isSignedIn, router]);
 
   // Load selected address details from local storage / API
   useEffect(() => {
+    if (!addressId) return;
     try {
       const saved = localStorage.getItem("penaameen_checkout_addresses");
       if (saved) {
-        const list = JSON.parse(saved);
-        const found = list.find((a: any) => a.id === addressId);
+        const list = JSON.parse(saved) as CheckoutAddress[];
+        const found = list.find((a) => a.id === addressId);
         if (found) setAddressData(found);
       }
     } catch {
@@ -68,51 +91,45 @@ function CheckoutPaymentPage() {
     }
   }, [addressId]);
 
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [modalTab, setModalTab] = useState<"qris" | "va">("qris");
-  const [selectedBank, setSelectedBank] = useState<"bca" | "mandiri" | "bri" | "bni">("bca");
-  const [copied, setCopied] = useState(false);
-  const [currentOrderRef, setCurrentOrderRef] = useState<string>("");
+  const grandTotal = cartTotal + (Number.isNaN(shippingCost) ? 0 : shippingCost);
 
-  const grandTotal = cartTotal + shippingCost;
+  const createLiveOrderOnServer = async () => {
+    const realEmail =
+      user?.primaryEmailAddress?.emailAddress ||
+      user?.emailAddresses?.[0]?.emailAddress ||
+      "";
+    const realName =
+      user?.fullName ||
+      (user?.firstName
+        ? `${user.firstName} ${user.lastName || ""}`.trim()
+        : null) ||
+      addressData?.recipientName ||
+      "";
 
-  const vaNumbers: Record<string, string> = {
-    bca: "88012" + (addressData?.phone ? addressData.phone.slice(-6) : "892019"),
-    mandiri: "89301" + (addressData?.phone ? addressData.phone.slice(-6) : "892019"),
-    bri: "10283" + (addressData?.phone ? addressData.phone.slice(-6) : "892019"),
-    bni: "98801" + (addressData?.phone ? addressData.phone.slice(-6) : "892019"),
-  };
-
-  const createLiveOrderOnServer = async (status = "PAID") => {
-    const realEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || "ihsanzz099@gmail.com";
-    const realName = user?.fullName || (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : null) || addressData?.recipientName || "Ihsan";
+    if (!realEmail || !realName || !addressData || !shippingMethod) {
+      return null;
+    }
 
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          addressId: addressId || "addr-default-1",
-          shippingMethod: shippingMethod || "jne-REG",
+          addressId,
+          shippingMethod,
           shippingCost,
           customerEmail: realEmail,
           customerName: realName,
           items: cartItems.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,
-            price: item.product?.price ? Number(item.product.price) : 150000,
-            name: item.product?.name || `Produk ${item.product.id}`,
+            name: item.product.name,
+            ...(item.product?.price
+              ? { price: Number(item.product.price) }
+              : {}),
             image: item.product?.image,
           })),
-          shippingAddress: addressData || {
-            recipientName: realName,
-            phone: "08123456789",
-            email: realEmail,
-            addressLine1: "Jl. Margorejo Indah No. 12",
-            city: "Surabaya",
-            province: "Jawa Timur",
-            postalCode: "60238",
-          },
+          shippingAddress: addressData,
         }),
       });
       const data = await res.json();
@@ -127,31 +144,36 @@ function CheckoutPaymentPage() {
     setIsProcessing(true);
     setError(null);
 
-    const orderRef = "PA-" + Date.now().toString().slice(-6);
-    setCurrentOrderRef(orderRef);
-
     try {
       // 1. Create order on server
-      const data = await createLiveOrderOnServer("PENDING_PAYMENT");
-      if (data?.orderNumber) {
-        setCurrentOrderRef(data.orderNumber);
+      const data = await createLiveOrderOnServer();
+      if (!data?.orderNumber) {
+        setError(
+          "Pesanan gagal dibuat di server. Silakan coba lagi atau gunakan transfer manual.",
+        );
+        setIsProcessing(false);
+        return;
       }
 
-      // If real Snap token exists on server, load Snap dialog
+      // If a real Snap token exists on server, load the Snap dialog
       if (data?.snapToken) {
         await loadSnapScript();
 
         if (window.snap) {
           window.snap.pay(data.snapToken, {
             onSuccess: () => {
-              saveOrderToLocalHistory(data.orderNumber || orderRef, "PAID");
+              saveOrderToLocalHistory(data.orderNumber, "PAID");
               clearCart();
-              router.push(`/checkout/success?order_id=${data.orderNumber || orderRef}`);
+              router.push(
+                `/checkout/success?order_id=${data.orderNumber}`,
+              );
             },
             onPending: () => {
-              saveOrderToLocalHistory(data.orderNumber || orderRef, "PENDING_PAYMENT");
+              saveOrderToLocalHistory(data.orderNumber, "PENDING_PAYMENT");
               clearCart();
-              router.push(`/checkout/success?order_id=${data.orderNumber || orderRef}&pending=1`);
+              router.push(
+                `/checkout/success?order_id=${data.orderNumber}&pending=1`,
+              );
             },
             onError: () => {
               setError("Pembayaran gagal atau dibatalkan. Silakan coba lagi.");
@@ -164,18 +186,25 @@ function CheckoutPaymentPage() {
           return;
         }
       }
-    } catch {
-      // Offline/dev mode fallback
-    }
 
-    // Open Interactive Indonesian Payment Modal (QRIS & Virtual Account)
-    setIsProcessing(false);
-    setShowPaymentModal(true);
+      // No snap token: do not fabricate a payment channel.
+      setError(
+        "Pembayaran otomatis belum tersedia saat ini. Silakan gunakan Transfer Bank Manual dan konfirmasi via WhatsApp.",
+      );
+      setIsProcessing(false);
+    } catch {
+      setError(
+        "Gagal terhubung ke penyedia pembayaran. Silakan gunakan Transfer Bank Manual.",
+      );
+      setIsProcessing(false);
+    }
   };
 
   const saveOrderToLocalHistory = (orderId: string, status = "PAID") => {
     try {
-      const existing = JSON.parse(localStorage.getItem("penaameen_orders_history") || "[]");
+      const existing = JSON.parse(
+        localStorage.getItem("penaameen_orders_history") || "[]",
+      );
       const newOrder = {
         id: orderId,
         orderNumber: orderId.startsWith("PA-") ? orderId : `PA-${orderId}`,
@@ -184,16 +213,8 @@ function CheckoutPaymentPage() {
         shippingCost: String(shippingCost),
         total: String(grandTotal),
         createdAt: new Date().toISOString(),
-        trackingNumber: "JP" + Math.floor(1000000000 + Math.random() * 9000000000),
-        shippingAddress: addressData || {
-          recipientName: "Pelanggan Pena Ameen",
-          phone: "08123456789",
-          addressLine1: "Jl. Margorejo Indah No. 12",
-          city: "Surabaya",
-          province: "Jawa Timur",
-          postalCode: "60238",
-        },
-        shippingMethod: shippingMethod.toUpperCase(),
+        ...(addressData ? { shippingAddress: addressData } : {}),
+        shippingMethod: (shippingMethod ?? "").toUpperCase(),
         items: cartItems.map((item) => ({
           id: item.id,
           quantity: item.quantity,
@@ -206,57 +227,80 @@ function CheckoutPaymentPage() {
         })),
         statusHistory: [
           {
-            id: "sh-1",
-            status: "PAID",
-            note: "Pembayaran terverifikasi otomatis via QRIS / VA",
-            createdAt: new Date().toISOString(),
-          },
-          {
-            id: "sh-2",
-            status: "PROCESSING",
-            note: "Pesanan sedang disiapkan & dikemas di Gudang Surabaya",
+            id: `sh-${orderId}-${status.toLowerCase()}`,
+            status,
+            note:
+              status === "PAID"
+                ? "Pembayaran tercatat di server"
+                : "Pesanan dicatat, menunggu verifikasi pembayaran",
             createdAt: new Date().toISOString(),
           },
         ],
       };
-      localStorage.setItem("penaameen_orders_history", JSON.stringify([newOrder, ...existing]));
+      localStorage.setItem(
+        "penaameen_orders_history",
+        JSON.stringify([newOrder, ...existing]),
+      );
     } catch (e) {
       console.warn("Failed to persist order locally", e);
     }
   };
 
-  const handleSimulatePaymentSuccess = async () => {
-    setIsProcessing(true);
-    const serverResult = await createLiveOrderOnServer("PAID");
-    const finalOrderNumber = serverResult?.orderNumber || currentOrderRef;
-
-    saveOrderToLocalHistory(finalOrderNumber, "PAID");
-    clearCart();
-    setShowPaymentModal(false);
-    setIsProcessing(false);
-    router.push(`/checkout/success?order_id=${finalOrderNumber}`);
-  };
-
-  const handleCopyVA = () => {
-    const va = vaNumbers[selectedBank];
-    if (va) {
-      navigator.clipboard.writeText(va);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const handleManualWhatsAppConfirmation = async () => {
-    const serverResult = await createLiveOrderOnServer("PENDING_PAYMENT");
-    const finalOrderNumber = serverResult?.orderNumber || ("PA-" + Date.now().toString().slice(-6));
+    setIsProcessing(true);
+    setError(null);
 
-    saveOrderToLocalHistory(finalOrderNumber, "PENDING_PAYMENT");
-    const text = `Halo Admin Pena Ameen, saya ingin konfirmasi pesanan dengan nomor ${finalOrderNumber} sebesar Rp${grandTotal.toLocaleString("id-ID")}. Mohon info rekening transfer. Terima kasih!`;
-    const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(text)}`;
+    const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "";
+    if (!adminWhatsApp) {
+      setError(
+        "Nomor WhatsApp admin belum dikonfigurasi. Silakan hubungi admin Pena Ameen untuk konfirmasi pembayaran.",
+      );
+      setIsProcessing(false);
+      return;
+    }
+
+    const serverResult = await createLiveOrderOnServer();
+    if (!serverResult?.orderNumber) {
+      setError(
+        "Pesanan gagal dibuat di server. Silakan coba lagi setelah beberapa saat.",
+      );
+      setIsProcessing(false);
+      return;
+    }
+
+    saveOrderToLocalHistory(serverResult.orderNumber, "PENDING_PAYMENT");
+    const text = `Halo Admin Pena Ameen, saya ingin konfirmasi pesanan dengan nomor ${serverResult.orderNumber} sebesar Rp${grandTotal.toLocaleString("id-ID")}. Mohon info rekening transfer. Terima kasih!`;
+    const waUrl = `https://wa.me/${adminWhatsApp.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
     clearCart();
     window.open(waUrl, "_blank");
-    router.push(`/checkout/success?order_id=${finalOrderNumber}&pending=1`);
+    router.push(
+      `/checkout/success?order_id=${serverResult.orderNumber}&pending=1`,
+    );
   };
+
+  if (checkoutIncomplete) {
+    return (
+      <div className="min-h-screen bg-background-50 pb-24">
+        <div className="container px-4 mx-auto py-24 text-center">
+          <div className="bg-white rounded-3xl border border-supporting-200 p-10 max-w-md mx-auto shadow-xs">
+            <span className="text-3xl">🧭</span>
+            <h1 className="text-lg font-serif font-bold text-primary-950 mt-3">
+              Checkout Belum Lengkap
+            </h1>
+            <p className="text-xs text-supporting-600 mt-2">
+              Silakan pilih alamat pengiriman dan kurir terlebih dahulu.
+            </p>
+            <Link
+              href="/checkout/address"
+              className="inline-block mt-5 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm rounded-2xl transition-all shadow-md"
+            >
+              Pilih Alamat & Kurir
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background-50 pb-24">
@@ -339,10 +383,18 @@ function CheckoutPaymentPage() {
                   <span className="text-[10px] text-supporting-400 font-semibold uppercase tracking-wider block mb-1">
                     Penerima
                   </span>
-                  <p className="font-bold text-primary-950">{addressData?.recipientName || "Pelanggan Pena Ameen"}</p>
-                  <p className="text-supporting-500">{addressData?.phone || "08123456789"}</p>
+                  <p className="font-bold text-primary-950">
+                    {addressData?.recipientName || "—"}
+                  </p>
+                  <p className="text-supporting-500">
+                    {addressData?.phone || "—"}
+                  </p>
                   <p className="text-supporting-600 mt-1 leading-relaxed">
-                    {addressData?.addressLine1 || "Jl. Margorejo Indah No. 12"}, {addressData?.city || "Surabaya"}
+                    {addressData
+                      ? `${addressData.addressLine1 || ""}${
+                          addressData.city ? `, ${addressData.city}` : ""
+                        }`
+                      : "—"}
                   </p>
                 </div>
 
@@ -350,8 +402,9 @@ function CheckoutPaymentPage() {
                   <span className="text-[10px] text-supporting-400 font-semibold uppercase tracking-wider block mb-1">
                     Kurir Dipilih
                   </span>
-                  <p className="font-bold text-primary-950 uppercase">{shippingMethod.replace("-", " — ")}</p>
-                  <p className="text-supporting-500">Estimasi tiba 2-3 hari kerja</p>
+                  <p className="font-bold text-primary-950 uppercase">
+                    {shippingMethod.replace("-", " — ")}
+                  </p>
                   <p className="text-primary-700 font-semibold mt-1">
                     Ongkos Kirim: Rp{shippingCost.toLocaleString("id-ID")}
                   </p>
@@ -443,21 +496,15 @@ function CheckoutPaymentPage() {
                       </div>
 
                       <p className="text-xs text-supporting-600 leading-relaxed mb-3">
-                        Transfer langsung ke rekening resmi Pena Ameen dan konfirmasi bukti transfer via CS WhatsApp.
+                        Transfer langsung ke rekening resmi Pena Ameen dan konfirmasi bukti transfer via CS WhatsApp. Detail rekening resmi dikonfirmasi melalui WhatsApp.
                       </p>
 
                       {paymentMethod === "manual" && (
-                        <div className="mt-3 p-3.5 bg-white rounded-xl border border-supporting-200 space-y-2 text-xs">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium text-supporting-600">Bank BCA</span>
-                            <span className="font-mono font-bold text-primary-900">123-456-7890</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium text-supporting-600">Bank Mandiri</span>
-                            <span className="font-mono font-bold text-primary-900">142-00-1234567-8</span>
-                          </div>
-                          <p className="text-[10px] text-supporting-400 pt-1 border-t border-supporting-100">
-                            Atas Nama: <strong>Penerbit Pena Ameen</strong>
+                        <div className="mt-3 p-3.5 bg-white rounded-xl border border-supporting-200 text-xs">
+                          <p className="text-supporting-600 leading-relaxed">
+                            Setelah pembayaran dibuat, pesanan dicatat sebagai
+                            <strong> menunggu verifikasi</strong> hingga admin
+                            mengonfirmasi transfer.
                           </p>
                         </div>
                       )}
@@ -515,11 +562,6 @@ function CheckoutPaymentPage() {
                   <span className="font-semibold text-primary-950">Rp{shippingCost.toLocaleString("id-ID")}</span>
                 </div>
 
-                <div className="flex justify-between text-supporting-600">
-                  <span>Biaya Layanan</span>
-                  <span className="font-semibold text-emerald-600">GRATIS</span>
-                </div>
-
                 <div className="pt-3.5 border-t border-supporting-200 flex justify-between items-baseline">
                   <div>
                     <span className="text-sm font-bold text-primary-950 block">Total Tagihan</span>
@@ -557,12 +599,19 @@ function CheckoutPaymentPage() {
                 <button
                   type="button"
                   onClick={handleManualWhatsAppConfirmation}
-                  className="w-full mt-6 py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl transition-all shadow-md shadow-emerald-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                  disabled={isProcessing}
+                  className="w-full mt-6 py-4 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-bold text-sm rounded-2xl transition-all shadow-md shadow-emerald-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  <span>Konfirmasi via WhatsApp</span>
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  {isProcessing ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      <span>Konfirmasi via WhatsApp</span>
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    </>
+                  )}
                 </button>
               )}
 
@@ -581,172 +630,6 @@ function CheckoutPaymentPage() {
           </div>
         </div>
       </div>
-
-      {/* Interactive Payment Gateway Dialog (QRIS & Virtual Account) */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-supporting-100">
-              <div className="flex items-center gap-2">
-                <span className="font-serif font-bold text-primary-950 text-base">Pembayaran Pena Ameen</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary-100 text-primary-800">
-                  {currentOrderRef}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowPaymentModal(false)}
-                className="text-supporting-400 hover:text-supporting-600 font-bold text-lg"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Total to pay banner */}
-            <div className="p-4 bg-primary-50 rounded-2xl border border-primary-100 text-center">
-              <span className="text-[11px] text-supporting-500 font-medium block">Total Pembayaran</span>
-              <span className="text-2xl font-bold text-primary-800 font-mono">
-                Rp{grandTotal.toLocaleString("id-ID")}
-              </span>
-              <span className="text-[10px] text-amber-600 block mt-1 font-semibold">
-                ⏱️ Selesaikan dalam 14:59 menit
-              </span>
-            </div>
-
-            {/* Method Tabs */}
-            <div className="flex border-b border-supporting-200">
-              <button
-                type="button"
-                onClick={() => setModalTab("qris")}
-                className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${
-                  modalTab === "qris"
-                    ? "border-primary-600 text-primary-700"
-                    : "border-transparent text-supporting-400 hover:text-supporting-600"
-                }`}
-              >
-                QRIS Instan
-              </button>
-              <button
-                type="button"
-                onClick={() => setModalTab("va")}
-                className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${
-                  modalTab === "va"
-                    ? "border-primary-600 text-primary-700"
-                    : "border-transparent text-supporting-400 hover:text-supporting-600"
-                }`}
-              >
-                Virtual Account
-              </button>
-            </div>
-
-            {/* Tab 1: QRIS */}
-            {modalTab === "qris" ? (
-              <div className="text-center space-y-3 py-2">
-                <div className="relative w-48 h-48 mx-auto bg-white p-2 rounded-2xl border-2 border-primary-500 shadow-md flex items-center justify-center">
-                  {/* Real QRIS Code SVG Pattern */}
-                  <svg className="w-full h-full text-primary-950" viewBox="0 0 100 100" fill="currentColor">
-                    <rect width="100" height="100" fill="white" />
-                    <rect x="10" y="10" width="25" height="25" fill="#1b4332" rx="4" />
-                    <rect x="15" y="15" width="15" height="15" fill="white" rx="2" />
-                    <rect x="18" y="18" width="9" height="9" fill="#1b4332" />
-
-                    <rect x="65" y="10" width="25" height="25" fill="#1b4332" rx="4" />
-                    <rect x="70" y="15" width="15" height="15" fill="white" rx="2" />
-                    <rect x="73" y="18" width="9" height="9" fill="#1b4332" />
-
-                    <rect x="10" y="65" width="25" height="25" fill="#1b4332" rx="4" />
-                    <rect x="15" y="70" width="15" height="15" fill="white" rx="2" />
-                    <rect x="18" y="73" width="9" height="9" fill="#1b4332" />
-
-                    <rect x="42" y="12" width="6" height="6" fill="#1b4332" />
-                    <rect x="52" y="18" width="6" height="6" fill="#1b4332" />
-                    <rect x="42" y="28" width="6" height="6" fill="#1b4332" />
-                    <rect x="12" y="45" width="6" height="6" fill="#1b4332" />
-                    <rect x="25" y="45" width="6" height="6" fill="#1b4332" />
-                    <rect x="45" y="45" width="10" height="10" fill="#2d6a4f" rx="2" />
-                    <rect x="65" y="45" width="6" height="6" fill="#1b4332" />
-                    <rect x="80" y="45" width="6" height="6" fill="#1b4332" />
-                    <rect x="42" y="65" width="6" height="6" fill="#1b4332" />
-                    <rect x="52" y="75" width="6" height="6" fill="#1b4332" />
-                    <rect x="72" y="65" width="6" height="6" fill="#1b4332" />
-                    <rect x="62" y="82" width="6" height="6" fill="#1b4332" />
-                    <rect x="82" y="82" width="6" height="6" fill="#1b4332" />
-                  </svg>
-                  <div className="absolute inset-x-0 bottom-1">
-                    <span className="text-[9px] font-bold text-primary-900 bg-white/90 px-2 py-0.5 rounded shadow-2xs">
-                      PENA AMEEN QRIS
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-supporting-600">
-                  Scan QRIS menggunakan <strong>GoPay, OVO, BCA Mobile, ShopeePay, atau Dana</strong>
-                </p>
-              </div>
-            ) : (
-              /* Tab 2: Virtual Account */
-              <div className="space-y-4 py-2">
-                <div className="grid grid-cols-4 gap-1.5">
-                  {(["bca", "mandiri", "bri", "bni"] as const).map((bank) => (
-                    <button
-                      key={bank}
-                      type="button"
-                      onClick={() => setSelectedBank(bank)}
-                      className={`py-2 px-1 text-[11px] font-bold rounded-xl border uppercase transition-all ${
-                        selectedBank === bank
-                          ? "border-primary-600 bg-primary-50 text-primary-800 shadow-xs"
-                          : "border-supporting-200 text-supporting-500 hover:bg-supporting-50"
-                      }`}
-                    >
-                      {bank}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="p-4 bg-supporting-50 rounded-2xl border border-supporting-200 space-y-2">
-                  <span className="text-[10px] text-supporting-400 uppercase font-semibold block">
-                    Nomor Virtual Account {selectedBank.toUpperCase()}
-                  </span>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-lg font-bold font-mono text-primary-950">
-                      {vaNumbers[selectedBank]}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleCopyVA}
-                      className="px-3 py-1 bg-white hover:bg-supporting-100 text-primary-700 border border-supporting-300 rounded-lg text-xs font-semibold shadow-2xs"
-                    >
-                      {copied ? "✓ Tersalin" : "Salin"}
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-supporting-500 pt-1 border-t border-supporting-200">
-                    Atas Nama: <strong>PENA AMEEN OFFICIAL</strong>
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Modal Actions */}
-            <div className="space-y-2 pt-3 border-t border-supporting-100">
-              <button
-                type="button"
-                onClick={handleSimulatePaymentSuccess}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-900/10 flex items-center justify-center gap-2"
-              >
-                <span>✓ Konfirmasi Pembayaran Berhasil</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPaymentModal(false)}
-                className="w-full py-2 text-supporting-500 hover:text-supporting-700 text-xs font-medium"
-              >
-                Tutup & Ubah Metode
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

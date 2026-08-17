@@ -15,9 +15,6 @@ interface AdminOrdersManagerProps {
 
 export function AdminOrdersManager({
   initialOrders,
-  total,
-  currentPage,
-  perPage,
 }: AdminOrdersManagerProps) {
   const router = useRouter();
   const [orders, setOrders] = useState<AdminOrder[]>(initialOrders);

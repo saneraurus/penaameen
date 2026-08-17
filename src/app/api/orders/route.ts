@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import Midtrans from "midtrans-client";
-import { registerLiveOrder, loadFileOrders } from "@/lib/admin/orders";
 
 const createOrderSchema = z.object({
   addressId: z.string().min(1),
@@ -185,7 +184,7 @@ export async function POST(request: Request) {
         savedOrderId = order.id;
       }
     } catch (dbErr) {
-      console.warn("Could not save order directly to MySQL DB, using live store fallback:", dbErr);
+      console.warn("Could not save order directly to MySQL DB:", dbErr);
     }
 
     // Resolve actual authenticated user identity
@@ -202,62 +201,6 @@ export async function POST(request: Request) {
       body.customerName ||
       addressSnapshot.recipientName ||
       "Ihsan";
-
-    // 4. Register into Live Admin Orders Store
-    registerLiveOrder({
-      id: savedOrderId,
-      orderNumber,
-      customerName: realName,
-      customerEmail: realEmail,
-      status: "pending",
-      paymentStatus: "pending",
-      fulfillmentStatus: "unfulfilled",
-      totalAmount: total,
-      currency: "IDR",
-      itemCount: orderItemsToSave.reduce((sum, i) => sum + i.quantity, 0),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      shippingAddress: {
-        name: realName,
-        address1: addressSnapshot.addressLine1 || "Jl. Margorejo Indah No. 12",
-        city: addressSnapshot.city || "Surabaya",
-        province: addressSnapshot.province || "Jawa Timur",
-        postalCode: addressSnapshot.postalCode || "60238",
-        country: "Indonesia",
-        phone: addressSnapshot.phone || "08123456789",
-      },
-      items: orderItemsToSave.map((i) => ({
-        id: `itm-${i.productId}`,
-        productId: i.productId,
-        productName: i.name,
-        productSlug: `produk-${i.productId}`,
-        quantity: i.quantity,
-        unitPrice: i.price,
-        totalPrice: i.price * i.quantity,
-      })),
-      paymentHistory: [
-        {
-          id: `pay-${savedOrderId}`,
-          type: "payment_intent",
-          status: "pending",
-          amount: total,
-          currency: "IDR",
-          provider: "midtrans",
-          providerReference: orderNumber,
-          createdAt: new Date().toISOString(),
-        },
-      ],
-      fulfillmentHistory: [
-        {
-          id: `ful-${savedOrderId}`,
-          type: "shipped",
-          status: "pending",
-          carrier: shippingMethod.toUpperCase(),
-          trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-          createdAt: new Date().toISOString(),
-        },
-      ],
-    });
 
     // 5. Try Midtrans Snap token
     let snapToken: string | undefined = undefined;
@@ -329,56 +272,10 @@ export async function GET() {
         });
       }
     } catch {
-      // db fallback
+      // db unavailable - return empty list
     }
 
-    if (dbOrders.length > 0) {
-      return NextResponse.json({ orders: dbOrders });
-    }
-
-    // Fallback to persistent live file orders
-    const fileOrders = loadFileOrders();
-    const customerOrders = fileOrders.map((o) => ({
-      id: o.id,
-      orderNumber: o.orderNumber,
-      status:
-        o.status === "pending"
-          ? "PENDING_PAYMENT"
-          : o.fulfillmentStatus === "delivered"
-          ? "DELIVERED"
-          : o.fulfillmentStatus === "shipped"
-          ? "SHIPPED"
-          : o.fulfillmentStatus === "fulfilled"
-          ? "PROCESSING"
-          : o.paymentStatus === "paid"
-          ? "PROCESSING"
-          : o.status === "cancelled"
-          ? "CANCELLED"
-          : "PROCESSING",
-      subtotal: String(o.totalAmount),
-      shippingCost: "18000",
-      total: String(o.totalAmount),
-      createdAt: o.createdAt,
-      trackingNumber: o.fulfillmentHistory?.[0]?.trackingNumber || "JP8912389102",
-      shippingMethod: o.fulfillmentHistory?.[0]?.carrier || "JNE",
-      shippingAddress: {
-        recipientName: o.shippingAddress?.name || "Pelanggan Pena Ameen",
-        city: o.shippingAddress?.city || "Surabaya",
-        province: o.shippingAddress?.province || "Jawa Timur",
-      },
-      items: o.items.map((i) => ({
-        id: i.id,
-        quantity: i.quantity,
-        price: String(i.unitPrice),
-        subtotal: String(i.totalPrice),
-        product: {
-          name: i.productName,
-          image: "/images/penaameen/products/home-learning.jpg",
-        },
-      })),
-    }));
-
-    return NextResponse.json({ orders: customerOrders });
+    return NextResponse.json({ orders: dbOrders });
   } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

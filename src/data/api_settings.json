@@ -32,9 +32,9 @@
     "notifyAdminOnOrder": true
   },
   "emailForwarding": {
-    "forwardingEmail": "ihsanzz099@gmail.com",
-    "whatsappAdminPhone": "08123456789",
-    "enableWhatsappNotification": true
+    "forwardingEmail": "",
+    "whatsappAdminPhone": "",
+    "enableWhatsappNotification": false
   },
   "clerkAuth": {
     "publishableKey": "pk_test_YWNjdXJhdGUtcXVhZ2dhLTg1MjkuY2xlcmsuYWNjb3VudHMuZGV2JA",

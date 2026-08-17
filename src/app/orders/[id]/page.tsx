@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 
 declare global {
@@ -102,7 +101,7 @@ const statusConfig: Record<
 };
 
 async function loadSnapScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (window.snap) return resolve();
     const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true";
     const snapUrl = isProduction
@@ -242,7 +241,7 @@ function OrderDetailInner() {
       // Update local storage history
       try {
         const localSaved = JSON.parse(localStorage.getItem("penaameen_orders_history") || "[]");
-        const updated = localSaved.map((o: any) =>
+        const updated = localSaved.map((o: { id: string; orderNumber?: string }) =>
           o.id === order.id || o.orderNumber === order.orderNumber
             ? { ...o, status: "PROCESSING", paymentStatus: "paid" }
             : o
@@ -335,11 +334,14 @@ function OrderDetailInner() {
     { num: 5, title: "Pesanan Selesai", desc: "Paket telah sampai ke alamat tujuan" },
   ];
 
-  const waConfirmUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(
-    `Halo CS Pena Ameen, saya ingin menanyakan pesanan #${order.orderNumber} senilai Rp ${Number(
-      order.total
-    ).toLocaleString("id-ID")}.`
-  )}`;
+  const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || "";
+  const waConfirmUrl = adminWhatsApp
+    ? `https://wa.me/${adminWhatsApp.replace(/\D/g, "")}?text=${encodeURIComponent(
+        `Halo CS Pena Ameen, saya ingin menanyakan pesanan #${order.orderNumber} senilai Rp ${Number(
+          order.total
+        ).toLocaleString("id-ID")}.`
+      )}`
+    : "";
 
   return (
     <div className="min-h-screen bg-background-50 pb-24">
@@ -364,14 +366,16 @@ function OrderDetailInner() {
             </div>
 
             <div className="flex items-center gap-2">
-              <a
-                href={waConfirmUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-colors shadow-2xs"
-              >
-                <span>💬 Bantuan CS WhatsApp</span>
-              </a>
+              {adminWhatsApp ? (
+                <a
+                  href={waConfirmUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-colors shadow-2xs"
+                >
+                  <span>💬 Bantuan CS WhatsApp</span>
+                </a>
+              ) : null}
             </div>
           </div>
         </div>

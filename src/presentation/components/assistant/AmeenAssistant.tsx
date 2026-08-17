@@ -57,9 +57,9 @@ export function AmeenAssistant() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const messagesRef = useRef<ChatMessage[]>(messages);
-  messagesRef.current = messages;
 
   useEffect(() => {
+    messagesRef.current = messages;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messagesRef.current));
     } catch {

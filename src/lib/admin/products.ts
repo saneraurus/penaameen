@@ -1,7 +1,5 @@
-import { products as initialProductData } from "@/data/products";
 import { prisma } from "@/lib/prisma";
-import fs from "fs";
-import path from "path";
+import { Prisma, type ProductStatus } from "@/generated/prisma";
 
 export interface AdminProduct {
   id: string;
@@ -41,391 +39,223 @@ export interface GetProductsResult {
   total: number;
 }
 
-const LIVE_PRODUCTS_FILE = path.join(process.cwd(), "src/data/live_products.json");
-
-type ProductStatus = "published" | "draft" | "archived";
-
-function mapPrismaProduct(db: {
+type ProductRow = {
   id: string;
   slug: string;
   name: string;
-  category: { name: string } | null;
   description: string;
-  shortDescription: string | null;
   price: bigint;
-  salePrice: bigint | null;
-  compareAtPrice: bigint | null;
+  image: string;
+  status: ProductStatus;
+  shortDescription: string | null;
   sku: string | null;
   stock: number;
-  status: ProductStatus;
-  image: string;
+  salePrice: bigint | null;
   tags: unknown;
-  relatedProductIds: unknown;
   seoTitle: string | null;
   seoDescription: string | null;
   seoCanonical: string | null;
   seoIndexable: boolean;
+  relatedProductIds: unknown;
   createdAt: Date;
   updatedAt: Date;
-}): AdminProduct {
-  return {
-    id: db.id,
-    slug: db.slug,
-    name: db.name,
-    category: db.category?.name ?? "",
-    description: db.description,
-    shortDescription: db.shortDescription ?? undefined,
-    price: Number(db.price),
-    salePrice: db.salePrice === null ? undefined : Number(db.salePrice),
-    sku: db.sku ?? undefined,
-    stockQuantity: db.stock,
-    status: db.status,
-    image: db.image,
-    tags: Array.isArray(db.tags) ? (db.tags as string[]) : undefined,
-    relatedProductIds: Array.isArray(db.relatedProductIds)
-      ? (db.relatedProductIds as string[])
-      : undefined,
-    seoTitle: db.seoTitle ?? undefined,
-    seoDescription: db.seoDescription ?? undefined,
-    seoCanonical: db.seoCanonical ?? undefined,
-    seoIndexable: db.seoIndexable,
-    createdAt: db.createdAt.toISOString(),
-    updatedAt: db.updatedAt.toISOString(),
-  };
+  category?: { name: string } | null;
+};
+
+function withoutUndefined<T extends Record<string, unknown>>(
+  value: T,
+): { [K in keyof T]?: Exclude<T[K], undefined> } {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, v]) => v !== undefined),
+  ) as { [K in keyof T]?: Exclude<T[K], undefined> };
 }
 
-// ---------------------------------------------------------------------------
-// File fallback (development only). Used when the database is unreachable.
-// It is NOT the source of truth in production: writes prefer Prisma and the
-// file path is explicitly a dev fallback.
-// ---------------------------------------------------------------------------
-
-export function loadFileProducts(): AdminProduct[] {
-  try {
-    if (fs.existsSync(LIVE_PRODUCTS_FILE)) {
-      const raw = fs.readFileSync(LIVE_PRODUCTS_FILE, "utf-8");
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed as AdminProduct[];
-      }
-    }
-  } catch (e) {
-    console.warn("Could not read live_products.json:", e);
-  }
-
-  const seeded: AdminProduct[] = initialProductData.map((p, idx) => ({
+function mapProduct(p: ProductRow): AdminProduct {
+  return {
     id: p.id,
     slug: p.slug,
     name: p.name,
-    category: p.category,
+    category: p.category?.name ?? "",
     description: p.description,
-    price: p.price,
+    price: Number(p.price),
     image: p.image,
-    status: idx < 16 ? "published" : idx < 18 ? "draft" : "archived",
-    shortDescription: p.description.slice(0, 160),
-    sku: `PA-${p.id.padStart(4, "0")}`,
-    stockQuantity: 50,
-    createdAt: new Date(Date.now() - (19 - idx) * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-  }));
-
-  saveFileProducts(seeded);
-  return seeded;
+    status: p.status,
+    shortDescription: p.shortDescription ?? undefined,
+    sku: p.sku ?? undefined,
+    stockQuantity: p.stock,
+    salePrice: p.salePrice != null ? Number(p.salePrice) : undefined,
+    tags: Array.isArray(p.tags) ? (p.tags as string[]) : undefined,
+    seoTitle: p.seoTitle ?? undefined,
+    seoDescription: p.seoDescription ?? undefined,
+    seoCanonical: p.seoCanonical ?? undefined,
+    seoIndexable: p.seoIndexable,
+    relatedProductIds: Array.isArray(p.relatedProductIds)
+      ? (p.relatedProductIds as string[])
+      : undefined,
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  };
 }
 
-export function saveFileProducts(productsList: AdminProduct[]): void {
-  try {
-    const dir = path.dirname(LIVE_PRODUCTS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(LIVE_PRODUCTS_FILE, JSON.stringify(productsList, null, 2), "utf-8");
-  } catch (e) {
-    console.warn("Could not write live_products.json:", e);
-  }
-}
-
-// Cached per-process so repeated admin reads do not hammer a down database.
-let prismaUnavailable = false;
-
-function isPrismaAvailable(): boolean {
-  return !prismaUnavailable;
-}
-
-function markPrismaUnavailable(): void {
-  prismaUnavailable = true;
-}
-
-async function resolveCategoryId(name: string): Promise<string> {
+async function resolveCategory(categoryName: string): Promise<string> {
+  const slug = categoryName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
   const category = await prisma.category.upsert({
-    where: { name },
-    update: {},
-    create: { name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-") },
+    where: { slug },
+    update: { name: categoryName },
+    create: { name: categoryName, slug },
   });
   return category.id;
 }
 
-function toPrismaCreateData(
-  data: Omit<AdminProduct, "id" | "createdAt" | "updatedAt">,
-  categoryId: string,
-) {
-  return {
-    slug: data.slug,
-    name: data.name,
-    categoryId,
-    description: data.description,
-    shortDescription: data.shortDescription ?? null,
-    price: BigInt(Math.round(data.price)),
-    compareAtPrice: null,
-    salePrice: data.salePrice === undefined ? null : BigInt(Math.round(data.salePrice)),
-    sku: data.sku ?? null,
-    stock: data.stockQuantity ?? 0,
-    status: data.status,
-    image: data.image,
-    images: [],
-    ...(data.tags ? { tags: data.tags as unknown as object } : {}),
-    ...(data.relatedProductIds
-      ? { relatedProductIds: data.relatedProductIds as unknown as object }
-      : {}),
-    seoTitle: data.seoTitle ?? null,
-    seoDescription: data.seoDescription ?? null,
-    seoCanonical: data.seoCanonical ?? null,
-    seoIndexable: data.seoIndexable ?? true,
-  };
-}
-
-export async function getProducts(options: GetProductsOptions): Promise<GetProductsResult> {
+export async function getProducts(
+  options: GetProductsOptions,
+): Promise<GetProductsResult> {
   const { page, perPage, search, category, status } = options;
 
-  if (isPrismaAvailable()) {
-    try {
-      const where: Record<string, unknown> = {};
-      if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { slug: { contains: search } },
-          { sku: { contains: search } },
-        ];
-      }
-      if (category) {
-        where.category = { name: category };
-      }
-      if (status) where.status = status;
-
-      const [rows, total] = await Promise.all([
-        prisma.product.findMany({
-          where,
-          include: { category: true },
-          orderBy: { createdAt: "desc" },
-          skip: (page - 1) * perPage,
-          take: perPage,
-        }),
-        prisma.product.count({ where }),
-      ]);
-
-      return { products: rows.map(mapPrismaProduct), total };
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
-
-  // Dev/offline fallback
-  const productsList = loadFileProducts();
-  let filtered = [...productsList];
-
+  const where: Record<string, unknown> = {};
   if (search) {
-    const searchLower = search.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.slug.toLowerCase().includes(searchLower) ||
-        (p.sku && p.sku.toLowerCase().includes(searchLower)),
-    );
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { slug: { contains: search, mode: "insensitive" } },
+      { sku: { contains: search, mode: "insensitive" } },
+    ];
   }
-  if (category) filtered = filtered.filter((p) => p.category === category);
-  if (status) filtered = filtered.filter((p) => p.status === status);
+  if (category) where.category = { name: category };
+  if (status) where.status = status;
 
-  filtered.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  const [rows, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: { category: true },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * perPage,
+      take: perPage,
+    }),
+    prisma.product.count({ where }),
+  ]);
 
-  const total = filtered.length;
-  const start = (page - 1) * perPage;
-  const paginated = filtered.slice(start, start + perPage);
-
-  return { products: paginated, total };
+  return { products: rows.map(mapProduct), total };
 }
 
 export async function getProductCategories(): Promise<string[]> {
-  if (isPrismaAvailable()) {
-    try {
-      const rows = await prisma.category.findMany({
-        orderBy: { name: "asc" },
-      });
-      return rows.map((c) => c.name);
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
-  const productsList = loadFileProducts();
-  const categories = new Set(productsList.map((p) => p.category).filter(Boolean));
-  return Array.from(categories).sort();
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+  });
+  return categories.map((c) => c.name);
 }
 
-export async function getProductById(id: string): Promise<AdminProduct | null> {
-  if (isPrismaAvailable()) {
-    try {
-      const db = await prisma.product.findFirst({
-        where: { OR: [{ id }, { slug: id }] },
-        include: { category: true },
-      });
-      if (db) return mapPrismaProduct(db);
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
-  const productsList = loadFileProducts();
-  return productsList.find((p) => p.id === id || p.slug === id) ?? null;
+export async function getProductById(
+  id: string,
+): Promise<AdminProduct | null> {
+  const product = await prisma.product.findFirst({
+    where: { OR: [{ id }, { slug: id }] },
+    include: { category: true },
+  });
+  return product ? mapProduct(product as ProductRow) : null;
 }
 
-export async function getProductBySlug(slug: string): Promise<AdminProduct | null> {
-  return getProductById(slug);
+export async function getProductBySlug(
+  slug: string,
+): Promise<AdminProduct | null> {
+  const product = await prisma.product.findUnique({
+    where: { slug },
+    include: { category: true },
+  });
+  return product ? mapProduct(product as ProductRow) : null;
 }
 
 export async function createProduct(
   data: Omit<AdminProduct, "id" | "createdAt" | "updatedAt">,
 ): Promise<AdminProduct> {
-  if (isPrismaAvailable()) {
-    try {
-      const categoryId = await resolveCategoryId(data.category || "Umum");
-      const db = await prisma.product.create({
-        data: toPrismaCreateData(data, categoryId),
-        include: { category: true },
-      });
-      return mapPrismaProduct(db);
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
+  const categoryId = await resolveCategory(data.category);
+  const slug =
+    data.slug ||
+    data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
-  const productsList = loadFileProducts();
-  const maxNumericId = productsList.reduce((max, p) => {
-    const num = Number(p.id);
-    return !isNaN(num) && num > max ? num : max;
-  }, 0);
+  const product = await prisma.product.create({
+    data: {
+      slug,
+      name: data.name,
+      categoryId,
+      description: data.description,
+      price: BigInt(data.price),
+      image: data.image,
+      status: (data.status as ProductStatus) ?? "published",
+      shortDescription: data.shortDescription ?? null,
+      sku: data.sku ?? null,
+      stock: data.stockQuantity ?? 0,
+      salePrice: data.salePrice != null ? BigInt(data.salePrice) : null,
+      tags: data.tags ?? Prisma.JsonNull,
+      seoTitle: data.seoTitle ?? null,
+      seoDescription: data.seoDescription ?? null,
+      seoCanonical: data.seoCanonical ?? null,
+      seoIndexable: data.seoIndexable ?? true,
+      relatedProductIds: data.relatedProductIds ?? Prisma.JsonNull,
+    },
+    include: { category: true },
+  });
 
-  const newId = String(maxNumericId > 0 ? maxNumericId + 1 : Date.now());
-  const newProduct: AdminProduct = {
-    ...data,
-    id: newId,
-    sku: data.sku || `PA-${newId.padStart(4, "0")}`,
-    status: data.status || "published",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  productsList.unshift(newProduct);
-  saveFileProducts(productsList);
-  return newProduct;
+  return mapProduct(product as ProductRow);
 }
 
 export async function updateProduct(
   id: string,
   data: Partial<Omit<AdminProduct, "id" | "createdAt">>,
 ): Promise<AdminProduct | null> {
-  if (isPrismaAvailable()) {
-    try {
-      const existing = await prisma.product.findFirst({
-        where: { OR: [{ id }, { slug: id }] },
-      });
-      if (!existing) return null;
-
-      const updateData: Record<string, unknown> = {};
-      if (data.name !== undefined) updateData.name = data.name;
-      if (data.slug !== undefined) updateData.slug = data.slug;
-      if (data.description !== undefined) updateData.description = data.description;
-      if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription ?? null;
-      if (data.price !== undefined) updateData.price = BigInt(Math.round(data.price));
-      if (data.salePrice !== undefined) updateData.salePrice = data.salePrice === undefined ? null : BigInt(Math.round(data.salePrice));
-      if (data.stockQuantity !== undefined) updateData.stock = data.stockQuantity;
-      if (data.image !== undefined) updateData.image = data.image;
-      if (data.status !== undefined) updateData.status = data.status;
-      if (data.sku !== undefined) updateData.sku = data.sku ?? null;
-      if (data.seoTitle !== undefined) updateData.seoTitle = data.seoTitle ?? null;
-      if (data.seoDescription !== undefined) updateData.seoDescription = data.seoDescription ?? null;
-      if (data.seoCanonical !== undefined) updateData.seoCanonical = data.seoCanonical ?? null;
-      if (data.seoIndexable !== undefined) updateData.seoIndexable = data.seoIndexable;
-      if (data.tags !== undefined) updateData.tags = data.tags as unknown as object;
-      if (data.relatedProductIds !== undefined)
-        updateData.relatedProductIds = data.relatedProductIds as unknown as object;
-      if (data.category !== undefined) {
-        updateData.categoryId = await resolveCategoryId(data.category);
-      }
-
-      const db = await prisma.product.update({
-        where: { id: existing.id },
-        data: updateData,
-        include: { category: true },
-      });
-      return mapPrismaProduct(db);
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
-
-  const productsList = loadFileProducts();
-  const index = productsList.findIndex((p) => p.id === id || p.slug === id);
-  if (index === -1) return null;
-
-  const existing = productsList[index];
+  const existing = await prisma.product.findFirst({
+    where: { OR: [{ id }, { slug: id }] },
+  });
   if (!existing) return null;
 
-  const updated: AdminProduct = {
-    ...existing,
-    ...data,
-    id: existing.id,
-    createdAt: existing.createdAt,
-    updatedAt: new Date().toISOString(),
-  };
+  const categoryId = data.category
+    ? await resolveCategory(data.category)
+    : undefined;
 
-  productsList[index] = updated;
-  saveFileProducts(productsList);
-  return updated;
+  const product = await prisma.product.update({
+    where: { id: existing.id },
+    data: withoutUndefined({
+      name: data.name,
+      slug: data.slug,
+      categoryId,
+      description: data.description,
+      price: data.price != null ? BigInt(data.price) : undefined,
+      image: data.image,
+      status: data.status as ProductStatus | undefined,
+      shortDescription: data.shortDescription,
+      sku: data.sku,
+      stock: data.stockQuantity,
+      salePrice: data.salePrice != null ? BigInt(data.salePrice) : undefined,
+      tags: data.tags,
+      seoTitle: data.seoTitle,
+      seoDescription: data.seoDescription,
+      seoCanonical: data.seoCanonical,
+      seoIndexable: data.seoIndexable,
+      relatedProductIds: data.relatedProductIds,
+    }),
+    include: { category: true },
+  });
+
+  return mapProduct(product as ProductRow);
 }
 
 export async function setProductStatus(
   id: string,
-  status: ProductStatus,
+  status: "published" | "draft" | "archived",
 ): Promise<AdminProduct | null> {
   return updateProduct(id, { status });
 }
 
-// Soft delete: business records are archived, never hard-deleted.
 export async function deleteProduct(id: string): Promise<boolean> {
-  if (isPrismaAvailable()) {
-    try {
-      const existing = await prisma.product.findFirst({
-        where: { OR: [{ id }, { slug: id }] },
-      });
-      if (!existing) return false;
-      await prisma.product.update({
-        where: { id: existing.id },
-        data: { status: "archived" },
-      });
-      return true;
-    } catch {
-      markPrismaUnavailable();
-    }
-  }
-
-  const productsList = loadFileProducts();
-  const index = productsList.findIndex((p) => p.id === id || p.slug === id);
-  if (index === -1) return false;
-
-  const existing = productsList[index];
+  const existing = await prisma.product.findFirst({
+    where: { OR: [{ id }, { slug: id }] },
+  });
   if (!existing) return false;
-
-  existing.status = "archived";
-  existing.updatedAt = new Date().toISOString();
-  productsList[index] = existing;
-  saveFileProducts(productsList);
+  await prisma.product.delete({ where: { id: existing.id } });
   return true;
 }

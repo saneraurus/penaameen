@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { loadFileProducts } from "@/lib/admin/products";
+import { products as catalogProducts } from "@/data/products";
 
 export const dynamic = "force-dynamic";
 
@@ -30,12 +30,9 @@ export async function GET() {
     console.warn("Database query failed, using persistent live products file:", error);
   }
 
-  // Load from persistent products store (published only)
-  const fileProducts = loadFileProducts();
-  const publishedProducts = fileProducts.filter((p) => p.status === "published");
-
+  // Fallback: static catalog (source of truth until DB is populated)
   return NextResponse.json({
-    products: publishedProducts.map((p) => ({
+    products: catalogProducts.map((p) => ({
       id: p.id,
       slug: p.slug,
       name: p.name,
@@ -43,7 +40,7 @@ export async function GET() {
       description: p.description,
       price: p.price,
       image: p.image,
-      stock: p.stockQuantity ?? 50,
+      stock: 50,
     })),
   });
 }

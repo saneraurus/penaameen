@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
+import { CartContext } from "@/context/CartContext";
 
 export function FeaturedProductSection() {
   const [activeTab, setActiveTab] = useState<"isi" | "keunggulan">("isi");
+  const [isAdded, setIsAdded] = useState(false);
+  const cartContext = useContext(CartContext);
 
   const formatPrice = (price: number) => `Rp${price.toLocaleString("id-ID")}`;
 
@@ -40,197 +43,267 @@ export function FeaturedProductSection() {
 
   const keyAdvantages = [
     {
+      icon: "⚡",
       title: "Sistem Cepat 200 Menit",
       desc: "Kurikulum padat yang terbukti mengantarkan santri dan pemula lancar membaca dalam waktu singkat.",
     },
     {
+      icon: "🧠",
       title: "Formula Kata Anti-Lupa",
       desc: "Menggunakan asosiasi bunyi kata alami bahasa Indonesia sehingga tidak mudah terlupakan.",
     },
     {
+      icon: "🎯",
       title: "Cocok untuk Semua Usia",
       desc: "Efektif digunakan untuk balita, anak usia sekolah, remaja, mualaf, hingga lansia.",
     },
     {
+      icon: "🌟",
       title: "Bahan Cetak Standar Premium",
       desc: "Kertas tebal ramah anak, warna cerah tidak silau, dan tahan digunakan bertahun-tahun.",
     },
   ];
 
+  const handleQuickAdd = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (cartContext?.addToCart) {
+      try {
+        await cartContext.addToCart("1", 1);
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 2200);
+      } catch {
+        // Fallback
+      }
+    }
+  };
+
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white relative overflow-hidden">
-      {/* Decorative ambient background elements */}
+    <section className="py-16 md:py-24 bg-gradient-to-br from-primary-950 via-primary-900 to-primary-950 text-white relative overflow-hidden border-y border-primary-800/80">
+      {/* Decorative ambient background glows */}
       <div
-        className="absolute top-0 right-1/4 w-96 h-96 bg-primary-600/15 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"
         aria-hidden="true"
       />
       <div
-        className="absolute bottom-0 left-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"
         aria-hidden="true"
       />
 
-      <div className="container px-4 mx-auto relative z-10">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 items-center">
-          {/* Left Column: Visual Showcase & Badges */}
-          <div className="lg:col-span-6">
+      <div className="container px-4 mx-auto relative z-10 max-w-6xl">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 items-center">
+          {/* ============================================================ */}
+          {/* Left Column: 3D Box Photography & Trust Badges */}
+          {/* ============================================================ */}
+          <div className="lg:col-span-5 space-y-4">
             <Reveal>
-              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/15 bg-primary-800/60 group">
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 bg-primary-900 group">
                 <Image
                   src="/images/penaameen/products/featured-home-learning.jpg?v=20260817b"
                   alt="Paket Home Learning ALBARQY Box Set Lengkap dengan Buku, Flashcard, Poster, dan Tas Eksklusif"
                   fill
+                  priority
                   unoptimized
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="(max-width: 1024px) 100vw, 42vw"
                   className="object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
 
                 {/* Floating Top Badge */}
-                <div className="absolute top-4 left-4 bg-primary-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
-                  <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                <div className="absolute top-3.5 left-3.5 bg-primary-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
+                  <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                     <span>👑</span>
                     <span>Paket Unggulan Terlengkap</span>
                   </span>
                 </div>
 
-                {/* Floating Bottom Milestone Badge */}
-                <div className="absolute bottom-4 left-4 right-4 bg-primary-900/90 backdrop-blur-md p-3.5 rounded-2xl border border-white/20 shadow-lg flex items-center justify-between">
+                {/* Floating Bottom Trust Pill */}
+                <div className="absolute bottom-3.5 left-3.5 right-3.5 bg-primary-950/90 backdrop-blur-md p-3 rounded-2xl border border-white/20 shadow-lg flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-amber-400 text-primary-950 flex items-center justify-center font-bold text-sm">
+                    <span className="w-7 h-7 rounded-full bg-amber-400 text-primary-950 flex items-center justify-center font-bold text-xs">
                       ★
                     </span>
                     <div>
                       <p className="text-xs font-bold text-white leading-tight">
                         Rating 4.9 / 5.0
                       </p>
-                      <p className="text-[11px] text-primary-200">
+                      <p className="text-[10px] text-emerald-300">
                         Dipercaya 3.200+ Keluarga &amp; Sekolah
                       </p>
                     </div>
                   </div>
-                  <span className="text-[11px] font-semibold bg-white/20 text-white px-2.5 py-1 rounded-lg">
+                  <span className="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded-md">
                     Box Set 5-in-1
                   </span>
                 </div>
               </div>
+
+              {/* 3 Quick Micro-Trust Badges */}
+              <div className="grid grid-cols-3 gap-2 pt-1">
+                {[
+                  { icon: "🛡️", label: "100% Orisinal", sub: "Garansi Resmi" },
+                  { icon: "⚡", label: "Garansi Cacat", sub: "Ganti Baru" },
+                  { icon: "🚚", label: "Kirim Cepat", sub: "Nasional" },
+                ].map((b, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center"
+                  >
+                    <span className="text-sm mb-0.5">{b.icon}</span>
+                    <span className="text-[11px] font-bold text-white leading-tight">{b.label}</span>
+                    <span className="text-[9px] text-white/60">{b.sub}</span>
+                  </div>
+                ))}
+              </div>
             </Reveal>
           </div>
 
-          {/* Right Column: Information, Kit Breakdown & CTAs */}
-          <div className="lg:col-span-6 flex flex-col justify-between">
+          {/* ============================================================ */}
+          {/* Right Column: Title, Tabbed Breakdown, & Action Box */}
+          {/* ============================================================ */}
+          <div className="lg:col-span-7 flex flex-col justify-between">
             <Reveal delay={0.15}>
               <div>
-                <div className="flex flex-wrap items-center gap-2 mb-3">
+                {/* Header Pills */}
+                <div className="flex flex-wrap items-center gap-2 mb-2.5">
                   <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full">
                     PILIHAN BELAJAR UTAMA
                   </span>
-                  <span className="text-xs text-primary-300 font-medium">
+                  <span className="text-xs text-emerald-300 font-medium">
                     • Metode Anti-Lupa 200 Menit
                   </span>
                 </div>
 
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white leading-tight mb-4">
+                {/* Section Title */}
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-white leading-tight mb-2.5">
                   Paket Home Learning ALBARQY
                 </h2>
 
-                <p className="text-sm sm:text-base text-primary-100/90 leading-relaxed mb-6">
-                  Solusi menyeluruh pembelajaran membaca Al-Qur&apos;an mandiri
-                  di rumah. Dirancang agar anak dan pembelajar dewasa dapat
-                  belajar secara runtut, menyenangkan, dan cepat mahir tanpa
-                  rasa bosan.
+                <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
+                  Solusi menyeluruh pembelajaran membaca Al-Qur&apos;an mandiri di rumah. Dirancang agar anak dan pembelajar dewasa dapat belajar secara runtut, menyenangkan, dan cepat mahir tanpa rasa bosan.
                 </p>
 
-                {/* Tab Switcher: Isi Paket vs Keunggulan */}
-                <div className="flex gap-2 p-1 bg-primary-900/80 rounded-xl border border-white/15 mb-5 w-fit">
+                {/* Interactive Tab Switcher */}
+                <div className="flex items-center gap-2 p-1 bg-primary-900/90 rounded-2xl border border-white/20 mb-4 w-fit">
                   <button
+                    type="button"
                     onClick={() => setActiveTab("isi")}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                       activeTab === "isi"
                         ? "bg-white text-primary-950 shadow-xs"
-                        : "text-primary-200 hover:text-white"
+                        : "text-white/70 hover:text-white"
                     }`}
                   >
-                    📦 Isi Paket Box (5 Item)
+                    <span>📦 Isi Paket Box (5 Item)</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => setActiveTab("keunggulan")}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                       activeTab === "keunggulan"
                         ? "bg-white text-primary-950 shadow-xs"
-                        : "text-primary-200 hover:text-white"
+                        : "text-white/70 hover:text-white"
                     }`}
                   >
-                    ⚡ Keunggulan Metode
+                    <span>⚡ Keunggulan Metode</span>
                   </button>
                 </div>
 
-                {/* Content based on Active Tab */}
-                {activeTab === "isi" ? (
-                  <div className="space-y-3 mb-8">
+                {/* Tab Content 1: Compact 2-Column Box Contents */}
+                {activeTab === "isi" && (
+                  <div className="grid gap-2.5 sm:grid-cols-2 mb-5">
                     {kitContents.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-start gap-3 p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                        className={`flex items-start gap-2.5 p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors ${
+                          idx === 4 ? "sm:col-span-2" : ""
+                        }`}
                       >
-                        <span className="text-base flex-shrink-0 mt-0.5">
+                        <span className="text-xl flex-shrink-0 mt-0.5 p-1 rounded-lg bg-white/10">
                           {item.icon}
                         </span>
                         <div>
-                          <h4 className="text-xs sm:text-sm font-semibold text-white">
+                          <h4 className="text-xs sm:text-sm font-bold text-white leading-tight mb-0.5">
                             {item.title}
                           </h4>
-                          <p className="text-[11px] sm:text-xs text-primary-200 leading-snug">
+                          <p className="text-[11px] text-white/70 leading-snug">
                             {item.desc}
                           </p>
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="grid gap-3 sm:grid-cols-2 mb-8">
+                )}
+
+                {/* Tab Content 2: 2x2 Key Advantages */}
+                {activeTab === "keunggulan" && (
+                  <div className="grid gap-2.5 sm:grid-cols-2 mb-5">
                     {keyAdvantages.map((adv, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 rounded-xl bg-white/5 border border-white/10"
+                        className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-start gap-2.5"
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-amber-400 font-bold text-sm">
-                            ✓
-                          </span>
-                          <h4 className="text-xs sm:text-sm font-semibold text-white">
+                        <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                          ✓
+                        </span>
+                        <div>
+                          <h4 className="text-xs sm:text-sm font-bold text-white mb-0.5">
                             {adv.title}
                           </h4>
+                          <p className="text-[11px] text-white/70 leading-snug">
+                            {adv.desc}
+                          </p>
                         </div>
-                        <p className="text-[11px] sm:text-xs text-primary-200 leading-relaxed">
-                          {adv.desc}
-                        </p>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Price & Purchase Actions */}
-                <div className="p-5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex flex-wrap items-center justify-between gap-4">
+                {/* Price & Purchase Actions Bar */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[11px] uppercase tracking-wider text-primary-200 block">
+                    <span className="text-[10px] uppercase tracking-wider text-emerald-300 font-bold block mb-0.5">
                       Harga Paket Lengkap
                     </span>
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex items-baseline gap-2.5">
                       <span className="text-2xl sm:text-3xl font-bold text-amber-300 font-serif">
                         {formatPrice(966000)}
                       </span>
-                      <span className="text-xs text-primary-200 line-through opacity-75">
+                      <span className="text-xs text-white/50 line-through">
                         {formatPrice(1250000)}
                       </span>
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
+                        Hemat Rp284.000 + Bonus Tas Eksklusif
+                      </span>
                     </div>
-                    <span className="text-[11px] text-amber-200/90 font-medium">
-                      ✓ Hemat Rp284.000 + Bonus Tas Eksklusif
-                    </span>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2.5">
+                    {cartContext?.addToCart && (
+                      <button
+                        type="button"
+                        onClick={handleQuickAdd}
+                        className={`px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                          isAdded
+                            ? "bg-emerald-500 text-white shadow-lg"
+                            : "bg-white/15 hover:bg-white/25 text-white border border-white/20"
+                        }`}
+                      >
+                        {isAdded ? (
+                          <>
+                            <span>✓</span>
+                            <span>Ditambah!</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>+</span>
+                            <span>Keranjang</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
                     <Link
                       href="/produk/paket-home-learning-albarqy"
-                      className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-primary-950 font-bold rounded-xl text-xs sm:text-sm shadow-md transition-all duration-200 transform hover:-translate-y-0.5 inline-flex items-center gap-2"
+                      className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-primary-950 font-bold rounded-xl text-xs sm:text-sm shadow-md transition-all duration-200 transform hover:-translate-y-0.5 inline-flex items-center gap-1.5"
                     >
                       <span>Lihat Detail Produk</span>
                       <svg
@@ -247,9 +320,10 @@ export function FeaturedProductSection() {
                         />
                       </svg>
                     </Link>
+
                     <Link
                       href="/kontak"
-                      className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-medium border border-white/20 transition-colors"
+                      className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-medium border border-white/20 transition-colors"
                     >
                       Tanya CS
                     </Link>
