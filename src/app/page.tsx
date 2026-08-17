@@ -1,12 +1,35 @@
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Reveal } from "@/components/motion/Reveal";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { LearningJourneySection } from "@/components/sections/LearningJourneySection";
-import { FeaturedProductSection } from "@/components/sections/FeaturedProductSection";
-import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
-import { EditorialStorySection } from "@/components/sections/EditorialStorySection";
 import { ProductCatalogSection } from "@/components/sections/ProductCatalogSection";
+import { FeaturedProductSection } from "@/components/sections/FeaturedProductSection";
+
+// Dynamically import below-the-fold interactive sections to reduce initial TBT & bundle size
+const LearningJourneySection = dynamic(
+  () =>
+    import("@/components/sections/LearningJourneySection").then(
+      (m) => m.LearningJourneySection
+    ),
+  { ssr: true }
+);
+
+const TestimonialsSection = dynamic(
+  () =>
+    import("@/components/sections/TestimonialsSection").then(
+      (m) => m.TestimonialsSection
+    ),
+  { ssr: true }
+);
+
+const EditorialStorySection = dynamic(
+  () =>
+    import("@/components/sections/EditorialStorySection").then(
+      (m) => m.EditorialStorySection
+    ),
+  { ssr: true }
+);
 
 const articles = [
   {
@@ -138,11 +161,10 @@ export default function HomePage() {
                 <div className="relative">
                   <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-supporting-200 group">
                     <Image
-                      src="/images/penaameen/editorial/anak-belajar-mengaji.jpg?v=20260817c"
+                      src="/images/penaameen/editorial/anak-belajar-mengaji.jpg"
                       alt="Suasana belajar mengaji dan membaca bersama keluarga Penerbit Pena Ameen"
                       fill
-                      unoptimized
-                      priority
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-cover group-hover:scale-103 transition-transform duration-700 ease-out"
                     />
 
@@ -230,10 +252,9 @@ export default function HomePage() {
                   <div>
                     <div className="relative mb-3 aspect-[4/3] rounded-2xl overflow-hidden bg-supporting-100">
                       <Image
-                        src={`${item.image}?v=20260817b`}
+                        src={item.image}
                         alt={item.title}
                         fill
-                        unoptimized
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-cover"
                       />
@@ -280,7 +301,6 @@ export default function HomePage() {
                       src="/images/penaameen/methods/method-acm.jpg"
                       alt="Anak ceria belajar membaca dengan buku metode ACM"
                       fill
-                      unoptimized
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                     />
@@ -350,7 +370,6 @@ export default function HomePage() {
                       src="/images/penaameen/methods/method-albarqy.jpg"
                       alt="Santri belajar membaca Al-Qur'an dengan metode Al-Barqy"
                       fill
-                      unoptimized
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                     />
@@ -456,7 +475,6 @@ export default function HomePage() {
                         src={art.image}
                         alt={art.title}
                         fill
-                        unoptimized
                         sizes="(max-width: 1024px) 100vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -505,7 +523,7 @@ export default function HomePage() {
             src="/images/penaameen/hero/hero-bg-islamic-learning.jpg"
             alt=""
             fill
-            unoptimized
+            sizes="100vw"
             className="object-cover"
           />
         </div>

@@ -211,7 +211,7 @@ export function TestimonialsSection() {
                             src={item.avatar}
                             alt={item.name}
                             fill
-                            unoptimized
+                            sizes="36px"
                             className="object-cover"
                           />
                         </div>
@@ -277,7 +277,7 @@ export function TestimonialsSection() {
                     src={selectedProof.image!}
                     alt={`Bukti ulasan dari ${selectedProof.name}`}
                     fill
-                    unoptimized
+                    sizes="(max-width: 640px) 100vw, 448px"
                     className="object-contain"
                   />
                 </div>

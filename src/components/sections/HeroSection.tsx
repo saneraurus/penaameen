@@ -133,7 +133,6 @@ export function HeroSection() {
           alt="Latar Belajar Islami Pena Ameen"
           fill
           priority
-          unoptimized
           sizes="100vw"
           className="object-cover object-center brightness-[0.40] contrast-[1.10]"
         />
@@ -317,11 +316,11 @@ export function HeroSection() {
                 <div className="lg:col-span-5">
                   <div className="relative aspect-[16/10] sm:aspect-[16/10] max-h-[160px] sm:max-h-[190px] rounded-xl overflow-hidden border border-white/25 shadow-md bg-primary-800/80">
                     <Image
-                      src={`${activeTab.image}?v=20260817b`}
+                      src={activeTab.image}
                       alt={activeTab.imageAlt}
                       fill
-                      unoptimized
                       priority
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
                       className="object-cover"
                     />
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-primary-950/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/20 flex items-center justify-between text-[11px] text-white">

@@ -37,7 +37,6 @@ export function EditorialStorySection() {
                     src="/images/penaameen/editorial/editorial-family-bonding.jpg"
                     alt="Ibu dan anak membaca buku bersama dengan penuh kehangatan dan senyuman"
                     fill
-                    unoptimized
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover group-hover:scale-103 transition-transform duration-700 ease-out"
                   />

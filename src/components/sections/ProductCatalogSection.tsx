@@ -152,10 +152,10 @@ export function ProductCatalogSection() {
                       className="relative aspect-[4/3] bg-supporting-100 overflow-hidden block"
                     >
                       <Image
-                        src={`${product.image}?v=20260817b`}
+                        src={product.image}
                         alt={product.name}
                         fill
-                        unoptimized
+                        sizes="(max-width: 640px) 220px, 250px"
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

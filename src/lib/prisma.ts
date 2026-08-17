@@ -9,7 +9,13 @@ const globalForPrisma = globalThis as unknown as {
 function getPrismaClient(): PrismaClient {
   if (!globalForPrisma.prisma) {
     const adapter = new PrismaPg(
-      new Pool({ connectionString: process.env["DATABASE_URL"] }),
+      new Pool({
+        connectionString: process.env["DATABASE_URL"],
+        // Force UTF-8 client encoding. Windows PostgreSQL defaults to the
+        // locale encoding (WIN1252), which rejects characters such as U+2011
+        // (non-breaking hyphen) emitted by AI providers with "22P05".
+        options: "-c client_encoding=UTF8",
+      }),
     );
     globalForPrisma.prisma = new PrismaClient({
       adapter,
