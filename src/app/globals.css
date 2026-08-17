@@ -84,6 +84,19 @@
   --color-background-800: #5d5148;
   --color-background-900: #312b2a;
 
+  /* shadcn UI Color Tokens */
+  --color-popover: #ffffff;
+  --color-popover-foreground: #14232e;
+  --color-border: #e9ecef;
+  --color-input: #dee2e6;
+  --color-ring: #368c57;
+  --color-background: #ffffff;
+  --color-foreground: #14232e;
+  --color-muted: #f8f9fa;
+  --color-muted-foreground: #6c757d;
+  --color-accent: #f8f9fa;
+  --color-accent-foreground: #14232e;
+
   /* Typography */
   --font-sans: "Inter", system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", Georgia, serif;
@@ -247,4 +260,80 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/*
+ * Refined motion + layout utilities.
+ *
+ * `animate-fade-in` is referenced by the navigation drawer; it was previously
+ * undefined, so the mobile menu animated from nothing. We define it here.
+ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-rise-in {
+    animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Editorial image-frame used across the marketing pages. */
+  .image-frame {
+    border-radius: var(--radius-3xl);
+    overflow: hidden;
+    background: var(--color-supporting-100);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+/* Consistent vertical rhythm for editorial sections (mobile → desktop). */
+.section-y {
+  padding-top: clamp(3.5rem, 8vw, 7rem);
+  padding-bottom: clamp(3.5rem, 8vw, 7rem);
+}
+
+/* Subtle, premium hairline used for dividers and card edges. */
+.hairline {
+  border-color: color-mix(in srgb, var(--color-supporting-200) 70%, transparent);
+}
+
+/* Eyebrow / kicker label — small, tracked, quiet. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary-700);
 }

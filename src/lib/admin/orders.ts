@@ -1,3 +1,33 @@
+import { prisma } from "@/lib/prisma";
+import fs from "fs";
+import path from "path";
+
+const LIVE_ORDERS_FILE = path.join(process.cwd(), "src/data/live_orders.json");
+
+export function loadFileOrders(): AdminOrder[] {
+  try {
+    if (fs.existsSync(LIVE_ORDERS_FILE)) {
+      const raw = fs.readFileSync(LIVE_ORDERS_FILE, "utf-8");
+      return JSON.parse(raw) as AdminOrder[];
+    }
+  } catch (e) {
+    console.warn("Could not read live_orders.json:", e);
+  }
+  return [];
+}
+
+export function saveFileOrders(orders: AdminOrder[]): void {
+  try {
+    const dir = path.dirname(LIVE_ORDERS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(LIVE_ORDERS_FILE, JSON.stringify(orders, null, 2), "utf-8");
+  } catch (e) {
+    console.warn("Could not write live_orders.json:", e);
+  }
+}
+
 export interface AdminOrder {
   id: string;
   orderNumber: string;
@@ -90,334 +120,20 @@ export interface GetOrdersResult {
   total: number;
 }
 
-const PRODUCTS_FOR_ORDERS = [
-  {
-    id: "1",
-    name: "Paket Home Learning ALBARQY",
-    slug: "paket-home-learning-albarqy",
-    price: 966000,
-  },
-  {
-    id: "2",
-    name: "Paket FlashCard ALBARQY",
-    slug: "paket-flashcard-albarqy",
-    price: 378000,
-  },
-  {
-    id: "5",
-    name: "Paket Buku Metode Belajar Membaca ACM 3",
-    slug: "paket-buku-metode-belajar-membaca-acm-3",
-    price: 166000,
-  },
-  { id: "7", name: "Paket ALBARQY 3", slug: "paket-albarqy-3", price: 355000 },
-  {
-    id: "11",
-    name: "Paket Home Learning Buku Belajar Cepat Membaca ACM",
-    slug: "paket-home-learning-acm",
-    price: 795000,
-  },
-  {
-    id: "14",
-    name: "Cinta (tak) Selamanya Indah",
-    slug: "cinta-tak-selamanya-indah",
-    price: 50000,
-  },
-  {
-    id: "17",
-    name: "BETON MUTU TINGGI RAMAH LINGKUNGAN",
-    slug: "beton-mutu-tinggi-ramah-lingkungan",
-    price: 185000,
-  },
-];
+export const MOCK_ADMIN_ORDERS: AdminOrder[] = [];
 
-const CUSTOMERS = [
-  { name: "Siti Aisyah", email: "siti.aisyah@example.com" },
-  { name: "Budi Santoso", email: "budi.santoso@example.com" },
-  { name: "Rina Marlina", email: "rina.marlina@example.com" },
-  { name: "Ahmad Fauzi", email: "ahmad.fauzi@example.com" },
-  { name: "Dewi Lestari", email: "dewi.lestari@example.com" },
-  { name: "Eko Prasetyo", email: "eko.prasetyo@example.com" },
-  { name: "Fitri Handayani", email: "fitri.handayani@example.com" },
-];
-
-const CITIES = [
-  { city: "Jakarta", province: "DKI Jakarta", postalCode: "12560" },
-  { city: "Bandung", province: "Jawa Barat", postalCode: "40123" },
-  { city: "Surabaya", province: "Jawa Timur", postalCode: "60234" },
-  { city: "Yogyakarta", province: "DI Yogyakarta", postalCode: "55281" },
-  { city: "Semarang", province: "Jawa Tengah", postalCode: "50244" },
-];
-
-function buildItems(seed: number): AdminOrderItem[] {
-  const count = (seed % 3) + 1;
-  const items: AdminOrderItem[] = [];
-  for (let i = 0; i < count; i++) {
-    const product =
-      PRODUCTS_FOR_ORDERS[(seed + i) % PRODUCTS_FOR_ORDERS.length]!;
-    const quantity = ((seed + i) % 3) + 1;
-    items.push({
-      id: `${seed}-${i}`,
-      productId: product.id,
-      productName: product.name,
-      productSlug: product.slug,
-      quantity,
-      unitPrice: product.price,
-      totalPrice: product.price * quantity,
-    });
+export function registerLiveOrder(order: AdminOrder): void {
+  const current = loadFileOrders();
+  const existingIdx = current.findIndex(
+    (o) => o.id === order.id || o.orderNumber === order.orderNumber
+  );
+  if (existingIdx >= 0) {
+    current[existingIdx] = order;
+  } else {
+    current.unshift(order);
   }
-  return items;
+  saveFileOrders(current);
 }
-
-function buildPayments(
-  seed: number,
-  total: number,
-  paymentStatus: AdminOrder["paymentStatus"],
-): PaymentEvent[] {
-  const now = Date.now();
-  const base = new Date(now - seed * 36 * 60 * 60 * 1000).toISOString();
-  if (paymentStatus === "paid") {
-    return [
-      {
-        id: `pay-${seed}-1`,
-        type: "payment_intent",
-        status: "succeeded",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-INT`,
-        createdAt: base,
-      },
-    ];
-  }
-  if (paymentStatus === "pending") {
-    return [
-      {
-        id: `pay-${seed}-1`,
-        type: "payment_intent",
-        status: "pending",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-INT`,
-        createdAt: base,
-      },
-    ];
-  }
-  if (paymentStatus === "failed") {
-    return [
-      {
-        id: `pay-${seed}-1`,
-        type: "payment_intent",
-        status: "failed",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-INT`,
-        createdAt: base,
-      },
-    ];
-  }
-  if (paymentStatus === "refunded") {
-    return [
-      {
-        id: `pay-${seed}-1`,
-        type: "charge",
-        status: "succeeded",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-CHG`,
-        createdAt: base,
-      },
-      {
-        id: `pay-${seed}-2`,
-        type: "refund",
-        status: "succeeded",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-REF`,
-        createdAt: new Date(now - seed * 12 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
-  }
-  if (paymentStatus === "partially_refunded") {
-    return [
-      {
-        id: `pay-${seed}-1`,
-        type: "charge",
-        status: "succeeded",
-        amount: total,
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-CHG`,
-        createdAt: base,
-      },
-      {
-        id: `pay-${seed}-2`,
-        type: "refund",
-        status: "succeeded",
-        amount: Math.round(total / 2),
-        currency: "IDR",
-        provider: "midtrans",
-        providerReference: `ORD-${seed}-REF`,
-        createdAt: new Date(now - seed * 8 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
-  }
-  return [];
-}
-
-function buildFulfillment(
-  seed: number,
-  fulfillmentStatus: AdminOrder["fulfillmentStatus"],
-): FulfillmentEvent[] {
-  const now = Date.now();
-  const events: FulfillmentEvent[] = [];
-  if (fulfillmentStatus === "shipped" || fulfillmentStatus === "delivered") {
-    events.push({
-      id: `ful-${seed}-1`,
-      type: "packed",
-      status: "completed",
-      createdAt: new Date(now - seed * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    events.push({
-      id: `ful-${seed}-2`,
-      type: "shipped",
-      status: "completed",
-      trackingNumber: `JNE${seed}000${seed}`,
-      carrier: "JNE",
-      trackingUrl: `https://www.jne.co.id/tracking/${seed}`,
-      createdAt: new Date(now - seed * 12 * 60 * 60 * 1000).toISOString(),
-    });
-  }
-  if (fulfillmentStatus === "delivered") {
-    events.push({
-      id: `ful-${seed}-3`,
-      type: "delivered",
-      status: "completed",
-      createdAt: new Date(now - seed * 6 * 60 * 60 * 1000).toISOString(),
-    });
-  }
-  if (fulfillmentStatus === "fulfilled") {
-    events.push({
-      id: `ful-${seed}-1`,
-      type: "packed",
-      status: "completed",
-      createdAt: new Date(now - seed * 24 * 60 * 60 * 1000).toISOString(),
-    });
-  }
-  return events;
-}
-
-const ORDER_SEEDS: Array<{
-  status: AdminOrder["status"];
-  paymentStatus: AdminOrder["paymentStatus"];
-  fulfillmentStatus: AdminOrder["fulfillmentStatus"];
-}> = [
-  {
-    status: "pending",
-    paymentStatus: "pending",
-    fulfillmentStatus: "unfulfilled",
-  },
-  {
-    status: "processing",
-    paymentStatus: "paid",
-    fulfillmentStatus: "unfulfilled",
-  },
-  {
-    status: "processing",
-    paymentStatus: "paid",
-    fulfillmentStatus: "fulfilled",
-  },
-  { status: "completed", paymentStatus: "paid", fulfillmentStatus: "shipped" },
-  {
-    status: "completed",
-    paymentStatus: "paid",
-    fulfillmentStatus: "delivered",
-  },
-  {
-    status: "cancelled",
-    paymentStatus: "failed",
-    fulfillmentStatus: "unfulfilled",
-  },
-  {
-    status: "refunded",
-    paymentStatus: "refunded",
-    fulfillmentStatus: "unfulfilled",
-  },
-  {
-    status: "pending",
-    paymentStatus: "pending",
-    fulfillmentStatus: "unfulfilled",
-  },
-  {
-    status: "processing",
-    paymentStatus: "paid",
-    fulfillmentStatus: "fulfilled",
-  },
-  {
-    status: "completed",
-    paymentStatus: "paid",
-    fulfillmentStatus: "delivered",
-  },
-  { status: "processing", paymentStatus: "paid", fulfillmentStatus: "shipped" },
-  {
-    status: "pending",
-    paymentStatus: "partially_refunded",
-    fulfillmentStatus: "unfulfilled",
-  },
-];
-
-const MOCK_ADMIN_ORDERS: AdminOrder[] = Array.from({ length: 24 }, (_, idx) => {
-  const seed = idx + 1;
-  const template = ORDER_SEEDS[idx % ORDER_SEEDS.length]!;
-  const customer = CUSTOMERS[idx % CUSTOMERS.length]!;
-  const cityInfo = CITIES[idx % CITIES.length]!;
-  const items = buildItems(seed);
-  const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0);
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const created = new Date(
-    Date.now() - seed * 18 * 60 * 60 * 1000,
-  ).toISOString();
-
-  return {
-    id: String(seed),
-    orderNumber: `PA-${String(1000 + seed)}`,
-    customerName: customer.name,
-    customerEmail: customer.email,
-    status: template.status,
-    paymentStatus: template.paymentStatus,
-    fulfillmentStatus: template.fulfillmentStatus,
-    totalAmount,
-    currency: "IDR",
-    itemCount,
-    createdAt: created,
-    updatedAt: new Date(
-      Date.now() - (seed % 5) * 6 * 60 * 60 * 1000,
-    ).toISOString(),
-    shippingAddress: {
-      name: customer.name,
-      address1: `Jl. Contoh No. ${seed}`,
-      city: cityInfo.city,
-      province: cityInfo.province,
-      postalCode: cityInfo.postalCode,
-      country: "Indonesia",
-      phone: `0812${String(1000000 + seed * 7).slice(0, 7)}`,
-    },
-    billingAddress: {
-      name: customer.name,
-      address1: `Jl. Contoh No. ${seed}`,
-      city: cityInfo.city,
-      province: cityInfo.province,
-      postalCode: cityInfo.postalCode,
-      country: "Indonesia",
-    },
-    items,
-    paymentHistory: buildPayments(seed, totalAmount, template.paymentStatus),
-    fulfillmentHistory: buildFulfillment(seed, template.fulfillmentStatus),
-  };
-});
 
 export async function getOrders(
   options: GetOrdersOptions,
@@ -433,7 +149,118 @@ export async function getOrders(
     dateTo,
   } = options;
 
-  let filtered = [...MOCK_ADMIN_ORDERS];
+  let prismaOrders: AdminOrder[] = [];
+
+  try {
+    const dbOrders = await prisma.order.findMany({
+      include: {
+        items: { include: { product: true } },
+        user: true,
+        statusHistory: { orderBy: { createdAt: "desc" } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    prismaOrders = dbOrders.map((db) => {
+      const addr = db.shippingAddress as Record<string, string> | null;
+      const paymentStat =
+        db.status === "PAID" || db.status === "PROCESSING" || db.status === "SHIPPED" || db.status === "DELIVERED"
+          ? "paid"
+          : db.status === "REFUNDED"
+          ? "refunded"
+          : db.status === "CANCELLED"
+          ? "failed"
+          : "pending";
+
+      const fulfillmentStat =
+        db.status === "DELIVERED"
+          ? "delivered"
+          : db.status === "SHIPPED"
+          ? "shipped"
+          : db.status === "PROCESSING"
+          ? "fulfilled"
+          : "unfulfilled";
+
+      const orderStat =
+        db.status === "PENDING_PAYMENT"
+          ? "pending"
+          : db.status === "PAID" || db.status === "PROCESSING"
+          ? "processing"
+          : db.status === "DELIVERED"
+          ? "completed"
+          : db.status === "CANCELLED"
+          ? "cancelled"
+          : db.status === "REFUNDED"
+          ? "refunded"
+          : "pending";
+
+      return {
+        id: db.id,
+        orderNumber: db.orderNumber,
+        customerName: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
+        customerEmail: db.user?.email || "pelanggan@penaameen.com",
+        status: orderStat,
+        paymentStatus: paymentStat,
+        fulfillmentStatus: fulfillmentStat,
+        totalAmount: Number(db.total),
+        currency: "IDR",
+        itemCount: db.items.reduce((sum: number, i: { quantity: number }) => sum + i.quantity, 0),
+        createdAt: db.createdAt.toISOString(),
+        updatedAt: db.updatedAt.toISOString(),
+        shippingAddress: {
+          name: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
+          address1: addr?.addressLine1 || "Alamat Pengiriman",
+          city: addr?.city || "Surabaya",
+          province: addr?.province || "Jawa Timur",
+          postalCode: addr?.postalCode || "60238",
+          country: "Indonesia",
+          phone: addr?.phone || "08123456789",
+        },
+        items: db.items.map((i: { id: string; productId: string; product?: { name?: string; slug?: string } | null; quantity: number; price: bigint | number; subtotal: bigint | number }) => ({
+          id: i.id,
+          productId: i.productId,
+          productName: i.product?.name || `Produk ${i.productId}`,
+          productSlug: i.product?.slug || `produk-${i.productId}`,
+          quantity: i.quantity,
+          unitPrice: Number(i.price),
+          totalPrice: Number(i.subtotal),
+        })),
+        paymentHistory: [
+          {
+            id: `pay-${db.id}`,
+            type: "payment_intent",
+            status: paymentStat === "paid" ? "succeeded" : "pending",
+            amount: Number(db.total),
+            currency: "IDR",
+            provider: "midtrans",
+            providerReference: db.midtransOrderId || db.orderNumber,
+            createdAt: db.createdAt.toISOString(),
+          },
+        ],
+        fulfillmentHistory: [
+          {
+            id: `ful-${db.id}`,
+            type: "shipped",
+            status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
+            carrier: db.shippingMethod || "JNE",
+            trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+            createdAt: db.createdAt.toISOString(),
+          },
+        ],
+      };
+    });
+  } catch {
+    // Prisma offline/empty fallback
+  }
+
+  const fileOrders = loadFileOrders();
+
+  // Merge live orders with file orders and prisma orders
+  const allOrdersMap = new Map<string, AdminOrder>();
+  for (const o of prismaOrders) allOrdersMap.set(o.id, o);
+  for (const o of fileOrders) allOrdersMap.set(o.id, o);
+
+  let filtered = Array.from(allOrdersMap.values());
 
   if (search) {
     const searchLower = search.toLowerCase();
@@ -464,25 +291,235 @@ export async function getOrders(
 }
 
 export async function getOrderById(id: string): Promise<AdminOrder | null> {
-  return MOCK_ADMIN_ORDERS.find((o) => o.id === id) ?? null;
+  // 1. Try Prisma DB
+  try {
+    const db = await prisma.order.findFirst({
+      where: { OR: [{ id }, { orderNumber: id }] },
+      include: {
+        items: { include: { product: true } },
+        user: true,
+        statusHistory: { orderBy: { createdAt: "desc" } },
+      },
+    });
+
+    if (db) {
+      const addr = db.shippingAddress as Record<string, string> | null;
+      const paymentStat =
+        db.status === "PAID" || db.status === "PROCESSING" || db.status === "SHIPPED" || db.status === "DELIVERED"
+          ? "paid"
+          : db.status === "REFUNDED"
+          ? "refunded"
+          : db.status === "CANCELLED"
+          ? "failed"
+          : "pending";
+
+      const fulfillmentStat =
+        db.status === "DELIVERED"
+          ? "delivered"
+          : db.status === "SHIPPED"
+          ? "shipped"
+          : db.status === "PROCESSING"
+          ? "fulfilled"
+          : "unfulfilled";
+
+      const orderStat =
+        db.status === "PENDING_PAYMENT"
+          ? "pending"
+          : db.status === "PAID" || db.status === "PROCESSING"
+          ? "processing"
+          : db.status === "DELIVERED"
+          ? "completed"
+          : db.status === "CANCELLED"
+          ? "cancelled"
+          : db.status === "REFUNDED"
+          ? "refunded"
+          : "pending";
+
+      return {
+        id: db.id,
+        orderNumber: db.orderNumber,
+        customerName: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
+        customerEmail: db.user?.email || "pelanggan@penaameen.com",
+        status: orderStat,
+        paymentStatus: paymentStat,
+        fulfillmentStatus: fulfillmentStat,
+        totalAmount: Number(db.total),
+        currency: "IDR",
+        itemCount: db.items.reduce((sum: number, i: { quantity: number }) => sum + i.quantity, 0),
+        createdAt: db.createdAt.toISOString(),
+        updatedAt: db.updatedAt.toISOString(),
+        shippingAddress: {
+          name: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
+          address1: addr?.addressLine1 || "Alamat Pengiriman",
+          city: addr?.city || "Surabaya",
+          province: addr?.province || "Jawa Timur",
+          postalCode: addr?.postalCode || "60238",
+          country: "Indonesia",
+          phone: addr?.phone || "08123456789",
+        },
+        items: db.items.map((i: { id: string; productId: string; product?: { name?: string; slug?: string } | null; quantity: number; price: bigint | number; subtotal: bigint | number }) => ({
+          id: i.id,
+          productId: i.productId,
+          productName: i.product?.name || `Produk ${i.productId}`,
+          productSlug: i.product?.slug || `produk-${i.productId}`,
+          quantity: i.quantity,
+          unitPrice: Number(i.price),
+          totalPrice: Number(i.subtotal),
+        })),
+        paymentHistory: [
+          {
+            id: `pay-${db.id}`,
+            type: "payment_intent",
+            status: paymentStat === "paid" ? "succeeded" : "pending",
+            amount: Number(db.total),
+            currency: "IDR",
+            provider: "midtrans",
+            providerReference: db.midtransOrderId || db.orderNumber,
+            createdAt: db.createdAt.toISOString(),
+          },
+        ],
+        fulfillmentHistory: [
+          {
+            id: `ful-${db.id}`,
+            type: "shipped",
+            status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
+            carrier: db.shippingMethod || "JNE",
+            trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+            createdAt: db.createdAt.toISOString(),
+          },
+        ],
+      };
+    }
+  } catch {
+    // DB query fallback
+  }
+
+  // 2. Try File Store
+  const fileOrders = loadFileOrders();
+  const fileMatch = fileOrders.find((o) => o.id === id || o.orderNumber === id);
+  if (fileMatch) return fileMatch;
+
+  return null;
 }
 
 export async function getOrderStatusCounts(): Promise<{
   paymentPending: number;
   fulfillmentReady: number;
   blocked: number;
+  totalOrders: number;
+  totalRevenue: number;
+  activeProcessing: number;
 }> {
+  const { orders } = await getOrders({ page: 1, perPage: 1000 });
+
+  const paymentPending = orders.filter((o) => o.paymentStatus === "pending").length;
+  const fulfillmentReady = orders.filter(
+    (o) =>
+      (o.paymentStatus === "paid" || o.status === "processing") &&
+      o.fulfillmentStatus !== "delivered" &&
+      o.status !== "cancelled"
+  ).length;
+  const blocked = orders.filter(
+    (o) => o.paymentStatus === "failed" || o.status === "cancelled"
+  ).length;
+  const activeProcessing = orders.filter(
+    (o) => o.status === "processing" || o.paymentStatus === "paid"
+  ).length;
+  const totalRevenue = orders
+    .filter((o) => o.paymentStatus === "paid" || o.status === "completed" || o.status === "processing")
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+
   return {
-    paymentPending: MOCK_ADMIN_ORDERS.filter(
-      (o) => o.paymentStatus === "pending",
-    ).length,
-    fulfillmentReady: MOCK_ADMIN_ORDERS.filter(
-      (o) =>
-        o.paymentStatus === "paid" && o.fulfillmentStatus === "unfulfilled",
-    ).length,
-    blocked: MOCK_ADMIN_ORDERS.filter(
-      (o) => o.paymentStatus === "failed" || o.status === "cancelled",
-    ).length,
+    paymentPending,
+    fulfillmentReady,
+    blocked,
+    totalOrders: orders.length,
+    totalRevenue,
+    activeProcessing,
+  };
+}
+
+export interface SalesDataPoint {
+  date: string;
+  shortDate: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface SalesAnalytics {
+  points7d: SalesDataPoint[];
+  points30d: SalesDataPoint[];
+  totalRevenue: number;
+  totalOrders: number;
+  paidOrdersCount: number;
+  averageOrderValue: number;
+}
+
+export async function getSalesAnalytics(): Promise<SalesAnalytics> {
+  const { orders } = await getOrders({ page: 1, perPage: 10000 });
+  const validOrders = orders.filter(
+    (o) =>
+      (o.paymentStatus === "paid" || o.status === "completed" || o.status === "processing") &&
+      o.status !== "cancelled"
+  );
+
+  const now = new Date();
+
+  function buildPoints(days: number): SalesDataPoint[] {
+    const points: SalesDataPoint[] = [];
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const dateIso = d.toISOString().slice(0, 10);
+
+      const matchingOrders = validOrders.filter((o) => {
+        try {
+          const orderDateIso = new Date(o.createdAt).toISOString().slice(0, 10);
+          return orderDateIso === dateIso;
+        } catch {
+          return false;
+        }
+      });
+
+      const dayRevenue = matchingOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const dayOrders = matchingOrders.length;
+
+      const shortLabel =
+        i === 0
+          ? "Hari Ini"
+          : i === 1
+          ? "Kemarin"
+          : d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" });
+
+      points.push({
+        date: d.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        shortDate: shortLabel,
+        revenue: dayRevenue,
+        orders: dayOrders,
+      });
+    }
+
+    return points;
+  }
+
+  const points7d = buildPoints(7);
+  const points30d = buildPoints(30);
+
+  const totalRevenue = validOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const paidOrdersCount = validOrders.length;
+  const averageOrderValue = paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0;
+
+  return {
+    points7d,
+    points30d,
+    totalRevenue,
+    totalOrders: orders.length,
+    paidOrdersCount,
+    averageOrderValue,
   };
 }
 
@@ -514,7 +551,7 @@ export async function transitionOrder(
   id: string,
   transition: OrderTransition,
 ): Promise<AdminOrder | null> {
-  const order = MOCK_ADMIN_ORDERS.find((o) => o.id === id);
+  const order = await getOrderById(id);
   if (!order) return null;
 
   const allowed = ALLOWED_TRANSITIONS[transition]?.[order.status];
@@ -528,6 +565,45 @@ export async function transitionOrder(
   if (transition === "mark_shipped") order.fulfillmentStatus = "shipped";
   if (transition === "mark_delivered") order.fulfillmentStatus = "delivered";
   order.updatedAt = new Date().toISOString();
+
+  // Try update Prisma DB
+  try {
+    const prismaStatusMap: Record<string, "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"> = {
+      pending: "PENDING_PAYMENT",
+      processing: transition === "mark_shipped" ? "SHIPPED" : "PROCESSING",
+      completed: "DELIVERED",
+      cancelled: "CANCELLED",
+      refunded: "REFUNDED",
+    };
+
+    const newPrismaStatus = prismaStatusMap[order.status] || "PROCESSING";
+
+    const updateData: Record<string, unknown> = {
+      status: newPrismaStatus,
+    };
+    if (transition === "mark_paid") updateData.paidAt = new Date();
+    if (transition === "mark_shipped") updateData.shippedAt = new Date();
+    if (transition === "mark_delivered") updateData.deliveredAt = new Date();
+    if (transition === "cancel") updateData.cancelledAt = new Date();
+
+    await prisma.order.update({
+      where: { id: order.id },
+      data: updateData as Parameters<typeof prisma.order.update>[0]["data"],
+    });
+
+    await prisma.orderStatusHistory.create({
+      data: {
+        orderId: order.id,
+        status: newPrismaStatus,
+        note: `Status diperbarui oleh Admin: ${transition.replace("_", " ").toUpperCase()}`,
+      },
+    });
+  } catch {
+    // In-memory fallback
+  }
+
+  // Update in Persistent File Store
+  registerLiveOrder(order);
 
   return order;
 }

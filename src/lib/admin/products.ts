@@ -1,4 +1,6 @@
-import { products as productData } from "@/data/products";
+import { products as initialProductData } from "@/data/products";
+import fs from "fs";
+import path from "path";
 
 export interface AdminProduct {
   id: string;
@@ -28,9 +30,9 @@ export interface AdminProduct {
 export interface GetProductsOptions {
   page: number;
   perPage: number;
-  search?: string;
-  category?: string;
-  status?: string;
+  search?: string | undefined;
+  category?: string | undefined;
+  status?: string | undefined;
 }
 
 export interface GetProductsResult {
@@ -38,48 +40,59 @@ export interface GetProductsResult {
   total: number;
 }
 
-const STATUS_MAP: Record<string, "published" | "draft" | "archived"> = {
-  "1": "published",
-  "2": "published",
-  "3": "published",
-  "4": "published",
-  "5": "published",
-  "6": "published",
-  "7": "published",
-  "8": "published",
-  "9": "published",
-  "10": "published",
-  "11": "published",
-  "12": "published",
-  "13": "published",
-  "14": "published",
-  "15": "draft",
-  "16": "draft",
-  "17": "draft",
-  "18": "archived",
-  "19": "archived",
-};
+const LIVE_PRODUCTS_FILE = path.join(process.cwd(), "src/data/live_products.json");
 
-const MOCK_ADMIN_PRODUCTS: AdminProduct[] = productData.map((p) => ({
-  id: p.id,
-  slug: p.slug,
-  name: p.name,
-  category: p.category,
-  description: p.description,
-  price: p.price,
-  image: p.image,
-  status: STATUS_MAP[p.id] ?? "published",
-  shortDescription: p.description.slice(0, 160),
-  sku: `PA-${p.id.padStart(4, "0")}`,
-  stockQuantity: Math.floor(Math.random() * 100) + 1,
-  createdAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-  updatedAt: new Date().toISOString(),
-}));
+export function loadFileProducts(): AdminProduct[] {
+  try {
+    if (fs.existsSync(LIVE_PRODUCTS_FILE)) {
+      const raw = fs.readFileSync(LIVE_PRODUCTS_FILE, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed as AdminProduct[];
+      }
+    }
+  } catch (e) {
+    console.warn("Could not read live_products.json:", e);
+  }
+
+  // Seed default products if not yet persisted
+  const seeded: AdminProduct[] = initialProductData.map((p, idx) => ({
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    category: p.category,
+    description: p.description,
+    price: p.price,
+    image: p.image,
+    status: idx < 16 ? "published" : idx < 18 ? "draft" : "archived",
+    shortDescription: p.description.slice(0, 160),
+    sku: `PA-${p.id.padStart(4, "0")}`,
+    stockQuantity: 50,
+    createdAt: new Date(Date.now() - (19 - idx) * 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+
+  saveFileProducts(seeded);
+  return seeded;
+}
+
+export function saveFileProducts(productsList: AdminProduct[]): void {
+  try {
+    const dir = path.dirname(LIVE_PRODUCTS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(LIVE_PRODUCTS_FILE, JSON.stringify(productsList, null, 2), "utf-8");
+  } catch (e) {
+    console.warn("Could not write live_products.json:", e);
+  }
+}
 
 export async function getProducts(options: GetProductsOptions): Promise<GetProductsResult> {
   const { page, perPage, search, category, status } = options;
+  const productsList = loadFileProducts();
 
-  let filtered = [...MOCK_ADMIN_PRODUCTS];
+  let filtered = [...productsList];
 
   if (search) {
     const searchLower = search.toLowerCase();
@@ -87,7 +100,7 @@ export async function getProducts(options: GetProductsOptions): Promise<GetProdu
       (p) =>
         p.name.toLowerCase().includes(searchLower) ||
         p.slug.toLowerCase().includes(searchLower) ||
-        p.sku?.toLowerCase().includes(searchLower)
+        (p.sku && p.sku.toLowerCase().includes(searchLower))
     );
   }
 
@@ -99,6 +112,8 @@ export async function getProducts(options: GetProductsOptions): Promise<GetProdu
     filtered = filtered.filter((p) => p.status === status);
   }
 
+  filtered.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+
   const total = filtered.length;
   const start = (page - 1) * perPage;
   const paginated = filtered.slice(start, start + perPage);
@@ -107,24 +122,42 @@ export async function getProducts(options: GetProductsOptions): Promise<GetProdu
 }
 
 export async function getProductCategories(): Promise<string[]> {
-  const categories = new Set(MOCK_ADMIN_PRODUCTS.map((p) => p.category));
+  const productsList = loadFileProducts();
+  const categories = new Set(productsList.map((p) => p.category).filter(Boolean));
   return Array.from(categories).sort();
 }
 
 export async function getProductById(id: string): Promise<AdminProduct | null> {
-  return MOCK_ADMIN_PRODUCTS.find((p) => p.id === id) ?? null;
+  const productsList = loadFileProducts();
+  return productsList.find((p) => p.id === id || p.slug === id) ?? null;
+}
+
+export async function getProductBySlug(slug: string): Promise<AdminProduct | null> {
+  const productsList = loadFileProducts();
+  return productsList.find((p) => p.slug === slug || p.id === slug) ?? null;
 }
 
 export async function createProduct(
   data: Omit<AdminProduct, "id" | "createdAt" | "updatedAt">
 ): Promise<AdminProduct> {
+  const productsList = loadFileProducts();
+  const maxNumericId = productsList.reduce((max, p) => {
+    const num = Number(p.id);
+    return !isNaN(num) && num > max ? num : max;
+  }, 0);
+
+  const newId = String(maxNumericId > 0 ? maxNumericId + 1 : Date.now());
   const newProduct: AdminProduct = {
     ...data,
-    id: String(Math.max(...MOCK_ADMIN_PRODUCTS.map((p) => Number(p.id))) + 1),
+    id: newId,
+    sku: data.sku || `PA-${newId.padStart(4, "0")}`,
+    status: data.status || "published",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  MOCK_ADMIN_PRODUCTS.push(newProduct);
+
+  productsList.unshift(newProduct);
+  saveFileProducts(productsList);
   return newProduct;
 }
 
@@ -132,43 +165,39 @@ export async function updateProduct(
   id: string,
   data: Partial<Omit<AdminProduct, "id" | "createdAt">>
 ): Promise<AdminProduct | null> {
-  const index = MOCK_ADMIN_PRODUCTS.findIndex((p) => p.id === id);
+  const productsList = loadFileProducts();
+  const index = productsList.findIndex((p) => p.id === id || p.slug === id);
   if (index === -1) return null;
 
-  const existing = MOCK_ADMIN_PRODUCTS[index];
+  const existing = productsList[index];
   if (!existing) return null;
 
   const updated: AdminProduct = {
+    ...existing,
+    ...data,
     id: existing.id,
-    slug: data.slug ?? existing.slug,
-    name: data.name ?? existing.name,
-    category: data.category ?? existing.category,
-    description: data.description ?? existing.description,
-    price: data.price ?? existing.price,
-    image: data.image ?? existing.image,
-    status: data.status ?? existing.status,
-    shortDescription: data.shortDescription ?? existing.shortDescription,
-    sku: data.sku ?? existing.sku,
-    stockQuantity: data.stockQuantity ?? existing.stockQuantity,
-    salePrice: data.salePrice ?? existing.salePrice,
-    saleStartDate: data.saleStartDate ?? existing.saleStartDate,
-    saleEndDate: data.saleEndDate ?? existing.saleEndDate,
-    tags: data.tags ?? existing.tags,
-    seoTitle: data.seoTitle ?? existing.seoTitle,
-    seoDescription: data.seoDescription ?? existing.seoDescription,
-    seoCanonical: data.seoCanonical ?? existing.seoCanonical,
-    seoIndexable: data.seoIndexable ?? existing.seoIndexable,
-    relatedProductIds: data.relatedProductIds ?? existing.relatedProductIds,
     createdAt: existing.createdAt,
     updatedAt: new Date().toISOString(),
   };
-  MOCK_ADMIN_PRODUCTS[index] = updated;
+
+  productsList[index] = updated;
+  saveFileProducts(productsList);
   return updated;
 }
 
+export async function setProductStatus(
+  id: string,
+  status: "published" | "draft" | "archived"
+): Promise<AdminProduct | null> {
+  return updateProduct(id, { status });
+}
+
 export async function deleteProduct(id: string): Promise<boolean> {
-  const index = MOCK_ADMIN_PRODUCTS.findIndex((p) => p.id === id);
+  const productsList = loadFileProducts();
+  const index = productsList.findIndex((p) => p.id === id || p.slug === id);
   if (index === -1) return false;
-  MOCK_ADMIN_PRODUCTS.splice(index, 1);
+
+  productsList.splice(index, 1);
+  saveFileProducts(productsList);
   return true;
 }

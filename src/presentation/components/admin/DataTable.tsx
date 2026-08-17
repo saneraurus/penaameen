@@ -1,6 +1,5 @@
-"use client";
-
 import { ReactNode } from "react";
+import Link from "next/link";
 
 export interface Column<T> {
   key: string;
@@ -15,7 +14,6 @@ interface DataTableProps<T> {
   keyAccessor: (row: T) => string;
   emptyMessage?: string;
   rowClassName?: (row: T) => string;
-  onRowClick?: (row: T) => void;
 }
 
 export function DataTable<T>({
@@ -24,7 +22,6 @@ export function DataTable<T>({
   keyAccessor,
   emptyMessage = "No data available",
   rowClassName,
-  onRowClick,
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
@@ -53,8 +50,7 @@ export function DataTable<T>({
           {data.map((row) => (
             <tr
               key={keyAccessor(row)}
-              className={`transition-colors ${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""} ${rowClassName?.(row) ?? ""}`}
-              onClick={() => onRowClick?.(row)}
+              className={`transition-colors ${rowClassName?.(row) ?? ""}`}
             >
               {columns.map((column) => (
                 <td key={column.key} className={`px-4 py-3 text-gray-900 ${column.className ?? ""}`}>
@@ -72,19 +68,17 @@ export function DataTable<T>({
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
+  onPageChange?: (page: number) => void;
   showPerPage?: boolean;
   perPage?: number;
   onPerPageChange?: (perPage: number) => void;
+  baseUrl?: string;
 }
 
 export function Pagination({
   currentPage,
   totalPages,
-  onPageChange,
-  showPerPage = false,
-  perPage,
-  onPerPageChange,
+  baseUrl = "",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -98,48 +92,36 @@ export function Pagination({
       <div className="text-sm text-gray-600">
         Page {currentPage} of {totalPages}
       </div>
-      <div className="flex items-center gap-2">
-        {showPerPage && perPage && onPerPageChange && (
-          <select
-            value={perPage}
-            onChange={(e) => onPerPageChange(Number(e.target.value))}
-            className="px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+      <div className="flex items-center gap-1">
+        {currentPage > 1 && (
+          <Link
+            href={`${baseUrl}?page=${currentPage - 1}`}
+            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
           >
-            <option value={10}>10 per page</option>
-            <option value={25}>25 per page</option>
-            <option value={50}>50 per page</option>
-            <option value={100}>100 per page</option>
-          </select>
+            Previous
+          </Link>
         )}
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <div className="flex items-center gap-1">
-          {visiblePages.map((page) => (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`w-8 h-8 text-sm rounded-md font-medium ${
-                page === currentPage
-                  ? "bg-primary-600 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+        {visiblePages.map((page) => (
+          <Link
+            key={page}
+            href={`${baseUrl}?page=${page}`}
+            className={`w-8 h-8 text-sm rounded-md font-medium flex items-center justify-center ${
+              page === currentPage
+                ? "bg-primary-600 text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {page}
+          </Link>
+        ))}
+        {currentPage < totalPages && (
+          <Link
+            href={`${baseUrl}?page=${currentPage + 1}`}
+            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+          >
+            Next
+          </Link>
+        )}
       </div>
     </div>
   );

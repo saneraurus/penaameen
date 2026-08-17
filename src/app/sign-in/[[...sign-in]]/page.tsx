@@ -9,6 +9,7 @@ export default function SignInPage() {
             formButtonPrimary: "bg-primary-600 hover:bg-primary-700 text-white",
             card: "rounded-3xl shadow-lg border border-supporting-200",
             headerTitle: "font-serif text-primary-950 font-bold",
+            badge: { display: "none" },
           },
         }}
       />

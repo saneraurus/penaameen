@@ -49,17 +49,26 @@ export default async function ArticleDetailPage({
                   {article.date} • {article.readTime} min read
                 </span>
               </div>
-              <h1 className="mb-4 text-3xl font-serif text-primary-600">
+              <h1 className="mb-6 text-3xl sm:text-4xl font-serif font-bold text-primary-950">
                 {article.title}
               </h1>
-              {/* In a real app, we would display the featured image here if desired */}
+              {article.image && (
+                <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-md mb-8 border border-supporting-200">
+                  <Image
+                    src={article.image}
+                    alt={article.title}
+                    fill
+                    priority
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none text-supporting-600">
-              {/* We'll use the content from the mock data */}
-              <p>{article.content}</p>
-              {/* In a real app, we would have multiple paragraphs, images, etc. */}
+            <div className="prose prose-lg max-w-none text-supporting-700 leading-relaxed space-y-4 text-base sm:text-lg whitespace-pre-line">
+              {article.content}
             </div>
 
             {/* Related Articles (placeholder) */}

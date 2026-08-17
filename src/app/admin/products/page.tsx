@@ -1,5 +1,6 @@
 import { AdminHeader } from "@/presentation/components/admin/AdminHeader";
 import { DataTable, Pagination } from "@/presentation/components/admin/DataTable";
+import { ProductStatusButton } from "@/presentation/components/admin/ProductStatusButton";
 import Link from "next/link";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
 import { getProducts, getProductCategories, type AdminProduct } from "@/lib/admin/products";
@@ -37,28 +38,34 @@ export default async function AdminProductsPage({
   const columns = [
     {
       key: "name",
-      header: "Product",
-      className: "w-64",
+      header: "Produk",
+      className: "w-72",
       render: (product: AdminProduct) => (
-        <Link
-          href={`/admin/products/${product.id}`}
-          className="font-medium text-gray-900 hover:text-primary-600"
-        >
-          {product.name}
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/products/${product.id}`}
+            className="font-medium text-gray-900 hover:text-primary-600 line-clamp-1"
+          >
+            {product.name}
+          </Link>
+        </div>
       ),
     },
     {
       key: "category",
-      header: "Category",
-      render: (product: AdminProduct) => product.category,
+      header: "Kategori",
+      render: (product: AdminProduct) => (
+        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+          {product.category}
+        </span>
+      ),
     },
     {
       key: "price",
-      header: "Price",
-      className: "w-48",
+      header: "Harga",
+      className: "w-36",
       render: (product: AdminProduct) => (
-        <span className="font-mono text-gray-900">
+        <span className="font-mono font-medium text-gray-900 text-xs">
           {new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
@@ -70,43 +77,57 @@ export default async function AdminProductsPage({
     {
       key: "status",
       header: "Status",
-      className: "w-40",
+      className: "w-36",
       render: (product: AdminProduct) => {
-        const statusColors = {
-          published: "bg-green-100 text-green-700",
-          draft: "bg-yellow-100 text-yellow-700",
-          archived: "bg-gray-100 text-gray-700",
+        const statusConfigs: Record<
+          AdminProduct["status"],
+          { label: string; bg: string; text: string; border: string }
+        > = {
+          published: {
+            label: "✓ Published",
+            bg: "bg-emerald-50",
+            text: "text-emerald-700",
+            border: "border-emerald-200",
+          },
+          draft: {
+            label: "⏳ Draft",
+            bg: "bg-amber-50",
+            text: "text-amber-700",
+            border: "border-amber-200",
+          },
+          archived: {
+            label: "📦 Archived",
+            bg: "bg-gray-100",
+            text: "text-gray-600",
+            border: "border-gray-200",
+          },
         };
+        const cfg = statusConfigs[product.status] || statusConfigs.published;
         return (
           <span
-            className={`px-2 py-1 text-xs font-medium rounded-full ${
-              statusColors[product.status] ?? "bg-gray-100 text-gray-700"
-            }`}
+            className={`px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}
           >
-            {product.status}
+            {cfg.label}
           </span>
         );
       },
     },
     {
       key: "actions",
-      header: "Actions",
-      className: "w-48",
+      header: "Aksi & Visibilitas",
+      className: "w-56",
       render: (product: AdminProduct) => (
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/products/${product.id}`}
-            className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-2.5 py-1 text-xs font-semibold border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors"
           >
             Edit
           </Link>
-          {product.status !== "archived" && (
-            <button
-              className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-            >
-              Archive
-            </button>
-          )}
+          <ProductStatusButton
+            productId={product.id}
+            currentStatus={product.status}
+          />
         </div>
       ),
     },
@@ -133,13 +154,13 @@ export default async function AdminProductsPage({
             <input
               type="search"
               name="search"
-              value={search}
+              defaultValue={search}
               placeholder="Search products..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <select
               name="category"
-              value={category}
+              defaultValue={category}
               className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">All Categories</option>
@@ -149,7 +170,7 @@ export default async function AdminProductsPage({
             </select>
             <select
               name="status"
-              value={status}
+              defaultValue={status}
               className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">All Status</option>
@@ -178,19 +199,7 @@ export default async function AdminProductsPage({
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={(newPage) => {
-              const params = new URLSearchParams(window.location.search);
-              params.set("page", String(newPage));
-              window.location.search = params.toString();
-            }}
-            showPerPage
-            perPage={perPage}
-            onPerPageChange={(newPerPage) => {
-              const params = new URLSearchParams(window.location.search);
-              params.set("perPage", String(newPerPage));
-              params.set("page", "1");
-              window.location.search = params.toString();
-            }}
+            baseUrl="/admin/products"
           />
         )}
       </div>

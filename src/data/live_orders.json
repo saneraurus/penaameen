@@ -1,0 +1,226 @@
+[
+  {
+    "id": "PA-20260817-1204",
+    "orderNumber": "PA-20260817-1204",
+    "customerName": "Pelanggan Pena Ameen",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "processing",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "fulfilled",
+    "totalAmount": 395000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T07:01:57.503Z",
+    "updatedAt": "2026-08-17T07:27:43.041Z",
+    "shippingAddress": {
+      "name": "Pelanggan Pena Ameen",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "item-1786950095638-ejdmt",
+        "productId": "prod-0",
+        "productName": "Paket FlashCard ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 378000,
+        "totalPrice": 378000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-PA-20260817-1204",
+        "type": "payment_intent",
+        "status": "succeeded",
+        "amount": 395000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-20260817-1204",
+        "createdAt": "2026-08-17T07:01:57.503Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-PA-20260817-1204",
+        "type": "shipped",
+        "status": "completed",
+        "carrier": "SICEPAT-REG",
+        "trackingNumber": "JP1506693696",
+        "createdAt": "2026-08-17T07:01:57.503Z"
+      }
+    ]
+  },
+  {
+    "id": "PA-20260817-8875",
+    "orderNumber": "PA-20260817-8875",
+    "customerName": "Pelanggan Pena Ameen",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "processing",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "fulfilled",
+    "totalAmount": 121000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T06:34:41.934Z",
+    "updatedAt": "2026-08-17T07:27:43.042Z",
+    "shippingAddress": {
+      "name": "Pelanggan Pena Ameen",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "item-1786948451380-x6u33",
+        "productId": "prod-0",
+        "productName": "Paket Aktivitas ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 103000,
+        "totalPrice": 103000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-PA-20260817-8875",
+        "type": "payment_intent",
+        "status": "succeeded",
+        "amount": 121000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-20260817-8875",
+        "createdAt": "2026-08-17T06:34:41.934Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-PA-20260817-8875",
+        "type": "shipped",
+        "status": "completed",
+        "carrier": "JNE-REG",
+        "trackingNumber": "JP6993170906",
+        "createdAt": "2026-08-17T06:34:41.934Z"
+      }
+    ]
+  },
+  {
+    "id": "PA-648952",
+    "orderNumber": "PA-648952",
+    "customerName": "Pelanggan Pena Ameen",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "processing",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "fulfilled",
+    "totalAmount": 983000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T05:47:30.249Z",
+    "updatedAt": "2026-08-17T07:27:43.045Z",
+    "shippingAddress": {
+      "name": "Pelanggan Pena Ameen",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "item-1786945581355-193v6",
+        "productId": "prod-0",
+        "productName": "Paket Home Learning ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 966000,
+        "totalPrice": 966000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-PA-648952",
+        "type": "payment_intent",
+        "status": "succeeded",
+        "amount": 983000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-648952",
+        "createdAt": "2026-08-17T05:47:30.249Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-PA-648952",
+        "type": "shipped",
+        "status": "completed",
+        "carrier": "SICEPAT-REG",
+        "trackingNumber": "JP2421837042",
+        "createdAt": "2026-08-17T05:47:30.249Z"
+      }
+    ]
+  },
+  {
+    "id": "ord-1786950113741",
+    "orderNumber": "PA-20260817-9348",
+    "customerName": "Ihsan",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "pending",
+    "paymentStatus": "pending",
+    "fulfillmentStatus": "unfulfilled",
+    "totalAmount": 395000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T07:01:53.775Z",
+    "updatedAt": "2026-08-17T07:27:43.046Z",
+    "shippingAddress": {
+      "name": "Ihsan",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "itm-2",
+        "productId": "prod-0",
+        "productName": "Paket FlashCard ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 378000,
+        "totalPrice": 378000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-ord-1786950113741",
+        "type": "payment_intent",
+        "status": "pending",
+        "amount": 395000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-20260817-9348",
+        "createdAt": "2026-08-17T07:01:53.775Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-ord-1786950113741",
+        "type": "shipped",
+        "status": "pending",
+        "carrier": "SICEPAT-REG",
+        "trackingNumber": "JP1441495333",
+        "createdAt": "2026-08-17T07:01:53.775Z"
+      }
+    ]
+  }
+]

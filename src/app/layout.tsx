@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import "@/app/globals.css";
-import { Header } from "@/presentation/components/header";
-import { Footer } from "@/presentation/components/footer";
+import { SiteLayoutWrapper } from "@/presentation/components/SiteLayoutWrapper";
 import { createFoundationMetadata } from "@/presentation/foundation-metadata";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
@@ -23,11 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <a className="skip-link" href="#main-content">
               Skip to main content
             </a>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <main id="main-content">{children}</main>
-              <Footer />
-            </div>
+            <SiteLayoutWrapper>{children}</SiteLayoutWrapper>
           </CartProvider>
         </ClerkProvider>
       </body>

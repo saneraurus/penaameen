@@ -17,13 +17,13 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("HeroSection Component", () => {
-  it("renders the main hero headline and brand badge", () => {
+  it("renders the main hero headline and primary CTA", () => {
     render(<HeroSection />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       /Kuasai Membaca & Mengaji/i,
     );
-    expect(screen.getByText("PENA AMEEN Digital Learning")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Jelajahi Paket & Produk/i })).toBeInTheDocument();
   });
 
   it("renders showcase multi-view switcher tabs and switches content on click", () => {
