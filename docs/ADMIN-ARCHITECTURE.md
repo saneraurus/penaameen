@@ -4,6 +4,12 @@
 
 **Status:** PROPOSED operations architecture aligned to the 24 private admin destinations. It does not create admin UI, permissions, dashboards, reports, integrations, or staff accounts.
 
+> **SUPERSEDED (2026-08-17, D010):** The approved Admin Control Center specification
+> (`PENA_AMEEN_ADMIN_ARCHITECTURE.md` v1.0) supersedes this document where they
+> conflict. Implementation follows `docs/ADMIN-CONTROL-CENTER-PLAN.md`. This
+> document remains valid as background for the operating boundary and manual
+> fallback design.
+
 ## 1. Admin architecture objective
 
 Admin operations use the same domain services and authoritative records as public commerce. Admin routes expose capability-gated task read models and commands; they do not bypass state machines, provider abstractions, audit, or migration/SEO safety controls.

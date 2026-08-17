@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
-import { transitionOrder, type OrderTransition } from "@/lib/admin/orders";
+import { auditStore } from "@/infrastructure/audit";
+import { recordStaffAudit } from "@/application/audit/audit-store";
+import {
+  transitionOrder,
+  getOrderById,
+  type OrderTransition,
+} from "@/lib/admin/orders";
+import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
+import { createResourceId } from "@/domain/common/identifiers";
 
 const VALID_TRANSITIONS: OrderTransition[] = [
   "mark_paid",
@@ -18,25 +26,56 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireStaffActor("orders:transition");
+    const actor = await requireStaffActor("orders:transition");
+    const correlationId = createRequestCorrelationId(
+      request.headers.get("x-request-id"),
+    );
     const { id } = await params;
     const body = await request.json();
     const transition = body.transition as OrderTransition;
 
     if (!VALID_TRANSITIONS.includes(transition)) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "order.transition.denied",
+        targetType: "order",
+        targetId: createResourceId(id),
+        outcome: "denied",
+        correlationId,
+        reason: `Invalid transition: ${String(transition)}`,
+      });
       return NextResponse.json(
         { error: "Invalid transition" },
         { status: 400 },
       );
     }
 
+    const before = await getOrderById(id);
     const updated = await transitionOrder(id, transition);
     if (!updated) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "order.transition.failed",
+        targetType: "order",
+        targetId: createResourceId(id),
+        outcome: "failed",
+        correlationId,
+        reason: `Order not found or transition not allowed: ${transition}`,
+      });
       return NextResponse.json(
         { error: "Order not found or transition not allowed" },
         { status: 404 },
       );
     }
+
+    await recordStaffAudit(auditStore, actor, {
+      action: "order.transition",
+      targetType: "order",
+      targetId: createResourceId(id),
+      outcome: "succeeded",
+      correlationId,
+      before: { status: before?.status },
+      after: { status: updated.status },
+      reason: transition,
+    });
 
     return NextResponse.json({ order: updated });
   } catch (error) {

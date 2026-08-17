@@ -197,8 +197,8 @@ export async function getOrders(
       return {
         id: db.id,
         orderNumber: db.orderNumber,
-        customerName: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-        customerEmail: db.user?.email || "pelanggan@penaameen.com",
+        customerName: addr?.recipientName || db.user?.name || "",
+        customerEmail: db.user?.email || "",
         status: orderStat,
         paymentStatus: paymentStat,
         fulfillmentStatus: fulfillmentStat,
@@ -207,15 +207,20 @@ export async function getOrders(
         itemCount: db.items.reduce((sum: number, i: { quantity: number }) => sum + i.quantity, 0),
         createdAt: db.createdAt.toISOString(),
         updatedAt: db.updatedAt.toISOString(),
-        shippingAddress: {
-          name: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-          address1: addr?.addressLine1 || "Alamat Pengiriman",
-          city: addr?.city || "Surabaya",
-          province: addr?.province || "Jawa Timur",
-          postalCode: addr?.postalCode || "60238",
-          country: "Indonesia",
-          phone: addr?.phone || "08123456789",
-        },
+        ...(addr
+          ? {
+              shippingAddress: {
+                name: addr.recipientName || "",
+                address1: addr.addressLine1 || "",
+                ...(addr.addressLine2 ? { address2: addr.addressLine2 } : {}),
+                city: addr.city || "",
+                province: addr.province || "",
+                postalCode: addr.postalCode || "",
+                country: addr.country || "Indonesia",
+                ...(addr.phone ? { phone: addr.phone } : {}),
+              },
+            }
+          : {}),
         items: db.items.map((i: { id: string; productId: string; product?: { name?: string; slug?: string } | null; quantity: number; price: bigint | number; subtotal: bigint | number }) => ({
           id: i.id,
           productId: i.productId,
@@ -237,16 +242,28 @@ export async function getOrders(
             createdAt: db.createdAt.toISOString(),
           },
         ],
-        fulfillmentHistory: [
-          {
-            id: `ful-${db.id}`,
-            type: "shipped",
-            status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
-            carrier: db.shippingMethod || "JNE",
-            trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-            createdAt: db.createdAt.toISOString(),
-          },
-        ],
+        // Derived strictly from real status history. Tracking numbers are
+        // only included when real shipment/tracking data exists; none is
+        // invented.
+        fulfillmentHistory: db.statusHistory
+          .filter(
+            (h: { status: string }) =>
+              h.status === "PROCESSING" ||
+              h.status === "SHIPPED" ||
+              h.status === "DELIVERED",
+          )
+          .map((h: { id: string; status: string; note?: string | null; createdAt: Date }) => ({
+            id: `ful-${h.id}`,
+            type:
+              h.status === "SHIPPED"
+                ? "shipped"
+                : h.status === "DELIVERED"
+                  ? "delivered"
+                  : "packed",
+            status: "completed",
+            createdAt: h.createdAt.toISOString(),
+            ...(h.note ? { notes: h.note } : {}),
+          })),
       };
     });
   } catch {
@@ -338,8 +355,8 @@ export async function getOrderById(id: string): Promise<AdminOrder | null> {
       return {
         id: db.id,
         orderNumber: db.orderNumber,
-        customerName: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-        customerEmail: db.user?.email || "pelanggan@penaameen.com",
+        customerName: addr?.recipientName || db.user?.name || "",
+        customerEmail: db.user?.email || "",
         status: orderStat,
         paymentStatus: paymentStat,
         fulfillmentStatus: fulfillmentStat,
@@ -348,15 +365,20 @@ export async function getOrderById(id: string): Promise<AdminOrder | null> {
         itemCount: db.items.reduce((sum: number, i: { quantity: number }) => sum + i.quantity, 0),
         createdAt: db.createdAt.toISOString(),
         updatedAt: db.updatedAt.toISOString(),
-        shippingAddress: {
-          name: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-          address1: addr?.addressLine1 || "Alamat Pengiriman",
-          city: addr?.city || "Surabaya",
-          province: addr?.province || "Jawa Timur",
-          postalCode: addr?.postalCode || "60238",
-          country: "Indonesia",
-          phone: addr?.phone || "08123456789",
-        },
+        ...(addr
+          ? {
+              shippingAddress: {
+                name: addr.recipientName || "",
+                address1: addr.addressLine1 || "",
+                ...(addr.addressLine2 ? { address2: addr.addressLine2 } : {}),
+                city: addr.city || "",
+                province: addr.province || "",
+                postalCode: addr.postalCode || "",
+                country: addr.country || "Indonesia",
+                ...(addr.phone ? { phone: addr.phone } : {}),
+              },
+            }
+          : {}),
         items: db.items.map((i: { id: string; productId: string; product?: { name?: string; slug?: string } | null; quantity: number; price: bigint | number; subtotal: bigint | number }) => ({
           id: i.id,
           productId: i.productId,
@@ -378,16 +400,28 @@ export async function getOrderById(id: string): Promise<AdminOrder | null> {
             createdAt: db.createdAt.toISOString(),
           },
         ],
-        fulfillmentHistory: [
-          {
-            id: `ful-${db.id}`,
-            type: "shipped",
-            status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
-            carrier: db.shippingMethod || "JNE",
-            trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-            createdAt: db.createdAt.toISOString(),
-          },
-        ],
+        // Derived strictly from real status history. Tracking numbers are
+        // only included when real shipment/tracking data exists; none is
+        // invented.
+        fulfillmentHistory: db.statusHistory
+          .filter(
+            (h: { status: string }) =>
+              h.status === "PROCESSING" ||
+              h.status === "SHIPPED" ||
+              h.status === "DELIVERED",
+          )
+          .map((h: { id: string; status: string; note?: string | null; createdAt: Date }) => ({
+            id: `ful-${h.id}`,
+            type:
+              h.status === "SHIPPED"
+                ? "shipped"
+                : h.status === "DELIVERED"
+                  ? "delivered"
+                  : "packed",
+            status: "completed",
+            createdAt: h.createdAt.toISOString(),
+            ...(h.note ? { notes: h.note } : {}),
+          })),
       };
     }
   } catch {

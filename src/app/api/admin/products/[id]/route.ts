@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { auditStore } from "@/infrastructure/audit";
+import { recordStaffAudit } from "@/application/audit/audit-store";
+import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
+import { createResourceId } from "@/domain/common/identifiers";
 import { getProductById, updateProduct, deleteProduct } from "@/lib/admin/products";
 
 export async function GET(
@@ -25,10 +29,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireStaffActor("catalog:write");
+    const actor = await requireStaffActor("catalog:write");
+    const correlationId = createRequestCorrelationId(
+      request.headers.get("x-request-id"),
+    );
     const { id } = await params;
     const body = await request.json();
 
+    const before = await getProductById(id);
     const updated = await updateProduct(id, {
       ...(body.name !== undefined ? { name: body.name } : {}),
       ...(body.slug !== undefined ? { slug: body.slug } : {}),
@@ -46,8 +54,28 @@ export async function PATCH(
     });
 
     if (!updated) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "product.update.failed",
+        targetType: "product",
+        targetId: createResourceId(id),
+        outcome: "failed",
+        correlationId,
+        reason: "Product not found",
+      });
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+
+    await recordStaffAudit(auditStore, actor, {
+      action: "product.update",
+      targetType: "product",
+      targetId: createResourceId(id),
+      outcome: "succeeded",
+      correlationId,
+      before: before
+        ? { name: before.name, slug: before.slug, price: before.price, status: before.status }
+        : undefined,
+      after: { name: updated.name, slug: updated.slug, price: updated.price, status: updated.status },
+    });
 
     return NextResponse.json({ success: true, product: updated });
   } catch (error) {
@@ -61,12 +89,37 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireStaffActor("catalog:write");
+    const actor = await requireStaffActor("catalog:write");
+    const correlationId = createRequestCorrelationId(
+      request.headers.get("x-request-id"),
+    );
     const { id } = await params;
+    const before = await getProductById(id);
     const ok = await deleteProduct(id);
     if (!ok) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "product.delete.failed",
+        targetType: "product",
+        targetId: createResourceId(id),
+        outcome: "failed",
+        correlationId,
+        reason: "Product not found",
+      });
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+
+    await recordStaffAudit(auditStore, actor, {
+      action: "product.delete",
+      targetType: "product",
+      targetId: createResourceId(id),
+      outcome: "succeeded",
+      correlationId,
+      before: before
+        ? { name: before.name, slug: before.slug }
+        : undefined,
+      reason: "Destructive action; no hard-delete of order history affected",
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);

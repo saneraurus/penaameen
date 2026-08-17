@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { mapMidtransStatus } from "@/lib/order-status";
 import crypto from "crypto";
+import { isSystemControlEnabled } from "@/lib/admin/system-controls";
+import { createNotification } from "@/lib/admin/notifications";
+import { auditStore } from "@/infrastructure/audit";
+import { recordSystemAudit } from "@/application/audit/audit-store";
+import { createResourceId } from "@/domain/common/identifiers";
 
 function verifyMidtransSignature(
   orderId: string,
@@ -57,6 +62,18 @@ export async function POST(request: Request) {
     if (!isValidSignature) {
       console.error("Invalid Midtrans signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+
+    // Emergency kill-switch: stop processing payment webhooks entirely.
+    if (await isSystemControlEnabled("disable_payment_webhook_processing")) {
+      console.warn(
+        "Webhook processing disabled by emergency control for order:",
+        order_id,
+      );
+      return NextResponse.json(
+        { error: "Webhook processing temporarily disabled" },
+        { status: 503 },
+      );
     }
 
     const order = await prisma.order.findUnique({
@@ -149,13 +166,56 @@ export async function POST(request: Request) {
       });
 
       if (finalStatus === "PAID") {
-        await sendOrderConfirmationEmail(order.id);
+        await createNotification({
+          type: "order.paid",
+          severity: "info",
+          title: `Pesanan ${order.orderNumber} dibayar`,
+          message: `Pembayaran diterima dan stok telah dikurangi otomatis.`,
+          targetType: "order",
+          targetId: order.id,
+        });
+
+        if (!(await isSystemControlEnabled("disable_outbound_email"))) {
+          await sendOrderConfirmationEmail(order.id);
+        }
       }
     }
+
+    await recordSystemAudit(auditStore, {
+      action: "payment.webhook",
+      targetType: "order",
+      targetId: createResourceId(order.id),
+      outcome: "succeeded",
+      after: {
+        transaction_status,
+        fraud_status: fraud_status ?? null,
+        gross_amount,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error processing Midtrans webhook:", error);
+
+    await createNotification({
+      type: "webhook.failed",
+      severity: "critical",
+      title: "Webhook Midtrans gagal diproses",
+      message: error instanceof Error ? error.message : "Error tidak diketahui",
+      targetType: "webhook",
+      targetId: "midtrans",
+    });
+
+    await recordSystemAudit(auditStore, {
+      action: "payment.webhook",
+      targetType: "webhook",
+      targetId: createResourceId("midtrans"),
+      outcome: "failed",
+      after: {
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+    });
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

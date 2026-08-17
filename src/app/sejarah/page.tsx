@@ -401,22 +401,19 @@ export default function HistoryPage() {
       </section>
 
       {/* Literacy programmes */}
-      <section className="py-16 md:py-24 bg-primary-800 text-white">
+      <section className="py-16 md:py-24 bg-primary-950 text-white border-y border-primary-800">
         <div className="container px-4 mx-auto">
           <Reveal>
             <div className="max-w-3xl mx-auto text-center mb-10 md:mb-12">
-              <span className="mb-3 inline-block text-xs font-semibold tracking-widest uppercase text-primary-200">
-                Peran Hari Ini
+              <span className="mb-3 inline-block text-xs font-bold tracking-widest uppercase text-emerald-300 bg-white/10 px-3.5 py-1 rounded-full border border-white/20">
+                Peran &amp; Dampak Nyata
               </span>
-              <h2 className="text-section font-serif leading-tight mb-4">
-                Pemberantasan Buta Aksara
+              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white leading-tight mb-4 drop-shadow-md">
+                Pemberantasan Buta Aksara Al-Qur&apos;an &amp; Latin
               </h2>
-              <p className="text-primary-100 leading-relaxed">
-                PENA AMEEN menjadi penyedia metode pembelajaran untuk pendidikan
-                anak dan orang dewasa penyandang buta aksara, di antaranya
-                pemberantasan buta aksara latin dan Al-Qur&apos;an. Program ini
-                beberapa kali dilakukan bersama beberapa Pemda maupun CSR
-                perusahaan.
+              <p className="text-white/90 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
+                PENA AMEEN menjadi penyedia metode pembelajaran untuk pendidikan anak dan orang dewasa penyandang
+                buta aksara di seluruh Indonesia melalui kemitraan bersama berbagai Pemda dan CSR perusahaan nasional.
               </p>
             </div>
           </Reveal>
@@ -424,11 +421,11 @@ export default function HistoryPage() {
           <dl className="grid gap-5 sm:grid-cols-3 max-w-4xl mx-auto">
             {literacyPartners.map((partner, index) => (
               <Reveal key={partner.name} delay={index * 0.1}>
-                <div className="h-full bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
+                <div className="h-full bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-md hover:bg-white/15 transition-colors">
                   <dt className="text-lg font-serif font-bold text-white mb-1">
                     {partner.name}
                   </dt>
-                  <dd className="text-xs font-medium text-primary-200 uppercase tracking-wider">
+                  <dd className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">
                     {partner.type}
                   </dd>
                 </div>
@@ -442,30 +439,29 @@ export default function HistoryPage() {
       <section className="py-16 md:py-24 bg-background-50">
         <div className="container px-4 mx-auto">
           <Reveal>
-            <div className="max-w-2xl mx-auto text-center">
-              <h2 className="text-section font-serif text-primary-900 leading-tight mb-4">
-                Lanjutkan Penjelajahan
+            <div className="max-w-3xl mx-auto text-center bg-white rounded-3xl p-8 sm:p-12 border border-supporting-200 shadow-sm">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950 leading-tight mb-4">
+                Lanjutkan Penjelajahan Bersama Pena Ameen
               </h2>
-              <p className="text-supporting-600 mb-8">
-                Kenali PENA AMEEN lebih dekat, pelajari metodenya, atau lihat
-                perangkat belajar yang tersedia.
+              <p className="text-supporting-600 mb-8 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                Kenali PENA AMEEN lebih dekat, pelajari metodenya, atau temukan modul perangkat belajar yang Anda butuhkan.
               </p>
-              <div className="flex flex-wrap gap-3 justify-center">
+              <div className="flex flex-wrap gap-3.5 justify-center">
                 <Link
                   href="/tentang"
-                  className="px-6 py-3 bg-primary-700 text-white rounded-xl hover:bg-primary-800 transition-colors font-medium text-sm"
+                  className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors font-bold text-sm shadow-xs"
                 >
                   Tentang Kami
                 </Link>
                 <Link
                   href="/metode"
-                  className="px-6 py-3 border border-primary-300 text-primary-700 rounded-xl hover:bg-primary-50 transition-colors font-medium text-sm"
+                  className="px-6 py-3 border border-primary-300 text-primary-800 bg-primary-50/50 rounded-xl hover:bg-primary-50 transition-colors font-bold text-sm"
                 >
                   Program / Metode
                 </Link>
                 <Link
                   href="/produk"
-                  className="px-6 py-3 border border-supporting-300 text-supporting-700 rounded-xl hover:bg-background-100 transition-colors font-medium text-sm"
+                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors font-bold text-sm shadow-xs"
                 >
                   Jelajahi Produk
                 </Link>

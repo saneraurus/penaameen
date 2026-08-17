@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
-import { getApiSettings, saveApiSettings, type ApiSettings } from "@/lib/admin/api-settings";
+import { auditStore } from "@/infrastructure/audit";
+import { recordStaffAudit } from "@/application/audit/audit-store";
+import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
+import { createResourceId } from "@/domain/common/identifiers";
+import {
+  getApiSettings,
+  getPublicApiSettings,
+  saveApiSettings,
+  type ApiSettings,
+} from "@/lib/admin/api-settings";
 
 export async function GET() {
   try {
     await requireStaffActor("access:read");
-    const settings = getApiSettings();
+    const settings = getPublicApiSettings();
     return NextResponse.json({ settings });
   } catch (error) {
     console.error("Error fetching API settings:", error);
@@ -15,7 +24,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await requireStaffActor("access:write");
+    const actor = await requireStaffActor("access:write");
+    const correlationId = createRequestCorrelationId(
+      request.headers.get("x-request-id"),
+    );
     const body = await request.json();
     const current = getApiSettings();
 
@@ -42,8 +54,30 @@ export async function POST(request: Request) {
       },
     };
 
+    const before = getPublicApiSettings();
     saveApiSettings(merged);
-    return NextResponse.json({ success: true, settings: merged });
+    const after = getPublicApiSettings();
+
+    await recordStaffAudit(auditStore, actor, {
+      action: "settings.api.update",
+      targetType: "settings",
+      targetId: createResourceId("api"),
+      outcome: "succeeded",
+      correlationId,
+      before: {
+        midtransIsProduction: before.midtrans.isProduction,
+        rajaongkirTier: before.rajaongkir.tier,
+        autoEmailProvider: before.autoEmail.provider,
+      },
+      after: {
+        midtransIsProduction: after.midtrans.isProduction,
+        rajaongkirTier: after.rajaongkir.tier,
+        autoEmailProvider: after.autoEmail.provider,
+      },
+      reason: "API/integration settings changed (secrets masked in audit)",
+    });
+
+    return NextResponse.json({ success: true, settings: after });
   } catch (error) {
     console.error("Error saving API settings:", error);
     return NextResponse.json({ error: "Failed to save API settings" }, { status: 500 });

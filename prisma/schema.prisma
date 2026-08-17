@@ -49,21 +49,38 @@ model Category {
 }
 
 model Product {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  name        String
-  categoryId  String
-  category    Category     @relation(fields: [categoryId], references: [id])
-  description String
-  price       BigInt       // IDR in minor units (sen) - but we'll store as rupiah integer
-  stock       Int          @default(0)
-  image       String
-  images      Json     // additional images
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  name             String
+  categoryId       String
+  category         Category      @relation(fields: [categoryId], references: [id])
+  description      String
+  shortDescription String?
+  price            BigInt        // IDR in minor units (sen) - but we'll store as rupiah integer
+  compareAtPrice   BigInt?
+  salePrice        BigInt?
+  sku              String?       @unique
+  stock            Int           @default(0)
+  status           ProductStatus @default(published)
+  image            String
+  images           Json          // additional images
+  tags             Json?
+  relatedProductIds Json?
+  seoTitle         String?
+  seoDescription   String?
+  seoCanonical     String?
+  seoIndexable     Boolean       @default(true)
+  isActive         Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+}
+
+enum ProductStatus {
+  published
+  draft
+  archived
 }
 
 model Cart {
@@ -144,4 +161,49 @@ model OrderStatusHistory {
   status    OrderStatus
   note      String?
   createdAt DateTime     @default(now())
+}
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  actorKind     String // system | customer | staff
+  actorId       String?
+  actorEmail    String?
+  actorRole     String?
+  action        String
+  targetType    String
+  targetId      String
+  outcome       String // succeeded | denied | failed | pending
+  correlationId String?
+  before        Json?
+  after         Json?
+  reason        String?
+  ipAddress     String?
+  occurredAt    DateTime  @default(now())
+
+  @@index([occurredAt])
+  @@index([targetType, targetId])
+  @@index([actorId])
+}
+
+model Notification {
+  id         String    @id @default(cuid())
+  type       String // order_paid | payment_webhook_failed | low_stock | ...
+  severity   String    @default("info") // info | warning | critical
+  title      String
+  message    String?
+  targetType String?
+  targetId   String?
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([readAt])
+  @@index([createdAt])
+}
+
+model SystemControl {
+  key         String    @id
+  value       Boolean   @default(false)
+  label       String
+  updatedById String?
+  updatedAt   DateTime  @updatedAt
 }

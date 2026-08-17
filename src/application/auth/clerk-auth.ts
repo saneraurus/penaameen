@@ -51,6 +51,9 @@ export const ROLE_CAPABILITY_MAP: Readonly<Record<ClerkOrgRole, ReadonlySet<stri
     "access:read",
     "access:write",
     "audit:read",
+    "notifications:read",
+    "notifications:write",
+    "system:control",
   ]),
   product_manager: new Set([
     "catalog:read",
@@ -124,8 +127,8 @@ export async function getStaffActor(): Promise<StaffActor | null> {
   let userEmail = (sessionClaims?.email as string) || "";
   let userFullName = (sessionClaims?.fullName as string) || null;
 
-  // 1. Check configured ADMIN_EMAILS list
-  const configuredAdminEmails = (process.env.ADMIN_EMAILS || "ihsanzz099@gmail.com,admin@penaameen.com")
+  // 1. Check configured ADMIN_EMAILS list (env-only; no invented fallbacks)
+  const configuredAdminEmails = (process.env.ADMIN_EMAILS || "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);

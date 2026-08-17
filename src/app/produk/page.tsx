@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAmeenContext } from "@/context/AmeenContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Product {
@@ -37,7 +38,12 @@ export default function ProductListPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const { addToCart } = useCart();
+  const { setSearchQuery } = useAmeenContext();
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setSearchQuery(search);
+  }, [search, setSearchQuery]);
 
   useEffect(() => {
     let active = true;
@@ -309,9 +315,10 @@ export default function ProductListPage() {
                       className="relative aspect-[4/3] bg-supporting-100 overflow-hidden block"
                     >
                       <Image
-                        src={product.image}
+                        src={`${product.image}?v=20260817b`}
                         alt={product.name}
                         fill
+                        unoptimized
                         className="object-cover w-full h-full group-hover:scale-108 transition-transform duration-500 ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

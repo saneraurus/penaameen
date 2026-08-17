@@ -2,10 +2,16 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getApiSettings } from "@/lib/admin/api-settings";
 
 const shippingRateSchema = z.object({
   addressId: z.string().min(1),
 });
+
+// TEMPORARY ASSUMPTION (SHIP-004 UNKNOWN): per-product weights are not yet
+// confirmed. Until real weights exist, the cart weight basis is a documented
+// assumption. The quoted rates themselves are always computed by the provider.
+const ASSUMED_WEIGHT_GRAMS_PER_ITEM = 500;
 
 interface RajaOngkirCost {
   service: string;
@@ -28,12 +34,60 @@ interface RajaOngkirResponse {
   };
 }
 
-async function getRajaOngkirRates(originPostalCode: string, destinationPostalCode: string, weight: number): Promise<RajaOngkirResponse | null> {
-  const apiKey = process.env.RAJAONGKIR_API_KEY;
-  if (!apiKey) {
-    return null;
+type CityCache = { fetchedAt: number; byName: Map<string, number> };
+
+let cityCache: CityCache | null = null;
+const CITY_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+async function loadRajaOngkirCities(apiKey: string): Promise<CityCache> {
+  if (cityCache && Date.now() - cityCache.fetchedAt < CITY_CACHE_TTL_MS) {
+    return cityCache;
   }
 
+  const response = await fetch("https://api.rajaongkir.com/starter/city", {
+    headers: { key: apiKey },
+  });
+  if (!response.ok) {
+    throw new Error(`RajaOngkir city lookup failed: ${response.status}`);
+  }
+  const data = (await response.json()) as {
+    rajaongkir?: { results?: Array<{ city_id: string; city_name: string; province: string }> };
+  };
+
+  const byName = new Map<string, number>();
+  for (const city of data.rajaongkir?.results ?? []) {
+    byName.set(
+      `${city.city_name.toLowerCase()}|${city.province.toLowerCase()}`,
+      Number(city.city_id),
+    );
+  }
+  cityCache = { fetchedAt: Date.now(), byName };
+  return cityCache;
+}
+
+async function resolveDestinationCityId(
+  apiKey: string,
+  city: string,
+  province: string,
+): Promise<number | null> {
+  try {
+    const cache = await loadRajaOngkirCities(apiKey);
+    return (
+      cache.byName.get(`${city.toLowerCase()}|${province.toLowerCase()}`) ??
+      null
+    );
+  } catch {
+    return null;
+  }
+}
+
+async function getRajaOngkirRates(
+  apiKey: string,
+  originCityId: string,
+  destinationCityId: number,
+  weight: number,
+  couriers: string[],
+): Promise<RajaOngkirResponse | null> {
   try {
     const response = await fetch("https://api.rajaongkir.com/starter/cost", {
       method: "POST",
@@ -42,10 +96,10 @@ async function getRajaOngkirRates(originPostalCode: string, destinationPostalCod
         key: apiKey,
       },
       body: new URLSearchParams({
-        origin: originPostalCode,
-        destination: destinationPostalCode,
+        origin: originCityId,
+        destination: String(destinationCityId),
         weight: weight.toString(),
-        courier: "jne,jnt,sicepat",
+        courier: couriers.join(","),
       }),
     });
 
@@ -59,45 +113,6 @@ async function getRajaOngkirRates(originPostalCode: string, destinationPostalCod
   }
 }
 
-const DEFAULT_COURIER_RATES = [
-  {
-    courier: "jne",
-    courierName: "JNE",
-    service: "REG",
-    description: "Layanan Reguler",
-    cost: 18000,
-    etd: "2-3",
-    note: "Paling Populer",
-  },
-  {
-    courier: "jnt",
-    courierName: "J&T Express",
-    service: "EZ",
-    description: "Pengiriman Cepat Reguler",
-    cost: 19000,
-    etd: "2-3",
-    note: "Tracking Real-time",
-  },
-  {
-    courier: "sicepat",
-    courierName: "SiCepat",
-    service: "REG",
-    description: "SiCepat Reguler",
-    cost: 17000,
-    etd: "1-2",
-    note: "Cepat & Hemat",
-  },
-  {
-    courier: "pos",
-    courierName: "POS Indonesia",
-    service: "KILAT",
-    description: "Pos Kilat Khusus",
-    cost: 15000,
-    etd: "3-4",
-    note: "Jangkauan Luas ke Seluruh Indonesia",
-  },
-];
-
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
@@ -108,40 +123,92 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { addressId } = shippingRateSchema.parse(body);
 
-    let addressPostalCode = "12345";
-    let totalWeight = 1000;
+    const settings = getApiSettings();
+    const apiKey = settings.rajaongkir.apiKey || process.env.RAJAONGKIR_API_KEY;
+    const originCityId = settings.rajaongkir.originCityId;
+    const enabledCouriers = settings.rajaongkir.enabledCouriers.filter(Boolean);
 
-    try {
-      const cart = await prisma.cart.findUnique({
-        where: { userId },
-        include: {
-          items: {
-            include: { product: true },
-          },
-        },
-      });
-
-      if (cart && cart.items.length > 0) {
-        totalWeight = cart.items.reduce((sum, item) => sum + item.quantity * 500, 0);
-      }
-
-      const address = await prisma.address.findFirst({
-        where: { id: addressId },
-      });
-
-      if (address) {
-        addressPostalCode = address.postalCode;
-      }
-    } catch {
-      // Ignore DB errors and use defaults
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "RajaOngkir API key belum dikonfigurasi (Admin → API Access)." },
+        { status: 503 },
+      );
     }
 
-    const originPostalCode = "60293"; // Surabaya / HQ warehouse postal code
+    if (!originCityId) {
+      return NextResponse.json(
+        { error: "Kota asal pengiriman belum dikonfigurasi (Admin → API Access). Ongkir tidak dapat dihitung tanpa asal yang benar." },
+        { status: 503 },
+      );
+    }
 
-    const rates = await getRajaOngkirRates(originPostalCode, addressPostalCode, totalWeight);
+    if (enabledCouriers.length === 0) {
+      return NextResponse.json(
+        { error: "Kurir pengiriman belum dikonfigurasi (Admin → API Access)." },
+        { status: 503 },
+      );
+    }
 
-    if (rates && rates.rajaongkir?.results) {
-      const formattedRates = rates.rajaongkir.results.flatMap((courier) =>
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: { include: { product: true } },
+      },
+    });
+
+    if (!cart || cart.items.length === 0) {
+      return NextResponse.json(
+        { error: "Keranjang kosong" },
+        { status: 400 },
+      );
+    }
+
+    const address = await prisma.address.findFirst({
+      where: { id: addressId },
+    });
+
+    if (!address) {
+      return NextResponse.json(
+        { error: "Alamat tujuan tidak ditemukan" },
+        { status: 404 },
+      );
+    }
+
+    const totalWeight = cart.items.reduce(
+      (sum, item) => sum + item.quantity * ASSUMED_WEIGHT_GRAMS_PER_ITEM,
+      0,
+    );
+
+    const destinationCityId = await resolveDestinationCityId(
+      apiKey,
+      address.city,
+      address.province,
+    );
+
+    if (destinationCityId === null) {
+      return NextResponse.json(
+        { error: "Kota tujuan tidak ditemukan pada data RajaOngkir. Periksa nama kota/provinsi alamat." },
+        { status: 503 },
+      );
+    }
+
+    const ratesResponse = await getRajaOngkirRates(
+      apiKey,
+      originCityId,
+      destinationCityId,
+      totalWeight,
+      enabledCouriers,
+    );
+
+    if (!ratesResponse?.rajaongkir?.results) {
+      return NextResponse.json(
+        { error: "Layanan ongkir tidak merespons. Tidak ada tarif inventif yang digunakan; coba lagi nanti." },
+        { status: 503 },
+      );
+    }
+
+    const formattedRates = ratesResponse.rajaongkir.results.flatMap(
+      (courier) =>
         courier.costs.flatMap((cost) =>
           cost.cost.map((c) => ({
             courier: courier.code,
@@ -151,28 +218,26 @@ export async function POST(request: Request) {
             cost: c.value,
             etd: c.etd,
             note: c.note,
-          }))
-        )
-      );
+          })),
+        ),
+    );
 
-      if (formattedRates.length > 0) {
-        return NextResponse.json({ rates: formattedRates });
-      }
+    if (formattedRates.length === 0) {
+      return NextResponse.json(
+        { error: "Tidak ada tarif tersedia untuk kombinasi asal-tujuan ini." },
+        { status: 503 },
+      );
     }
 
-    // Fallback to standard Indonesian courier rates based on weight
-    const weightMultiplier = Math.max(1, Math.ceil(totalWeight / 1000));
-    const calculatedDefaultRates = DEFAULT_COURIER_RATES.map((rate) => ({
-      ...rate,
-      cost: rate.cost * weightMultiplier,
-    }));
-
-    return NextResponse.json({ rates: calculatedDefaultRates });
+    return NextResponse.json({ rates: formattedRates });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
-    console.error("Error in shipping rates API, falling back:", error);
-    return NextResponse.json({ rates: DEFAULT_COURIER_RATES });
+    console.error("Error in shipping rates API:", error);
+    return NextResponse.json(
+      { error: "Gagal menghitung ongkir. Tidak ada tarif inventif yang digunakan." },
+      { status: 503 },
+    );
   }
 }

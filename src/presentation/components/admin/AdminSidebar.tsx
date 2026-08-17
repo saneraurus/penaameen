@@ -10,6 +10,9 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: "📊" },
   { name: "Products", href: "/admin/products", icon: "📦" },
   { name: "Orders", href: "/admin/orders", icon: "🧾", hasBadge: true },
+  { name: "Notifications", href: "/admin/notifications", icon: "🔔" },
+  { name: "Audit Log", href: "/admin/audit", icon: "📜" },
+  { name: "Emergency Controls", href: "/admin/system-controls", icon: "🛑" },
   { name: "API Access", href: "/admin/api-access", icon: "🔌" },
   { name: "Settings", href: "/admin/settings/access", icon: "⚙️" },
 ] as const;

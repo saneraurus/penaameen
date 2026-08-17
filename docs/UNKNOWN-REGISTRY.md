@@ -64,6 +64,20 @@ Source: Phase 0 and Phase 0.5 discovery documents. Status values intentionally r
 | TECH-003 | TECHNICAL | Current integrations | Needed to avoid breaking operations | Payment/shipping/analytics unknown | Admin settings/client | HIGH | Client | UNKNOWN |
 | TECH-004 | TECHNICAL | Backup/export availability | Needed for safe migration | Not known | Hosting/admin access | CRITICAL | Client/engineering | UNKNOWN |
 
+## Resolution additions — 2026-08-17 (owner decisions D010-D013)
+
+Rows below are resolved or partially resolved by explicit owner decisions recorded in `docs/DECISION-LOG.md` and implemented per `docs/ADMIN-CONTROL-CENTER-PLAN.md`. Original rows above remain unchanged for history.
+
+| ID | Resolution |
+|---|---|
+| PAY-001 | RESOLVED — Payment provider confirmed by implementation: **Midtrans** (D011). |
+| SHIP-001 | RESOLVED — Shipping provider confirmed by implementation: **RajaOngkir** (D011). |
+| TECH-003 | PARTIAL — Midtrans, RajaOngkir, Resend, Clerk confirmed (D011). WhatsApp, Brevo, GA4, Search Console remain UNKNOWN. |
+| ADMIN-001 | RESOLVED — RBAC model fixed as capability-first (D012); the spec's 8 role names are display labels only. Staff role combinations and approval thresholds remain client decisions. |
+| ADMIN-002 | UNCHANGED — Fulfillment SOP remains UNKNOWN; spec §14 provides a conceptual flow, not an approved SOP. |
+| ADMIN-003 | UNCHANGED — Reporting needs remain UNKNOWN. |
+| DES-001/DES-002, DATA-001..005, LEG-001..003, ANA-001..003, ORD-001..003, CUST-001..003, BR-001..003 | UNCHANGED — not affected by D010-D013. |
+
 ## Phase 4 data-architecture additions
 
 These entries were added because Phase 4 exposed target-data/migration decisions not represented as separate rows in the original registry. Existing entries remain unchanged; these additions do not resolve or replace them.

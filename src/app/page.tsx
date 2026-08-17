@@ -559,27 +559,39 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 md:py-24 bg-primary-800">
-        <div className="container px-4 mx-auto">
+      <section className="py-16 md:py-24 bg-primary-950 text-white relative overflow-hidden border-t border-primary-800">
+        <div className="absolute inset-0 opacity-15 pointer-events-none">
+          <Image
+            src="/images/penaameen/hero/hero-bg-islamic-learning.jpg"
+            alt=""
+            fill
+            unoptimized
+            className="object-cover"
+          />
+        </div>
+        <div className="container relative z-10 px-4 mx-auto">
           <Reveal>
-            <div className="max-w-2xl mx-auto text-center text-white">
-              <h2 className="mb-6 text-section font-serif leading-tight">
+            <div className="max-w-3xl mx-auto text-center text-white">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold uppercase tracking-wider mb-4 border border-white/20">
+                PENA AMEEN • METODE ANTI LUPA
+              </span>
+              <h2 className="mb-4 text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white leading-tight drop-shadow-md">
                 Mulai Perjalanan Belajar Hari Ini.
               </h2>
-              <p className="mb-8 text-lg text-primary-100 leading-relaxed">
-                Temukan metode dan perangkat belajar yang sesuai untuk Anda dan
-                keluarga.
+              <p className="mb-8 text-base sm:text-lg text-white/90 leading-relaxed max-w-xl mx-auto drop-shadow-xs">
+                Temukan metode dan perangkat belajar yang paling sesuai untuk Anda dan keluarga.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/produk"
-                  className="px-6 py-3 bg-white text-primary-700 rounded-md hover:bg-primary-50 transition-colors font-medium"
+                  className="px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg transition-all text-sm inline-flex items-center gap-2"
                 >
-                  Jelajahi Produk
+                  <span>Jelajahi Produk</span>
+                  <span>→</span>
                 </Link>
                 <Link
                   href="/metode"
-                  className="px-6 py-3 border border-primary-200 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
+                  className="px-6 py-3.5 border border-white/30 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl backdrop-blur-md transition-all text-sm"
                 >
                   Kenali Metode
                 </Link>

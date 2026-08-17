@@ -76,9 +76,10 @@ export function FeaturedProductSection() {
             <Reveal>
               <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/15 bg-primary-800/60 group">
                 <Image
-                  src="/images/penaameen/products/featured-home-learning.jpg"
+                  src="/images/penaameen/products/featured-home-learning.jpg?v=20260817b"
                   alt="Paket Home Learning ALBARQY Box Set Lengkap dengan Buku, Flashcard, Poster, dan Tas Eksklusif"
                   fill
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                 />

@@ -3,6 +3,11 @@
 **Phase:** 1 — Product Discovery
 **Status:** PROPOSED administrative capability blueprint. It does not implement an admin system, authentication model, permissions model, provider integration, dashboard metric, or data schema.
 
+> **SUPERSEDED (2026-08-17, D010):** The approved Admin Control Center specification
+> (`PENA_AMEEN_ADMIN_ARCHITECTURE.md` v1.0) supersedes this document where they
+> conflict. Implementation follows `docs/ADMIN-CONTROL-CENTER-PLAN.md`. This
+> document remains valid as background for capability profiles and boundaries.
+
 ## 1. Administrative product purpose
 
 The administrative platform should let authorized PENA AMEEN staff maintain accurate public catalog/content/SEO information and operate the order-to-fulfillment lifecycle with clear exceptions and audit-aware controls.

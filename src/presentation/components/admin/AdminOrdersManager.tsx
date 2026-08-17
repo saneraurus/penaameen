@@ -374,7 +374,7 @@ export function AdminOrdersManager({
                 : order.itemCount || 1;
 
             const carrier =
-              order.fulfillmentHistory?.[0]?.carrier || "SICEPAT / JNE";
+              order.fulfillmentHistory?.[0]?.carrier || null;
             const trackingNumber =
               order.fulfillmentHistory?.[0]?.trackingNumber || null;
 
@@ -657,7 +657,7 @@ export function AdminOrdersManager({
                             <span className="text-[10px] text-gray-400 font-semibold block">
                               Kurir Pengiriman
                             </span>
-                            <span className="font-bold text-gray-900">{carrier}</span>
+                            <span className="font-bold text-gray-900">{carrier || "-"}</span>
                           </div>
 
                           <div>
@@ -681,8 +681,8 @@ export function AdminOrdersManager({
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-xs text-amber-700 font-medium block mt-0.5">
-                                ⏳ Resi digenerate otomatis saat cetak label
+                              <span className="text-xs text-gray-500 font-medium block mt-0.5">
+                                Belum ada resi (menunggu data pengiriman terverifikasi)
                               </span>
                             )}
                           </div>

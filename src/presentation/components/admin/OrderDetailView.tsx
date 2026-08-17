@@ -41,9 +41,9 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
     }
   };
 
-  const carrier = order.fulfillmentHistory?.[0]?.carrier || "SICEPAT-REG";
+  const carrier = order.fulfillmentHistory?.[0]?.carrier || null;
   const trackingNumber =
-    order.fulfillmentHistory?.[0]?.trackingNumber || "JP892301923";
+    order.fulfillmentHistory?.[0]?.trackingNumber || null;
 
   return (
     <div className="space-y-6">
@@ -207,7 +207,9 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                 <span className="text-[10px] text-gray-400 font-semibold uppercase block">
                   Kurir Ekspedisi
                 </span>
-                <span className="font-bold text-gray-900 text-xs">{carrier}</span>
+                <span className="font-bold text-gray-900 text-xs">
+                  {carrier || "-"}
+                </span>
               </div>
 
               <div>
@@ -216,7 +218,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="font-mono font-bold text-xs text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">
-                    {trackingNumber}
+                    {trackingNumber || "-"}
                   </span>
                 </div>
               </div>

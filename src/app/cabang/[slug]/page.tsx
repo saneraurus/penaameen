@@ -65,23 +65,30 @@ export default async function BranchDetailPage({
               </div>
             </div>
 
-            {/* Products available at this branch (placeholder) */}
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-supporting-200">
-              <h3 className="mb-4 text-xl font-semibold text-primary-600">
-                Produk yang Tersedia
+            {/* Products available at this branch */}
+            <div className="bg-white rounded-3xl p-8 shadow-xs border border-supporting-200">
+              <h3 className="mb-3 text-xl font-serif font-bold text-primary-950">
+                Produk &amp; Layanan di Cabang Ini
               </h3>
-              <p className="mb-4 text-supporting-600">
-                Berbagai produk PENA AMEEN tersedia di cabang ini. Silakan
-                kunjungi langsung atau hubungi kontak di atas untuk informasi
-                lebih lanjut.
+              <p className="mb-6 text-supporting-600 text-sm sm:text-base leading-relaxed">
+                Seluruh produk resmi PENA AMEEN (Al-Barqy, ACM, Flashcard &amp; Alat Peraga) tersedia di cabang ini.
+                Anda juga dapat berkonsultasi langsung atau mendaftarkan lembaga Anda untuk program pembinaan pengajar.
               </p>
-              <Link
-                href="/produk"
-                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
-              >
-                Lihat Semua Produk
-                <span className="ml-2">→</span>
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/produk"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-bold text-sm shadow-xs"
+                >
+                  <span>Jelajahi Katalog Produk</span>
+                  <span>→</span>
+                </Link>
+                <Link
+                  href="/kontak"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 rounded-xl transition-colors font-bold text-sm"
+                >
+                  <span>Hubungi Kami</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

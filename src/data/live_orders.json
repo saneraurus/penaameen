@@ -1,5 +1,117 @@
 [
   {
+    "id": "PA-20260817-8893",
+    "orderNumber": "PA-20260817-8893",
+    "customerName": "Pelanggan Pena Ameen",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "processing",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "fulfilled",
+    "totalAmount": 983000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T11:11:03.181Z",
+    "updatedAt": "2026-08-17T11:12:04.697Z",
+    "shippingAddress": {
+      "name": "Pelanggan Pena Ameen",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "item-1786965032321-6sj5p",
+        "productId": "prod-0",
+        "productName": "Paket Home Learning ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 966000,
+        "totalPrice": 966000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-PA-20260817-8893",
+        "type": "payment_intent",
+        "status": "succeeded",
+        "amount": 983000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-20260817-8893",
+        "createdAt": "2026-08-17T11:11:03.181Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-PA-20260817-8893",
+        "type": "shipped",
+        "status": "completed",
+        "carrier": "SICEPAT-REG",
+        "trackingNumber": "JP5110604615",
+        "createdAt": "2026-08-17T11:11:03.181Z"
+      }
+    ]
+  },
+  {
+    "id": "ord-1786965055319",
+    "orderNumber": "PA-20260817-3824",
+    "customerName": "Ihsan Abdil Haq",
+    "customerEmail": "ihsanzz099@gmail.com",
+    "status": "processing",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "unfulfilled",
+    "totalAmount": 983000,
+    "currency": "IDR",
+    "itemCount": 1,
+    "createdAt": "2026-08-17T11:10:56.410Z",
+    "updatedAt": "2026-08-17T11:12:15.436Z",
+    "shippingAddress": {
+      "name": "Ihsan Abdil Haq",
+      "address1": "Jl. Margorejo Indah No. 12",
+      "city": "Surabaya",
+      "province": "Jawa Timur",
+      "postalCode": "60238",
+      "country": "Indonesia",
+      "phone": "08123456789"
+    },
+    "items": [
+      {
+        "id": "itm-1",
+        "productId": "prod-0",
+        "productName": "Paket Home Learning ALBARQY",
+        "productSlug": "buku-pena-ameen",
+        "quantity": 1,
+        "unitPrice": 966000,
+        "totalPrice": 966000
+      }
+    ],
+    "paymentHistory": [
+      {
+        "id": "pay-ord-1786965055319",
+        "type": "payment_intent",
+        "status": "pending",
+        "amount": 983000,
+        "currency": "IDR",
+        "provider": "midtrans",
+        "providerReference": "PA-20260817-3824",
+        "createdAt": "2026-08-17T11:10:56.410Z"
+      }
+    ],
+    "fulfillmentHistory": [
+      {
+        "id": "ful-ord-1786965055319",
+        "type": "shipped",
+        "status": "pending",
+        "carrier": "SICEPAT-REG",
+        "trackingNumber": "JP8730397936",
+        "createdAt": "2026-08-17T11:10:56.410Z"
+      }
+    ]
+  },
+  {
     "id": "PA-20260817-1204",
     "orderNumber": "PA-20260817-1204",
     "customerName": "Pelanggan Pena Ameen",
@@ -11,7 +123,7 @@
     "currency": "IDR",
     "itemCount": 1,
     "createdAt": "2026-08-17T07:01:57.503Z",
-    "updatedAt": "2026-08-17T07:27:43.041Z",
+    "updatedAt": "2026-08-17T11:12:04.701Z",
     "shippingAddress": {
       "name": "Pelanggan Pena Ameen",
       "address1": "Jl. Margorejo Indah No. 12",
@@ -67,7 +179,7 @@
     "currency": "IDR",
     "itemCount": 1,
     "createdAt": "2026-08-17T06:34:41.934Z",
-    "updatedAt": "2026-08-17T07:27:43.042Z",
+    "updatedAt": "2026-08-17T11:12:04.703Z",
     "shippingAddress": {
       "name": "Pelanggan Pena Ameen",
       "address1": "Jl. Margorejo Indah No. 12",
@@ -123,7 +235,7 @@
     "currency": "IDR",
     "itemCount": 1,
     "createdAt": "2026-08-17T05:47:30.249Z",
-    "updatedAt": "2026-08-17T07:27:43.045Z",
+    "updatedAt": "2026-08-17T11:12:04.706Z",
     "shippingAddress": {
       "name": "Pelanggan Pena Ameen",
       "address1": "Jl. Margorejo Indah No. 12",
@@ -179,7 +291,7 @@
     "currency": "IDR",
     "itemCount": 1,
     "createdAt": "2026-08-17T07:01:53.775Z",
-    "updatedAt": "2026-08-17T07:27:43.046Z",
+    "updatedAt": "2026-08-17T11:12:04.708Z",
     "shippingAddress": {
       "name": "Ihsan",
       "address1": "Jl. Margorejo Indah No. 12",

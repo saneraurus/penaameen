@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { auditStore } from "@/infrastructure/audit";
+import { recordStaffAudit } from "@/application/audit/audit-store";
+import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
+import { createResourceId } from "@/domain/common/identifiers";
 import { getProducts, createProduct } from "@/lib/admin/products";
 
 export async function GET(request: Request) {
@@ -29,10 +33,21 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await requireStaffActor("catalog:write");
+    const actor = await requireStaffActor("catalog:write");
+    const correlationId = createRequestCorrelationId(
+      request.headers.get("x-request-id"),
+    );
     const body = await request.json();
 
     if (!body.name || !body.price) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "product.create.denied",
+        targetType: "product",
+        targetId: createResourceId("new"),
+        outcome: "denied",
+        correlationId,
+        reason: "Missing required fields (name/price)",
+      });
       return NextResponse.json({ error: "Nama produk dan harga wajib diisi" }, { status: 400 });
     }
 
@@ -57,6 +72,15 @@ export async function POST(request: Request) {
       sku: body.sku,
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
+    });
+
+    await recordStaffAudit(auditStore, actor, {
+      action: "product.create",
+      targetType: "product",
+      targetId: createResourceId(newProduct.id),
+      outcome: "succeeded",
+      correlationId,
+      after: { name: newProduct.name, slug: newProduct.slug },
     });
 
     return NextResponse.json({ success: true, product: newProduct });
