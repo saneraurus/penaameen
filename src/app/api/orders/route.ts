@@ -409,7 +409,9 @@ export async function GET() {
       return {
         id: order.id,
         orderNumber: order.orderNumber,
-        trackingNumber: (order as Record<string, unknown>).trackingNumber as string | null ?? null,
+        trackingNumber:
+          ((order as Record<string, unknown>).trackingNumber as
+            string | null) ?? null,
         status: order.status,
         subtotal: order.subtotal.toString(),
         shippingCost: order.shippingCost.toString(),

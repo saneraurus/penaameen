@@ -206,7 +206,7 @@ export class CasakuClient {
 
     return {
       transactionId: raw.transactionId,
-      qrString: raw.qr_string,
+      qrString: raw.qr_string ?? "",
       originalAmount: raw.originalAmount,
       totalAmount: raw.totalAmount,
       uniqueNominal: raw.uniqueNominal,
@@ -214,7 +214,7 @@ export class CasakuClient {
       packageIds: raw.packageIds ?? this.packageIds,
       expiredInMinutes: raw.expiredInMinutes,
       status: raw.status,
-      paymentUrl: raw.payment_url,
+      paymentUrl: raw.payment_url ?? "",
     };
   }
 
