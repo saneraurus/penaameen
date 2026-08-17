@@ -8,17 +8,9 @@ export interface AdminOrder {
   customerEmail: string;
   status: "pending" | "processing" | "completed" | "cancelled" | "refunded";
   paymentStatus:
-    | "pending"
-    | "paid"
-    | "failed"
-    | "refunded"
-    | "partially_refunded";
+    "pending" | "paid" | "failed" | "refunded" | "partially_refunded";
   fulfillmentStatus:
-    | "unfulfilled"
-    | "partial"
-    | "fulfilled"
-    | "shipped"
-    | "delivered";
+    "unfulfilled" | "partial" | "fulfilled" | "shipped" | "delivered";
   totalAmount: number;
   currency: string;
   itemCount: number;
@@ -156,7 +148,8 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
   return {
     id: db.id,
     orderNumber: db.orderNumber,
-    customerName: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
+    customerName:
+      addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
     customerEmail: db.user?.email || "pelanggan@penaameen.com",
     status: orderStat,
     paymentStatus: paymentStat,
@@ -242,8 +235,10 @@ export async function getOrders(
   if (fulfillmentStatus) where.fulfillmentStatus = fulfillmentStatus;
   if (dateFrom || dateTo) {
     where.createdAt = {};
-    if (dateFrom) (where.createdAt as Record<string, unknown>).gte = new Date(dateFrom);
-    if (dateTo) (where.createdAt as Record<string, unknown>).lte = new Date(dateTo);
+    if (dateFrom)
+      (where.createdAt as Record<string, unknown>).gte = new Date(dateFrom);
+    if (dateTo)
+      (where.createdAt as Record<string, unknown>).lte = new Date(dateTo);
   }
 
   const [rows, total] = await Promise.all([
@@ -261,7 +256,10 @@ export async function getOrders(
     prisma.order.count({ where }),
   ]);
 
-  return { orders: rows.map((r) => mapDbOrder(r as OrderWithRelations)), total };
+  return {
+    orders: rows.map((r) => mapDbOrder(r as OrderWithRelations)),
+    total,
+  };
 }
 
 export async function getOrderById(id: string): Promise<AdminOrder | null> {
@@ -286,7 +284,9 @@ export async function getOrderStatusCounts(): Promise<{
 }> {
   const { orders } = await getOrders({ page: 1, perPage: 1000 });
 
-  const paymentPending = orders.filter((o) => o.paymentStatus === "pending").length;
+  const paymentPending = orders.filter(
+    (o) => o.paymentStatus === "pending",
+  ).length;
   const fulfillmentReady = orders.filter(
     (o) =>
       (o.paymentStatus === "paid" || o.status === "processing") &&
@@ -362,7 +362,10 @@ export async function getSalesAnalytics(): Promise<SalesAnalytics> {
         }
       });
 
-      const dayRevenue = matchingOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+      const dayRevenue = matchingOrders.reduce(
+        (sum, o) => sum + o.totalAmount,
+        0,
+      );
       const dayOrders = matchingOrders.length;
 
       const shortLabel =
@@ -370,7 +373,10 @@ export async function getSalesAnalytics(): Promise<SalesAnalytics> {
           ? "Hari Ini"
           : i === 1
             ? "Kemarin"
-            : d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" });
+            : d.toLocaleDateString("id-ID", {
+                weekday: "short",
+                day: "numeric",
+              });
 
       points.push({
         date: d.toLocaleDateString("id-ID", {

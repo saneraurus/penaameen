@@ -4,11 +4,7 @@ import { usePathname } from "next/navigation";
 import { Header } from "@/presentation/components/header";
 import { Footer } from "@/presentation/components/footer";
 
-export function SiteLayoutWrapper({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function SiteLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
 

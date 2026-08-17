@@ -18,7 +18,10 @@ export async function GET() {
     return NextResponse.json({ settings });
   } catch (error) {
     console.error("Error fetching API settings:", error);
-    return NextResponse.json({ error: "Unauthorized or failed to fetch settings" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized or failed to fetch settings" },
+      { status: 401 },
+    );
   }
 }
 
@@ -80,6 +83,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, settings: after });
   } catch (error) {
     console.error("Error saving API settings:", error);
-    return NextResponse.json({ error: "Failed to save API settings" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to save API settings" },
+      { status: 500 },
+    );
   }
 }

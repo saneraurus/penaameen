@@ -1,7 +1,7 @@
 // src/app/metode/[slug]/page.tsx
 import Link from "next/link";
 import Image from "next/image";
-import { getMethodBySlug, methods } from "@/data/methods";
+import { getMethodBySlug } from "@/data/methods";
 import { products } from "@/data/products";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -50,7 +50,7 @@ export default async function MethodDetailPage({
   }
 
   const relatedProducts = products.filter((p) =>
-    method.relatedProductSlugs.includes(p.slug)
+    method.relatedProductSlugs.includes(p.slug),
   );
 
   const jsonLd = {
@@ -85,16 +85,28 @@ export default async function MethodDetailPage({
       <header className="bg-white/95 backdrop-blur-md sticky top-0 z-20 border-b border-supporting-200 shadow-2xs">
         <div className="container px-4 mx-auto py-3.5">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-supporting-500">
-              <Link href="/" className="hover:text-primary-700 transition-colors">
+            <nav
+              aria-label="Breadcrumb"
+              className="flex items-center gap-1.5 text-xs text-supporting-500"
+            >
+              <Link
+                href="/"
+                className="hover:text-primary-700 transition-colors"
+              >
                 Beranda
               </Link>
               <span aria-hidden="true">/</span>
-              <Link href="/metode" className="hover:text-primary-700 transition-colors">
+              <Link
+                href="/metode"
+                className="hover:text-primary-700 transition-colors"
+              >
                 Program &amp; Metode
               </Link>
               <span aria-hidden="true">/</span>
-              <span className="font-semibold text-primary-900" aria-current="page">
+              <span
+                className="font-semibold text-primary-900"
+                aria-current="page"
+              >
                 {method.name}
               </span>
             </nav>
@@ -255,13 +267,17 @@ export default async function MethodDetailPage({
                     ✓
                   </span>
                   <h3 className="text-base font-bold font-serif">
-                    {isACM ? "Metode ACM (Aku Cepat Membaca)" : "Metode AL-BARQY (Anti Lupa)"}
+                    {isACM
+                      ? "Metode ACM (Aku Cepat Membaca)"
+                      : "Metode AL-BARQY (Anti Lupa)"}
                   </h3>
                 </div>
                 <ul className="space-y-2.5 text-xs sm:text-sm text-supporting-800 font-medium">
                   {method.comparison.acm.map((point, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                      <span className="text-emerald-600 font-bold mt-0.5">
+                        ✓
+                      </span>
                       <span>{point}</span>
                     </li>
                   ))}
@@ -282,7 +298,8 @@ export default async function MethodDetailPage({
                 6 Alasan Memilih {method.name}
               </h2>
               <p className="text-sm text-supporting-600">
-                Dirancang dengan riset pedagogik mendalam agar setiap anak merasakan kegembiraan membaca:
+                Dirancang dengan riset pedagogik mendalam agar setiap anak
+                merasakan kegembiraan membaca:
               </p>
             </div>
 
@@ -320,7 +337,8 @@ export default async function MethodDetailPage({
                 Tahapan Sistematis Belajar {method.name}
               </h2>
               <p className="text-sm text-supporting-600 max-w-3xl">
-                Alur belajar terstruktur dari pengenalan kata konkret hingga kemandirian membaca:
+                Alur belajar terstruktur dari pengenalan kata konkret hingga
+                kemandirian membaca:
               </p>
             </div>
 
@@ -335,7 +353,9 @@ export default async function MethodDetailPage({
                       <span className="px-2.5 py-1 rounded-lg bg-primary-100 text-primary-800 text-xs font-bold uppercase tracking-wider">
                         {st.step}
                       </span>
-                      <span className="text-[11px] font-bold text-emerald-700">Langkah {idx + 1}</span>
+                      <span className="text-[11px] font-bold text-emerald-700">
+                        Langkah {idx + 1}
+                      </span>
                     </div>
 
                     <h3 className="text-sm font-bold text-primary-950 mb-2 leading-snug">
@@ -375,15 +395,20 @@ export default async function MethodDetailPage({
                   Formula Ideal 70% Membaca &amp; 30% Menulis
                 </h3>
                 <p className="text-sm text-white/80 leading-relaxed mb-6">
-                  Menyeimbangkan stimulasi auditori, visual, dan motorik kinestetik anak tanpa membuat tangan lelah.
+                  Menyeimbangkan stimulasi auditori, visual, dan motorik
+                  kinestetik anak tanpa membuat tangan lelah.
                 </p>
 
                 <div className="space-y-3">
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/15">
-                    <span className="text-xs font-bold text-amber-300 block mb-0.5">📖 {method.composition.reading}</span>
+                    <span className="text-xs font-bold text-amber-300 block mb-0.5">
+                      📖 {method.composition.reading}
+                    </span>
                   </div>
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/15">
-                    <span className="text-xs font-bold text-emerald-300 block mb-0.5">✏️ {method.composition.writing}</span>
+                    <span className="text-xs font-bold text-emerald-300 block mb-0.5">
+                      ✏️ {method.composition.writing}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -408,7 +433,9 @@ export default async function MethodDetailPage({
                 <ul className="space-y-2.5 text-xs sm:text-sm text-supporting-700">
                   {method.benefits.map((ben, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                      <span className="text-emerald-600 font-bold mt-0.5">
+                        ✓
+                      </span>
                       <span>{ben}</span>
                     </li>
                   ))}
@@ -499,7 +526,8 @@ export default async function MethodDetailPage({
                 Pertanyaan Populer Seputar {method.name}
               </h2>
               <p className="text-sm text-supporting-600">
-                Penjelasan detail untuk menjawab keraguan para orang tua dan pendidik:
+                Penjelasan detail untuk menjawab keraguan para orang tua dan
+                pendidik:
               </p>
             </div>
 
@@ -533,7 +561,8 @@ export default async function MethodDetailPage({
                 Mulai Pembelajaran {method.name} Hari Ini
               </h2>
               <p className="text-sm sm:text-base text-white/80 leading-relaxed">
-                Dapatkan paket modul pembelajaran orisinal atau daftarkan lembaga/sekolah Anda untuk pelatihan sertifikasi pengajar.
+                Dapatkan paket modul pembelajaran orisinal atau daftarkan
+                lembaga/sekolah Anda untuk pelatihan sertifikasi pengajar.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <Link

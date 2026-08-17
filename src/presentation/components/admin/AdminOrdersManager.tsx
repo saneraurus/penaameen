@@ -13,18 +13,21 @@ interface AdminOrdersManagerProps {
   perPage: number;
 }
 
-export function AdminOrdersManager({
-  initialOrders,
-}: AdminOrdersManagerProps) {
+export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
   const router = useRouter();
   const [orders, setOrders] = useState<AdminOrder[]>(initialOrders);
   const [activeTab, setActiveTab] = useState<
     "ALL" | "READY_TO_PROCESS" | "UNPAID" | "PACKING" | "SHIPPED" | "COMPLETED"
   >("ALL");
 
-  const [expandedOrderIds, setExpandedOrderIds] = useState<Record<string, boolean>>({});
-  const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<AdminOrder | null>(null);
-  const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
+  const [expandedOrderIds, setExpandedOrderIds] = useState<
+    Record<string, boolean>
+  >({});
+  const [selectedOrderForPrint, setSelectedOrderForPrint] =
+    useState<AdminOrder | null>(null);
+  const [processingOrderId, setProcessingOrderId] = useState<string | null>(
+    null,
+  );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const toggleExpand = (orderId: string) => {
@@ -33,7 +36,12 @@ export function AdminOrdersManager({
 
   // 1. Confirm Manual Payment (For Bank Transfers / WA confirmation)
   const handleConfirmPaid = async (orderId: string) => {
-    if (!confirm("Konfirmasi bahwa pembayaran untuk pesanan ini telah diterima dan terverifikasi?")) return;
+    if (
+      !confirm(
+        "Konfirmasi bahwa pembayaran untuk pesanan ini telah diterima dan terverifikasi?",
+      )
+    )
+      return;
 
     setProcessingOrderId(orderId);
     try {
@@ -58,10 +66,12 @@ export function AdminOrdersManager({
                   paymentStatus: "paid",
                   fulfillmentStatus: "unfulfilled",
                 }
-              : o
-          )
+              : o,
+          ),
         );
-        setToastMessage(`✓ Pembayaran #${orderId} berhasil dikonfirmasi! Pesanan kini siap diproses & dicetak resinya.`);
+        setToastMessage(
+          `✓ Pembayaran #${orderId} berhasil dikonfirmasi! Pesanan kini siap diproses & dicetak resinya.`,
+        );
         setTimeout(() => setToastMessage(null), 5000);
         router.refresh();
       }
@@ -94,10 +104,12 @@ export function AdminOrdersManager({
                   ...o,
                   fulfillmentStatus: "shipped",
                 }
-              : o
-          )
+              : o,
+          ),
         );
-        setToastMessage(`🚚 Pesanan #${orderId} telah ditandai 'Dalam Pengiriman'!`);
+        setToastMessage(
+          `🚚 Pesanan #${orderId} telah ditandai 'Dalam Pengiriman'!`,
+        );
         setTimeout(() => setToastMessage(null), 5000);
         router.refresh();
       }
@@ -133,8 +145,8 @@ export function AdminOrdersManager({
                   status: "cancelled",
                   paymentStatus: "failed",
                 }
-              : o
-          )
+              : o,
+          ),
         );
         setToastMessage(`Pesanan #${orderId} telah dibatalkan.`);
         setTimeout(() => setToastMessage(null), 4000);
@@ -149,7 +161,9 @@ export function AdminOrdersManager({
 
   const handlePrintLabel = (order: AdminOrder) => {
     if (order.paymentStatus !== "paid") {
-      alert("⚠️ Perhatian: Pesanan ini belum dibayar oleh pelanggan! Resi hanya dapat dicetak untuk pesanan yang telah lunas.");
+      alert(
+        "⚠️ Perhatian: Pesanan ini belum dibayar oleh pelanggan! Resi hanya dapat dicetak untuk pesanan yang telah lunas.",
+      );
       return;
     }
     setSelectedOrderForPrint(order);
@@ -167,11 +181,11 @@ export function AdminOrdersManager({
               paymentStatus: "paid",
               fulfillmentStatus: "fulfilled",
             }
-          : o
-      )
+          : o,
+      ),
     );
     setToastMessage(
-      `✓ Resi dicetak! Status Pesanan #${selectedOrderForPrint.orderNumber} otomatis diubah menjadi 'Sedang Dikemas'.`
+      `✓ Resi dicetak! Status Pesanan #${selectedOrderForPrint.orderNumber} otomatis diubah menjadi 'Sedang Dikemas'.`,
     );
     setTimeout(() => setToastMessage(null), 5000);
     router.refresh();
@@ -179,33 +193,46 @@ export function AdminOrdersManager({
 
   // Tab Filtering Logic
   const readyToProcessCount = orders.filter(
-    (o) => o.paymentStatus === "paid" && o.fulfillmentStatus === "unfulfilled" && o.status !== "cancelled"
+    (o) =>
+      o.paymentStatus === "paid" &&
+      o.fulfillmentStatus === "unfulfilled" &&
+      o.status !== "cancelled",
   ).length;
 
   const unpaidCount = orders.filter(
-    (o) => o.paymentStatus === "pending" && o.status !== "cancelled"
+    (o) => o.paymentStatus === "pending" && o.status !== "cancelled",
   ).length;
 
   const packingCount = orders.filter(
-    (o) => o.fulfillmentStatus === "fulfilled" && o.status !== "cancelled"
+    (o) => o.fulfillmentStatus === "fulfilled" && o.status !== "cancelled",
   ).length;
 
   const shippedCount = orders.filter(
-    (o) => o.fulfillmentStatus === "shipped" && o.status !== "cancelled"
+    (o) => o.fulfillmentStatus === "shipped" && o.status !== "cancelled",
   ).length;
 
   const filteredOrders = orders.filter((order) => {
     if (activeTab === "ALL") return true;
     if (activeTab === "READY_TO_PROCESS")
-      return order.paymentStatus === "paid" && order.fulfillmentStatus === "unfulfilled" && order.status !== "cancelled";
+      return (
+        order.paymentStatus === "paid" &&
+        order.fulfillmentStatus === "unfulfilled" &&
+        order.status !== "cancelled"
+      );
     if (activeTab === "UNPAID")
       return order.paymentStatus === "pending" && order.status !== "cancelled";
     if (activeTab === "PACKING")
-      return order.fulfillmentStatus === "fulfilled" && order.status !== "cancelled";
+      return (
+        order.fulfillmentStatus === "fulfilled" && order.status !== "cancelled"
+      );
     if (activeTab === "SHIPPED")
-      return order.fulfillmentStatus === "shipped" && order.status !== "cancelled";
+      return (
+        order.fulfillmentStatus === "shipped" && order.status !== "cancelled"
+      );
     if (activeTab === "COMPLETED")
-      return order.status === "completed" || order.fulfillmentStatus === "delivered";
+      return (
+        order.status === "completed" || order.fulfillmentStatus === "delivered"
+      );
     return true;
   });
 
@@ -370,8 +397,7 @@ export function AdminOrdersManager({
                 ? order.items.reduce((s, i) => s + (i.quantity || 1), 0)
                 : order.itemCount || 1;
 
-            const carrier =
-              order.fulfillmentHistory?.[0]?.carrier || null;
+            const carrier = order.fulfillmentHistory?.[0]?.carrier || null;
             const trackingNumber =
               order.fulfillmentHistory?.[0]?.trackingNumber || null;
 
@@ -382,8 +408,8 @@ export function AdminOrdersManager({
                   isUnpaid
                     ? "border-amber-200 hover:border-amber-300"
                     : isPaid && !isPacked
-                    ? "border-emerald-300 ring-2 ring-emerald-500/10"
-                    : "border-gray-200 hover:border-gray-300"
+                      ? "border-emerald-300 ring-2 ring-emerald-500/10"
+                      : "border-gray-200 hover:border-gray-300"
                 }`}
               >
                 {/* Header Banner for Unpaid Orders */}
@@ -392,7 +418,9 @@ export function AdminOrdersManager({
                     <div className="flex items-center gap-2">
                       <span className="text-base">⏳</span>
                       <span>
-                        <strong>Menunggu Pembayaran:</strong> Pelanggan belum menyelesaikan transfer. Jangan kemas atau kirim paket sebelum pembayaran lunas.
+                        <strong>Menunggu Pembayaran:</strong> Pelanggan belum
+                        menyelesaikan transfer. Jangan kemas atau kirim paket
+                        sebelum pembayaran lunas.
                       </span>
                     </div>
                     <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
@@ -407,7 +435,9 @@ export function AdminOrdersManager({
                     <div className="flex items-center gap-2">
                       <span className="text-base">⭐</span>
                       <span>
-                        <strong>Pembayaran Terverifikasi (LUNAS):</strong> Silakan klik <strong>Print Resi</strong> untuk mencetak label pengiriman dan memulai pengemasan.
+                        <strong>Pembayaran Terverifikasi (LUNAS):</strong>{" "}
+                        Silakan klik <strong>Print Resi</strong> untuk mencetak
+                        label pengiriman dan memulai pengemasan.
                       </span>
                     </div>
                     <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md">
@@ -435,13 +465,16 @@ export function AdminOrdersManager({
                         </span>
                         <span className="text-gray-300">•</span>
                         <span className="text-xs text-gray-500 font-medium">
-                          {new Date(order.createdAt).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </span>
                       </div>
 
@@ -462,7 +495,8 @@ export function AdminOrdersManager({
                       >
                         <span>📦</span>
                         <span>
-                          {uniqueProductCount} Macam Produk ({itemCount} item total)
+                          {uniqueProductCount} Macam Produk ({itemCount} item
+                          total)
                         </span>
                         <span className="text-[10px] text-gray-500 font-bold ml-0.5">
                           {isExpanded ? "▴ Tutup" : "▾ Rincian"}
@@ -479,11 +513,15 @@ export function AdminOrdersManager({
                         isPaid
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : isCancelled
-                          ? "bg-red-50 text-red-700 border-red-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200"
+                            ? "bg-red-50 text-red-700 border-red-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
                       }`}
                     >
-                      {isPaid ? "✓ Lunas / Terbayar" : isCancelled ? "✕ Dibatalkan" : "⏳ Menunggu Bayar"}
+                      {isPaid
+                        ? "✓ Lunas / Terbayar"
+                        : isCancelled
+                          ? "✕ Dibatalkan"
+                          : "⏳ Menunggu Bayar"}
                     </span>
 
                     {/* Fulfillment Badge */}
@@ -492,24 +530,26 @@ export function AdminOrdersManager({
                         isShipped
                           ? "bg-purple-50 text-purple-700 border-purple-200"
                           : isPacked
-                          ? "bg-indigo-50 text-indigo-700 border-indigo-200"
-                          : isPaid
-                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                          : "bg-gray-100 text-gray-500 border-gray-200"
+                            ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                            : isPaid
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                              : "bg-gray-100 text-gray-500 border-gray-200"
                       }`}
                     >
                       {isShipped
                         ? "🚚 Dalam Pengiriman"
                         : isPacked
-                        ? "📦 Sedang Dikemas"
-                        : isPaid
-                        ? "⭐ Siap Dikemas"
-                        : "⛔ Belum Lunas"}
+                          ? "📦 Sedang Dikemas"
+                          : isPaid
+                            ? "⭐ Siap Dikemas"
+                            : "⛔ Belum Lunas"}
                     </span>
 
                     {/* Total Bill */}
                     <div className="text-right pl-3 pr-1">
-                      <div className="text-[11px] text-gray-400 font-medium">Total Tagihan</div>
+                      <div className="text-[11px] text-gray-400 font-medium">
+                        Total Tagihan
+                      </div>
                       <div className="font-mono font-bold text-sm text-gray-900">
                         {new Intl.NumberFormat("id-ID", {
                           style: "currency",
@@ -533,7 +573,11 @@ export function AdminOrdersManager({
                           title="Klik jika pelanggan telah transfer manual ke rekening bank toko"
                         >
                           <span>✓</span>
-                          <span>{processingOrderId === order.id ? "Memproses..." : "Konfirmasi Lunas"}</span>
+                          <span>
+                            {processingOrderId === order.id
+                              ? "Memproses..."
+                              : "Konfirmasi Lunas"}
+                          </span>
                         </button>
 
                         <button
@@ -589,7 +633,9 @@ export function AdminOrdersManager({
                       <div className="md:col-span-2 space-y-3">
                         <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
                           <span>📚</span>
-                          <span>Rincian Produk Dipesan ({uniqueProductCount} Macam)</span>
+                          <span>
+                            Rincian Produk Dipesan ({uniqueProductCount} Macam)
+                          </span>
                         </h4>
 
                         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden divide-y divide-gray-100 shadow-xs">
@@ -654,7 +700,9 @@ export function AdminOrdersManager({
                             <span className="text-[10px] text-gray-400 font-semibold block">
                               Kurir Pengiriman
                             </span>
-                            <span className="font-bold text-gray-900">{carrier || "-"}</span>
+                            <span className="font-bold text-gray-900">
+                              {carrier || "-"}
+                            </span>
                           </div>
 
                           <div>
@@ -669,7 +717,9 @@ export function AdminOrdersManager({
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    navigator.clipboard.writeText(trackingNumber);
+                                    navigator.clipboard.writeText(
+                                      trackingNumber,
+                                    );
                                     alert("Nomor resi berhasil disalin!");
                                   }}
                                   className="text-[10px] text-gray-500 hover:text-gray-800 font-medium cursor-pointer"
@@ -679,7 +729,8 @@ export function AdminOrdersManager({
                               </div>
                             ) : (
                               <span className="text-xs text-gray-500 font-medium block mt-0.5">
-                                Belum ada resi (menunggu data pengiriman terverifikasi)
+                                Belum ada resi (menunggu data pengiriman
+                                terverifikasi)
                               </span>
                             )}
                           </div>
@@ -689,8 +740,9 @@ export function AdminOrdersManager({
                               Alamat Penerima
                             </span>
                             <div className="font-semibold text-gray-800 mt-0.5">
-                              {order.shippingAddress?.name || order.customerName} (
-                              {order.shippingAddress?.phone || "-"})
+                              {order.shippingAddress?.name ||
+                                order.customerName}{" "}
+                              ({order.shippingAddress?.phone || "-"})
                             </div>
                             <div className="text-gray-600 mt-0.5 leading-relaxed text-[11px]">
                               {order.shippingAddress?.address1}

@@ -19,7 +19,7 @@ interface Product {
 }
 
 interface FlyingBlob {
-  id: number;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -34,12 +34,15 @@ export default function ProductListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [flyingBlobs, setFlyingBlobs] = useState<FlyingBlob[]>([]);
-  const [addedProductIds, setAddedProductIds] = useState<Record<string, boolean>>({});
+  const [addedProductIds, setAddedProductIds] = useState<
+    Record<string, boolean>
+  >({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const { addToCart } = useCart();
   const { setSearchQuery } = useAmeenContext();
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const blobIdCounterRef = useRef(0);
 
   useEffect(() => {
     setSearchQuery(search);
@@ -64,7 +67,10 @@ export default function ProductListPage() {
     };
   }, []);
 
-  const categories = ["Semua", ...Array.from(new Set(products.map((p) => p.category)))];
+  const categories = [
+    "Semua",
+    ...Array.from(new Set(products.map((p) => p.category))),
+  ];
 
   const filtered = products.filter((p) => {
     const matchesSearch =
@@ -75,7 +81,10 @@ export default function ProductListPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>, product: Product) => {
+  const handleAddToCart = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    product: Product,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -95,7 +104,7 @@ export default function ProductListPage() {
     }
 
     // 2. Spawn flying blob
-    const blobId = Date.now() + Math.random();
+    const blobId = `blob-${++blobIdCounterRef.current}`;
     setFlyingBlobs((prev) => [
       ...prev,
       {
@@ -125,7 +134,7 @@ export default function ProductListPage() {
     }, 2800);
   };
 
-  const removeBlob = (blobId: number) => {
+  const removeBlob = (blobId: string) => {
     setFlyingBlobs((prev) => prev.filter((b) => b.id !== blobId));
   };
 
@@ -152,7 +161,9 @@ export default function ProductListPage() {
       <AnimatePresence>
         {flyingBlobs.map((blob) => {
           // Mid-point curve control for natural arc
-          const midX = (blob.startX + blob.endX) / 2 + (blob.startX > blob.endX ? -80 : 80);
+          const midX =
+            (blob.startX + blob.endX) / 2 +
+            (blob.startX > blob.endX ? -80 : 80);
           const midY = Math.min(blob.startY, blob.endY) - 100;
 
           return (
@@ -213,17 +224,23 @@ export default function ProductListPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 text-sm text-supporting-500 mb-2">
-                <Link href="/" className="hover:text-primary-600 transition-colors">
+                <Link
+                  href="/"
+                  className="hover:text-primary-600 transition-colors"
+                >
                   Beranda
                 </Link>
                 <span>/</span>
-                <span className="text-primary-800 font-medium">Katalog Produk</span>
+                <span className="text-primary-800 font-medium">
+                  Katalog Produk
+                </span>
               </div>
               <h1 className="text-3xl md:text-4xl font-serif text-primary-900 font-bold tracking-tight">
                 Katalog Produk & Metode
               </h1>
               <p className="text-supporting-600 mt-2 max-w-xl text-base leading-relaxed">
-                Temukan buku, paket belajar membaca Al-Barqy, ACM, dan materi edukasi resmi dari Pena Ameen.
+                Temukan buku, paket belajar membaca Al-Barqy, ACM, dan materi
+                edukasi resmi dari Pena Ameen.
               </p>
             </div>
 
@@ -290,7 +307,9 @@ export default function ProductListPage() {
             </div>
           ) : error ? (
             <div className="text-center py-16 bg-white rounded-3xl border border-red-100 max-w-lg mx-auto p-8 shadow-xs">
-              <p className="text-red-600 font-medium text-lg mb-2">Terjadi Gangguan</p>
+              <p className="text-red-600 font-medium text-lg mb-2">
+                Terjadi Gangguan
+              </p>
               <p className="text-supporting-500 text-sm mb-6">{error}</p>
               <button
                 onClick={() => window.location.reload()}
@@ -336,15 +355,35 @@ export default function ProductListPage() {
                         >
                           {isAdded ? (
                             <>
-                              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              <svg
+                                className="w-4 h-4 text-white"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
                               </svg>
                               <span>Ditambahkan!</span>
                             </>
                           ) : (
                             <>
-                              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                              <svg
+                                className="w-4 h-4 text-white"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 4v16m8-8H4"
+                                />
                               </svg>
                               <span>Tambah ke Keranjang</span>
                             </>
@@ -398,14 +437,30 @@ export default function ProductListPage() {
                         >
                           {isAdded ? (
                             <>
-                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              <svg
+                                className="w-3.5 h-3.5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
                               </svg>
                               <span>Ditambah</span>
                             </>
                           ) : (
                             <>
-                              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <svg
+                                className="w-3.5 h-3.5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                              >
                                 <circle cx="9" cy="21" r="1" />
                                 <circle cx="20" cy="21" r="1" />
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />

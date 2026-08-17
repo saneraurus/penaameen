@@ -87,13 +87,17 @@ async function testRajaOngkir(apiKey: string): Promise<TestResult> {
   }
 
   try {
-    const response = await fetch("https://api.rajaongkir.com/starter/province", {
-      headers: { key: apiKey },
-    });
+    const response = await fetch(
+      "https://api.rajaongkir.com/starter/province",
+      {
+        headers: { key: apiKey },
+      },
+    );
     if (response.ok) {
       return {
         success: true,
-        message: "Koneksi RajaOngkir terverifikasi (daftar provinsi berhasil diambil).",
+        message:
+          "Koneksi RajaOngkir terverifikasi (daftar provinsi berhasil diambil).",
         latencyMs: Date.now() - started,
       };
     }
@@ -130,7 +134,8 @@ async function testEmail(apiKey: string): Promise<TestResult> {
     if (response.ok || response.status === 200) {
       return {
         success: true,
-        message: "Koneksi Resend terverifikasi (daftar email berhasil diambil).",
+        message:
+          "Koneksi Resend terverifikasi (daftar email berhasil diambil).",
         latencyMs: Date.now() - started,
       };
     }
@@ -175,9 +180,15 @@ export async function POST(request: Request) {
       return NextResponse.json(result);
     }
 
-    return NextResponse.json({ success: false, message: "Layanan tidak dikenal" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Layanan tidak dikenal" },
+      { status: 400 },
+    );
   } catch (error) {
     console.error("Error testing service:", error);
-    return NextResponse.json({ error: "Failed to test API connection" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to test API connection" },
+      { status: 500 },
+    );
   }
 }

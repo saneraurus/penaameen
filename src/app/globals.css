@@ -323,7 +323,11 @@
 
 /* Subtle, premium hairline used for dividers and card edges. */
 .hairline {
-  border-color: color-mix(in srgb, var(--color-supporting-200) 70%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--color-supporting-200) 70%,
+    transparent
+  );
 }
 
 /* Eyebrow / kicker label — small, tracked, quiet. */

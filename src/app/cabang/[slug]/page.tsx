@@ -71,8 +71,10 @@ export default async function BranchDetailPage({
                 Produk &amp; Layanan di Cabang Ini
               </h3>
               <p className="mb-6 text-supporting-600 text-sm sm:text-base leading-relaxed">
-                Seluruh produk resmi PENA AMEEN (Al-Barqy, ACM, Flashcard &amp; Alat Peraga) tersedia di cabang ini.
-                Anda juga dapat berkonsultasi langsung atau mendaftarkan lembaga Anda untuk program pembinaan pengajar.
+                Seluruh produk resmi PENA AMEEN (Al-Barqy, ACM, Flashcard &amp;
+                Alat Peraga) tersedia di cabang ini. Anda juga dapat
+                berkonsultasi langsung atau mendaftarkan lembaga Anda untuk
+                program pembinaan pengajar.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link

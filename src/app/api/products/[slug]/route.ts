@@ -4,7 +4,7 @@ import { getProductBySlug } from "@/lib/admin/products";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
@@ -29,7 +29,10 @@ export async function GET(
       });
     }
   } catch (error) {
-    console.warn(`Database not available for product slug ${slug}, checking persistent live products:`, error);
+    console.warn(
+      `Database not available for product slug ${slug}, checking persistent live products:`,
+      error,
+    );
   }
 
   const liveProduct = await getProductBySlug(slug);

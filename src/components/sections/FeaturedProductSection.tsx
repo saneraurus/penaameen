@@ -148,7 +148,9 @@ export function FeaturedProductSection() {
                     className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col items-center justify-center"
                   >
                     <span className="text-sm mb-0.5">{b.icon}</span>
-                    <span className="text-[11px] font-bold text-white leading-tight">{b.label}</span>
+                    <span className="text-[11px] font-bold text-white leading-tight">
+                      {b.label}
+                    </span>
                     <span className="text-[9px] text-white/60">{b.sub}</span>
                   </div>
                 ))}
@@ -178,7 +180,10 @@ export function FeaturedProductSection() {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                  Solusi menyeluruh pembelajaran membaca Al-Qur&apos;an mandiri di rumah. Dirancang agar anak dan pembelajar dewasa dapat belajar secara runtut, menyenangkan, dan cepat mahir tanpa rasa bosan.
+                  Solusi menyeluruh pembelajaran membaca Al-Qur&apos;an mandiri
+                  di rumah. Dirancang agar anak dan pembelajar dewasa dapat
+                  belajar secara runtut, menyenangkan, dan cepat mahir tanpa
+                  rasa bosan.
                 </p>
 
                 {/* Interactive Tab Switcher */}

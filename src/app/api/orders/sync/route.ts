@@ -38,7 +38,16 @@ type LocalOrder = {
   items?: LocalOrderItem[];
 };
 
-const STATUS_MAP: Record<string, "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"> = {
+const STATUS_MAP: Record<
+  string,
+  | "PENDING_PAYMENT"
+  | "PAID"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "REFUNDED"
+> = {
   PENDING_PAYMENT: "PENDING_PAYMENT",
   PAID: "PAID",
   PROCESSING: "PROCESSING",
@@ -55,10 +64,13 @@ function toNumber(value: string | number | undefined): number {
 export async function POST(request: Request) {
   try {
     const clerkUser = await currentUser();
-    const fallbackEmail = clerkUser?.emailAddresses?.[0]?.emailAddress || "ihsanzz099@gmail.com";
+    const fallbackEmail =
+      clerkUser?.emailAddresses?.[0]?.emailAddress || "ihsanzz099@gmail.com";
     const fallbackName =
       clerkUser?.fullName ||
-      (clerkUser?.firstName ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim() : null) ||
+      (clerkUser?.firstName
+        ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim()
+        : null) ||
       "Ihsan";
 
     const body = await request.json();
@@ -76,8 +88,8 @@ export async function POST(request: Request) {
         localOrders
           .flatMap((o) => o.items ?? [])
           .map((i) => i.product?.id)
-          .filter((id): id is string => Boolean(id))
-      )
+          .filter((id): id is string => Boolean(id)),
+      ),
     );
 
     const existingProductIds = new Set(
@@ -86,7 +98,7 @@ export async function POST(request: Request) {
           where: { id: { in: allItemIds } },
           select: { id: true },
         })
-      ).map((p) => p.id)
+      ).map((p) => p.id),
     );
 
     let synced = 0;
@@ -94,7 +106,8 @@ export async function POST(request: Request) {
 
     for (const ord of localOrders) {
       if (!ord) continue;
-      const orderNum = ord.orderNumber || ord.id || ("PA-" + Date.now().toString().slice(-6));
+      const orderNum =
+        ord.orderNumber || ord.id || "PA-" + Date.now().toString().slice(-6);
       const status = STATUS_MAP[ord.status || ""] ?? "PENDING_PAYMENT";
       const subtotal = toNumber(ord.subtotal);
       const shippingCost = toNumber(ord.shippingCost);
@@ -125,12 +138,16 @@ export async function POST(request: Request) {
           });
         } else {
           const itemInputs = (ord.items ?? [])
-            .filter((i) => i.product?.id && existingProductIds.has(i.product.id))
+            .filter(
+              (i) => i.product?.id && existingProductIds.has(i.product.id),
+            )
             .map((i) => ({
               productId: i.product?.id as string,
               quantity: i.quantity || 1,
               price: BigInt(toNumber(i.price)),
-              subtotal: BigInt(toNumber(i.subtotal) || toNumber(i.price) * (i.quantity || 1)),
+              subtotal: BigInt(
+                toNumber(i.subtotal) || toNumber(i.price) * (i.quantity || 1),
+              ),
             }));
 
           await prisma.order.create({
@@ -162,9 +179,16 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, count: synced, orders: syncedOrders });
+    return NextResponse.json({
+      success: true,
+      count: synced,
+      orders: syncedOrders,
+    });
   } catch (error) {
     console.error("Error syncing orders:", error);
-    return NextResponse.json({ error: "Failed to sync orders" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to sync orders" },
+      { status: 500 },
+    );
   }
 }

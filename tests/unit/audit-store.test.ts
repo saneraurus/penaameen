@@ -30,7 +30,11 @@ import {
   safeRecordAudit,
   type AuditStore,
 } from "@/application/audit/audit-store";
-import { createActorId, createCorrelationId, createResourceId } from "@/domain/common/identifiers";
+import {
+  createActorId,
+  createCorrelationId,
+  createResourceId,
+} from "@/domain/common/identifiers";
 
 const actor = {
   staffId: createActorId("staff-1"),
@@ -68,14 +72,29 @@ describe("FileAuditStore", () => {
 
   it("filters by action, targetType, outcome, and actorId", async () => {
     const store = new FileAuditStore();
-    await recordStaffAudit(store, actor, { ...baseEvent(), action: "product.create" });
-    await recordStaffAudit(store, actor, { ...baseEvent(), action: "product.delete", outcome: "denied" });
+    await recordStaffAudit(store, actor, {
+      ...baseEvent(),
+      action: "product.create",
+    });
+    await recordStaffAudit(store, actor, {
+      ...baseEvent(),
+      action: "product.delete",
+      outcome: "denied",
+    });
 
-    const byAction = await store.list({ page: 1, perPage: 10, action: "product.delete" });
+    const byAction = await store.list({
+      page: 1,
+      perPage: 10,
+      action: "product.delete",
+    });
     expect(byAction.total).toBe(1);
     expect(byAction.events[0]?.outcome).toBe("denied");
 
-    const byOutcome = await store.list({ page: 1, perPage: 10, outcome: "succeeded" });
+    const byOutcome = await store.list({
+      page: 1,
+      perPage: 10,
+      outcome: "succeeded",
+    });
     expect(byOutcome.total).toBe(1);
     expect(byOutcome.events[0]?.action).toBe("product.create");
   });
@@ -123,6 +142,8 @@ describe("audit record helpers", () => {
       append: () => Promise.reject(new Error("boom")),
       list: async () => ({ events: [], total: 0 }),
     };
-    await expect(safeRecordAudit(failingStore, baseEvent())).resolves.toBeUndefined();
+    await expect(
+      safeRecordAudit(failingStore, baseEvent()),
+    ).resolves.toBeUndefined();
   });
 });

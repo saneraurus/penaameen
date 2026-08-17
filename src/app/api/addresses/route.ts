@@ -31,7 +31,10 @@ export async function GET() {
     return NextResponse.json({ addresses });
   } catch (error) {
     console.error("Error fetching addresses:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -74,6 +77,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Error creating address:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

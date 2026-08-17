@@ -59,9 +59,14 @@ function CheckoutPaymentPage() {
   const shippingCost = Number(shippingCostRaw ?? 0);
 
   const checkoutIncomplete =
-    !addressId || !shippingMethod || !shippingCostRaw || Number.isNaN(shippingCost);
+    !addressId ||
+    !shippingMethod ||
+    !shippingCostRaw ||
+    Number.isNaN(shippingCost);
 
-  const [paymentMethod, setPaymentMethod] = useState<"midtrans" | "manual">("midtrans");
+  const [paymentMethod, setPaymentMethod] = useState<"midtrans" | "manual">(
+    "midtrans",
+  );
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [addressData, setAddressData] = useState<CheckoutAddress | null>(null);
@@ -91,7 +96,8 @@ function CheckoutPaymentPage() {
     }
   }, [addressId]);
 
-  const grandTotal = cartTotal + (Number.isNaN(shippingCost) ? 0 : shippingCost);
+  const grandTotal =
+    cartTotal + (Number.isNaN(shippingCost) ? 0 : shippingCost);
 
   const createLiveOrderOnServer = async () => {
     const realEmail =
@@ -164,9 +170,7 @@ function CheckoutPaymentPage() {
             onSuccess: () => {
               saveOrderToLocalHistory(data.orderNumber, "PAID");
               clearCart();
-              router.push(
-                `/checkout/success?order_id=${data.orderNumber}`,
-              );
+              router.push(`/checkout/success?order_id=${data.orderNumber}`);
             },
             onPending: () => {
               saveOrderToLocalHistory(data.orderNumber, "PENDING_PAYMENT");
@@ -313,8 +317,18 @@ function CheckoutPaymentPage() {
                 href="/checkout/address"
                 className="text-xs text-supporting-500 hover:text-primary-700 flex items-center gap-1.5 transition-colors font-medium"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
                 Ubah Alamat / Kurir
               </Link>
@@ -355,7 +369,10 @@ function CheckoutPaymentPage() {
               <span>⚠️</span>
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 text-xs font-bold">
+            <button
+              onClick={() => setError(null)}
+              className="text-red-500 hover:text-red-700 text-xs font-bold"
+            >
               ✕
             </button>
           </div>
@@ -419,8 +436,12 @@ function CheckoutPaymentPage() {
                   💳
                 </span>
                 <div>
-                  <h2 className="text-lg font-serif font-bold text-primary-950">Metode Pembayaran</h2>
-                  <p className="text-xs text-supporting-500">Pilih opsi pembayaran yang paling nyaman untuk Anda</p>
+                  <h2 className="text-lg font-serif font-bold text-primary-950">
+                    Metode Pembayaran
+                  </h2>
+                  <p className="text-xs text-supporting-500">
+                    Pilih opsi pembayaran yang paling nyaman untuk Anda
+                  </p>
                 </div>
               </div>
 
@@ -453,12 +474,22 @@ function CheckoutPaymentPage() {
                       </div>
 
                       <p className="text-xs text-supporting-600 leading-relaxed mb-3">
-                        Bayar instan dengan QRIS (GoPay, OVO, ShopeePay, Dana) atau Transfer Virtual Account (BCA, Mandiri, BNI, BRI, Permata).
+                        Bayar instan dengan QRIS (GoPay, OVO, ShopeePay, Dana)
+                        atau Transfer Virtual Account (BCA, Mandiri, BNI, BRI,
+                        Permata).
                       </p>
 
                       {/* Payment Badges Icons */}
                       <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-supporting-100">
-                        {["QRIS", "BCA VA", "Mandiri", "BNI", "BRI", "GoPay", "ShopeePay"].map((badge) => (
+                        {[
+                          "QRIS",
+                          "BCA VA",
+                          "Mandiri",
+                          "BNI",
+                          "BRI",
+                          "GoPay",
+                          "ShopeePay",
+                        ].map((badge) => (
                           <span
                             key={badge}
                             className="px-2 py-0.5 bg-supporting-100/90 text-supporting-700 text-[10px] font-semibold rounded"
@@ -496,7 +527,9 @@ function CheckoutPaymentPage() {
                       </div>
 
                       <p className="text-xs text-supporting-600 leading-relaxed mb-3">
-                        Transfer langsung ke rekening resmi Pena Ameen dan konfirmasi bukti transfer via CS WhatsApp. Detail rekening resmi dikonfirmasi melalui WhatsApp.
+                        Transfer langsung ke rekening resmi Pena Ameen dan
+                        konfirmasi bukti transfer via CS WhatsApp. Detail
+                        rekening resmi dikonfirmasi melalui WhatsApp.
                       </p>
 
                       {paymentMethod === "manual" && (
@@ -528,19 +561,29 @@ function CheckoutPaymentPage() {
               {/* Items summary */}
               <div className="divide-y divide-supporting-100 max-h-56 overflow-y-auto pr-1 scrollbar-thin mb-5">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                  <div
+                    key={item.id}
+                    className="py-2.5 flex items-center justify-between gap-3 text-xs"
+                  >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="relative w-9 h-9 rounded-lg bg-supporting-100 overflow-hidden flex-shrink-0 border border-supporting-200">
                         <Image
-                          src={item.product.image || "/images/penaameen/products/home-learning.jpg"}
+                          src={
+                            item.product.image ||
+                            "/images/penaameen/products/home-learning.jpg"
+                          }
                           alt={item.product.name}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="truncate">
-                        <p className="font-semibold text-primary-950 truncate">{item.product.name}</p>
-                        <p className="text-[10px] text-supporting-500">Jumlah: {item.quantity} unit</p>
+                        <p className="font-semibold text-primary-950 truncate">
+                          {item.product.name}
+                        </p>
+                        <p className="text-[10px] text-supporting-500">
+                          Jumlah: {item.quantity} unit
+                        </p>
                       </div>
                     </div>
                     <span className="font-bold text-primary-800 flex-shrink-0">
@@ -554,18 +597,26 @@ function CheckoutPaymentPage() {
               <div className="space-y-2.5 pt-3 border-t border-supporting-100 text-xs">
                 <div className="flex justify-between text-supporting-600">
                   <span>Subtotal Produk</span>
-                  <span className="font-semibold text-primary-950">Rp{cartTotal.toLocaleString("id-ID")}</span>
+                  <span className="font-semibold text-primary-950">
+                    Rp{cartTotal.toLocaleString("id-ID")}
+                  </span>
                 </div>
 
                 <div className="flex justify-between text-supporting-600">
                   <span>Ongkos Kirim ({shippingMethod.toUpperCase()})</span>
-                  <span className="font-semibold text-primary-950">Rp{shippingCost.toLocaleString("id-ID")}</span>
+                  <span className="font-semibold text-primary-950">
+                    Rp{shippingCost.toLocaleString("id-ID")}
+                  </span>
                 </div>
 
                 <div className="pt-3.5 border-t border-supporting-200 flex justify-between items-baseline">
                   <div>
-                    <span className="text-sm font-bold text-primary-950 block">Total Tagihan</span>
-                    <span className="text-[10px] text-supporting-400">Total bersih yang dibayarkan</span>
+                    <span className="text-sm font-bold text-primary-950 block">
+                      Total Tagihan
+                    </span>
+                    <span className="text-[10px] text-supporting-400">
+                      Total bersih yang dibayarkan
+                    </span>
                   </div>
                   <span className="text-2xl font-bold text-primary-700">
                     Rp{grandTotal.toLocaleString("id-ID")}
@@ -589,8 +640,18 @@ function CheckoutPaymentPage() {
                   ) : (
                     <>
                       <span>Bayar Sekarang (Buka Snap)</span>
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
                       </svg>
                     </>
                   )}
@@ -607,8 +668,18 @@ function CheckoutPaymentPage() {
                   ) : (
                     <>
                       <span>Konfirmasi via WhatsApp</span>
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
                       </svg>
                     </>
                   )}
@@ -641,7 +712,9 @@ export default function CheckoutPaymentPageWrapper() {
         <div className="min-h-screen bg-background-50 flex items-center justify-center">
           <div className="text-center space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto" />
-            <p className="text-supporting-600 text-sm font-medium">Memuat halaman pembayaran...</p>
+            <p className="text-supporting-600 text-sm font-medium">
+              Memuat halaman pembayaran...
+            </p>
           </div>
         </div>
       }

@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "node:crypto";
-import type {
-  AuditEventInput,
-  AuditRecord,
-} from "@/domain/audit/audit-event";
+import type { AuditEventInput, AuditRecord } from "@/domain/audit/audit-event";
 import type {
   AuditListOptions,
   AuditListResult,

@@ -15,7 +15,7 @@ const requestSchema = z.object({
       z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().max(4000),
-      })
+      }),
     )
     .min(1)
     .max(30),
@@ -39,7 +39,10 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 30;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
-function enforceRateLimit(ip: string): { allowed: boolean; retryAfterSeconds?: number } {
+function enforceRateLimit(ip: string): {
+  allowed: boolean;
+  retryAfterSeconds?: number;
+} {
   const now = Date.now();
   const entry = rateLimitStore.get(ip);
 
@@ -156,7 +159,9 @@ function buildSystemPrompt(input: {
     input.orders.length > 0
       ? input.orders
           .map((o) => {
-            const items = o.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
+            const items = o.items
+              .map((i) => `${i.name} x${i.quantity}`)
+              .join(", ");
             return `- No. Pesanan: ${o.orderNumber} | Status: ${o.status} | Tanggal: ${o.createdAt} | Total: Rp${Number(o.total).toLocaleString("id-ID")} | Item: ${items}`;
           })
           .join("\n")
@@ -183,7 +188,6 @@ ATURAN WAJIB (guardrails):
 7. Jangan berjanji tanggal pengiriman pasti; jelaskan estimasi ditentukan saat checkout oleh kurir dan bisa dipantau lewat nomor resi di /orders.
 8. Jika tidak tahu jawabannya, jangan mengarang. Arahkan pelanggan ke: email cs.penaameen@yahoo.com, WhatsApp/telepon +62822 3123 9158, atau halaman /kontak.
 9. Jawab dengan teks biasa (boleh gunakan bullet list sederhana). Jangan gunakan format markdown header atau tabel.`;
-
 }
 
 export async function POST(request: Request) {
@@ -192,10 +196,11 @@ export async function POST(request: Request) {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       {
-        error: "Terlalu banyak permintaan. Silakan coba lagi beberapa saat lagi.",
+        error:
+          "Terlalu banyak permintaan. Silakan coba lagi beberapa saat lagi.",
         retryAfterSeconds: rateLimit.retryAfterSeconds,
       },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -204,7 +209,10 @@ export async function POST(request: Request) {
     const parsed = requestSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: "Permintaan tidak valid" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Permintaan tidak valid" },
+        { status: 400 },
+      );
     }
 
     const apiKey = process.env.GROQ_API_KEY;
@@ -212,7 +220,7 @@ export async function POST(request: Request) {
       console.error("GROQ_API_KEY is not configured.");
       return NextResponse.json(
         { error: "Layanan asisten belum dikonfigurasi. Hubungi admin." },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -220,7 +228,9 @@ export async function POST(request: Request) {
 
     const clerkAuth = await auth();
     const isSignedIn = Boolean(clerkAuth.userId);
-    const orders = isSignedIn ? await fetchUserOrders(clerkAuth.userId as string) : [];
+    const orders = isSignedIn
+      ? await fetchUserOrders(clerkAuth.userId as string)
+      : [];
 
     const systemPrompt = buildSystemPrompt({
       pagePath,
@@ -256,11 +266,11 @@ export async function POST(request: Request) {
     if (!groqResponse.ok) {
       const detail = await groqResponse.text().catch(() => "");
       console.error(
-        `GROQ request failed: ${groqResponse.status} ${detail.slice(0, 500)}`
+        `GROQ request failed: ${groqResponse.status} ${detail.slice(0, 500)}`,
       );
       return NextResponse.json(
         { error: "Asisten sedang sibuk. Silakan coba lagi sebentar lagi." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -272,7 +282,7 @@ export async function POST(request: Request) {
     if (!reply) {
       return NextResponse.json(
         { error: "Asisten tidak memberikan jawaban. Silakan coba lagi." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -281,7 +291,7 @@ export async function POST(request: Request) {
     console.error("Assistant route error:", error);
     return NextResponse.json(
       { error: "Terjadi kesalahan pada layanan asisten. Silakan coba lagi." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

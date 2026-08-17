@@ -58,7 +58,9 @@ export function AdminSidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}
@@ -87,7 +89,9 @@ export function AdminSidebar() {
           <div className="flex items-center gap-2.5">
             <UserButton />
             <div className="text-xs">
-              <p className="font-semibold text-gray-900 leading-tight">Admin Session</p>
+              <p className="font-semibold text-gray-900 leading-tight">
+                Admin Session
+              </p>
               <p className="text-[11px] text-gray-500">PENA AMEEN</p>
             </div>
           </div>

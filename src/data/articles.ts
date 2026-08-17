@@ -15,7 +15,8 @@ export const articles: Article[] = [
   {
     id: "profil-lengkap-penerbit-pena-ameen",
     slug: "profil-lengkap-penerbit-pena-ameen",
-    title: "Mengenal Lebih Dekat Penerbit Pena Ameen: Pelopor Revolusi Belajar Membaca & Mengaji Anti Lupa",
+    title:
+      "Mengenal Lebih Dekat Penerbit Pena Ameen: Pelopor Revolusi Belajar Membaca & Mengaji Anti Lupa",
     excerpt:
       "Ulasan lengkap perjalanan, visi, dan filosofi Penerbit Pena Ameen (Ameen Educare) dalam menghadirkan metode Al-Barqy 200 Menit dan ACM yang terbukti membimbing jutaan keluarga dan santri di Indonesia.",
     content: `Penerbit Pena Ameen (dikenal luas juga sebagai Ameen Educare) merupakan lembaga penerbitan dan riset edukasi Islam yang telah berdedikasi selama lebih dari tiga dekade dalam menghadirkan terobosan metode belajar membaca Al-Qur'an dan huruf Latin di Indonesia.

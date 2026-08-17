@@ -54,9 +54,7 @@ export function ShippingLabelModal({
                 <span className="font-mono font-bold">{trackingNumber}</span>
               </p>
               {carrier ? (
-                <p className="text-xs text-gray-500">
-                  Kurir: {carrier}
-                </p>
+                <p className="text-xs text-gray-500">Kurir: {carrier}</p>
               ) : null}
               <p className="text-xs text-gray-500">
                 Label resmi dari ekspedisi akan tersedia melalui integrasi
@@ -71,7 +69,8 @@ export function ShippingLabelModal({
               <p className="text-xs text-gray-500 leading-relaxed">
                 Resi hanya muncul dari data pengiriman yang terverifikasi
                 (integrasi ekspedisi). Label cetak otomatis dan nomor resi tidak
-                dibuat secara otomatis agar tidak ada informasi pengiriman palsu.
+                dibuat secara otomatis agar tidak ada informasi pengiriman
+                palsu.
               </p>
             </div>
           )}

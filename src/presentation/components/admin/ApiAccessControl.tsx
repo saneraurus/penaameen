@@ -36,7 +36,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
       });
 
       if (res.ok) {
-        setToastMessage("Pengaturan API dan integrasi berhasil disimpan ke backend!");
+        setToastMessage(
+          "Pengaturan API dan integrasi berhasil disimpan ke backend!",
+        );
         setTimeout(() => setToastMessage(null), 4000);
       } else {
         alert("Gagal menyimpan konfigurasi API.");
@@ -68,7 +70,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
         payload = {
           ...payload,
           provider: settings.autoEmail.provider,
-          recipient: settings.emailForwarding.forwardingEmail || "ihsanzz099@gmail.com",
+          recipient:
+            settings.emailForwarding.forwardingEmail || "ihsanzz099@gmail.com",
         };
       }
 
@@ -132,7 +135,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             <span>Pusat Kontrol API & Integrasi Backend</span>
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Kelola kredensial resmi Midtrans, RajaOngkir, Auto-Email, dan Webhooks Pena Ameen
+            Kelola kredensial resmi Midtrans, RajaOngkir, Auto-Email, dan
+            Webhooks Pena Ameen
           </p>
         </div>
 
@@ -143,7 +147,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
           className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-2"
         >
           <span>💾</span>
-          <span>{isSaving ? "Menyimpan..." : "Simpan Seluruh Konfigurasi"}</span>
+          <span>
+            {isSaving ? "Menyimpan..." : "Simpan Seluruh Konfigurasi"}
+          </span>
         </button>
       </div>
 
@@ -239,18 +245,24 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     Konfigurasi Midtrans Snap & Core API
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Mendukung pembayaran otomatis QRIS, Virtual Account (BCA, Mandiri, BRI, BNI), dan Kartu Kredit
+                    Mendukung pembayaran otomatis QRIS, Virtual Account (BCA,
+                    Mandiri, BRI, BNI), dan Kartu Kredit
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">Mode Lingkungan:</span>
+                  <span className="text-xs font-medium text-gray-600">
+                    Mode Lingkungan:
+                  </span>
                   <button
                     type="button"
                     onClick={() =>
                       setSettings((s) => ({
                         ...s,
-                        midtrans: { ...s.midtrans, isProduction: !s.midtrans.isProduction },
+                        midtrans: {
+                          ...s.midtrans,
+                          isProduction: !s.midtrans.isProduction,
+                        },
                       }))
                     }
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
@@ -259,7 +271,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         : "bg-amber-100 text-amber-800 border border-amber-300"
                     }`}
                   >
-                    {settings.midtrans.isProduction ? "🟢 Production / Live" : "🟡 Sandbox / Test Mode"}
+                    {settings.midtrans.isProduction
+                      ? "🟢 Production / Live"
+                      : "🟡 Sandbox / Test Mode"}
                   </button>
                 </div>
               </div>
@@ -276,7 +290,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       onChange={(e) =>
                         setSettings((s) => ({
                           ...s,
-                          midtrans: { ...s.midtrans, serverKey: e.target.value },
+                          midtrans: {
+                            ...s.midtrans,
+                            serverKey: e.target.value,
+                          },
                         }))
                       }
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
@@ -305,7 +322,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       onChange={(e) =>
                         setSettings((s) => ({
                           ...s,
-                          midtrans: { ...s.midtrans, clientKey: e.target.value },
+                          midtrans: {
+                            ...s.midtrans,
+                            clientKey: e.target.value,
+                          },
                         }))
                       }
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
@@ -353,14 +373,20 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     />
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(settings.midtrans.webhookUrl, "Webhook Midtrans")}
+                      onClick={() =>
+                        copyToClipboard(
+                          settings.midtrans.webhookUrl,
+                          "Webhook Midtrans",
+                        )
+                      }
                       className="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
                     >
                       Salin
                     </button>
                   </div>
                   <span className="text-[11px] text-gray-400 mt-1 block">
-                    Tempelkan URL ini di Midtrans Dashboard → Configuration → Notification URL
+                    Tempelkan URL ini di Midtrans Dashboard → Configuration →
+                    Notification URL
                   </span>
                 </div>
               </div>
@@ -379,7 +405,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       {testResults.midtrans.success ? "✓ " : "⚠️ "}
                       {testResults.midtrans.message}
                       {testResults.midtrans.latencyMs && (
-                        <span className="text-xs opacity-75"> ({testResults.midtrans.latencyMs}ms)</span>
+                        <span className="text-xs opacity-75">
+                          {" "}
+                          ({testResults.midtrans.latencyMs}ms)
+                        </span>
                       )}
                     </div>
                   )}
@@ -391,7 +420,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   disabled={testingService === "midtrans"}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {testingService === "midtrans" ? "Menguji Koneksi..." : "⚡ Uji Ping Koneksi Midtrans"}
+                  {testingService === "midtrans"
+                    ? "Menguji Koneksi..."
+                    : "⚡ Uji Ping Koneksi Midtrans"}
                 </button>
               </div>
             </div>
@@ -406,12 +437,15 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     Konfigurasi Ekspedisi & Ongkos Kirim (RajaOngkir)
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Menghitung ongkos kirim real-time berdasarkan berat buku dan alamat tujuan pembeli
+                    Menghitung ongkos kirim real-time berdasarkan berat buku dan
+                    alamat tujuan pembeli
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">Paket Akun:</span>
+                  <span className="text-xs font-medium text-gray-600">
+                    Paket Akun:
+                  </span>
                   <select
                     value={settings.rajaongkir.tier}
                     onChange={(e) =>
@@ -444,7 +478,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       onChange={(e) =>
                         setSettings((s) => ({
                           ...s,
-                          rajaongkir: { ...s.rajaongkir, apiKey: e.target.value },
+                          rajaongkir: {
+                            ...s.rajaongkir,
+                            apiKey: e.target.value,
+                          },
                         }))
                       }
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
@@ -469,7 +506,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     onChange={(e) =>
                       setSettings((s) => ({
                         ...s,
-                        rajaongkir: { ...s.rajaongkir, originCityName: e.target.value },
+                        rajaongkir: {
+                          ...s.rajaongkir,
+                          originCityName: e.target.value,
+                        },
                       }))
                     }
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
@@ -484,7 +524,13 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     Kurir Ekspedisi Aktif
                   </label>
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {["JNE", "J&T Express", "SiCepat", "Pos Indonesia", "Wahana"].map((courier) => (
+                    {[
+                      "JNE",
+                      "J&T Express",
+                      "SiCepat",
+                      "Pos Indonesia",
+                      "Wahana",
+                    ].map((courier) => (
                       <span
                         key={courier}
                         className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium rounded-lg"
@@ -519,7 +565,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   disabled={testingService === "rajaongkir"}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {testingService === "rajaongkir" ? "Menguji..." : "⚡ Uji Hitung Tarif Ongkir"}
+                  {testingService === "rajaongkir"
+                    ? "Menguji..."
+                    : "⚡ Uji Hitung Tarif Ongkir"}
                 </button>
               </div>
             </div>
@@ -534,12 +582,15 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     Otomatisasi Email Transaksional & Invoice
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Kirim email bukti pembayaran, kwitansi resmi, dan nomor resi otomatis kepada pelanggan
+                    Kirim email bukti pembayaran, kwitansi resmi, dan nomor resi
+                    otomatis kepada pelanggan
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">Provider Email:</span>
+                  <span className="text-xs font-medium text-gray-600">
+                    Provider Email:
+                  </span>
                   <select
                     value={settings.autoEmail.provider}
                     onChange={(e) =>
@@ -547,13 +598,16 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         ...s,
                         autoEmail: {
                           ...s.autoEmail,
-                          provider: e.target.value as "resend" | "smtp" | "sendgrid",
+                          provider: e.target.value as
+                            "resend" | "smtp" | "sendgrid",
                         },
                       }))
                     }
                     className="px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold"
                   >
-                    <option value="resend">Resend API (Rekomendasi Modern)</option>
+                    <option value="resend">
+                      Resend API (Rekomendasi Modern)
+                    </option>
                     <option value="smtp">Custom SMTP Server</option>
                     <option value="sendgrid">SendGrid API</option>
                   </select>
@@ -597,7 +651,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     onChange={(e) =>
                       setSettings((s) => ({
                         ...s,
-                        autoEmail: { ...s.autoEmail, senderName: e.target.value },
+                        autoEmail: {
+                          ...s.autoEmail,
+                          senderName: e.target.value,
+                        },
                       }))
                     }
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
@@ -614,7 +671,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     onChange={(e) =>
                       setSettings((s) => ({
                         ...s,
-                        autoEmail: { ...s.autoEmail, senderEmail: e.target.value },
+                        autoEmail: {
+                          ...s.autoEmail,
+                          senderEmail: e.target.value,
+                        },
                       }))
                     }
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
@@ -633,12 +693,17 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         onChange={(e) =>
                           setSettings((s) => ({
                             ...s,
-                            autoEmail: { ...s.autoEmail, sendInvoiceOnPaid: e.target.checked },
+                            autoEmail: {
+                              ...s.autoEmail,
+                              sendInvoiceOnPaid: e.target.checked,
+                            },
                           }))
                         }
                         className="rounded text-primary-600 focus:ring-primary-500"
                       />
-                      <span>Kirim invoice otomatis saat pembayaran terverifikasi</span>
+                      <span>
+                        Kirim invoice otomatis saat pembayaran terverifikasi
+                      </span>
                     </label>
 
                     <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
@@ -648,12 +713,18 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         onChange={(e) =>
                           setSettings((s) => ({
                             ...s,
-                            autoEmail: { ...s.autoEmail, sendTrackingOnShipped: e.target.checked },
+                            autoEmail: {
+                              ...s.autoEmail,
+                              sendTrackingOnShipped: e.target.checked,
+                            },
                           }))
                         }
                         className="rounded text-primary-600 focus:ring-primary-500"
                       />
-                      <span>Kirim nomor resi pengiriman saat pesanan berstatus dikirim</span>
+                      <span>
+                        Kirim nomor resi pengiriman saat pesanan berstatus
+                        dikirim
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -682,7 +753,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   disabled={testingService === "email"}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {testingService === "email" ? "Mengirim Email..." : "⚡ Kirim Email Uji Coba"}
+                  {testingService === "email"
+                    ? "Mengirim Email..."
+                    : "⚡ Kirim Email Uji Coba"}
                 </button>
               </div>
             </div>
@@ -696,7 +769,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   Email Forwarding & Notifikasi Admin / CS
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Setiap pesanan baru dan pertanyaan pelanggan akan diteruskan langsung ke email & WA pengelola
+                  Setiap pesanan baru dan pertanyaan pelanggan akan diteruskan
+                  langsung ke email & WA pengelola
                 </p>
               </div>
 
@@ -720,7 +794,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
-                    Email ini menerima notifikasi instan saat ada pembeli membuat pesanan baru
+                    Email ini menerima notifikasi instan saat ada pembeli
+                    membuat pesanan baru
                   </span>
                 </div>
 
@@ -743,7 +818,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
-                    Digunakan untuk link konfirmasi manual WhatsApp di halaman checkout
+                    Digunakan untuk link konfirmasi manual WhatsApp di halaman
+                    checkout
                   </span>
                 </div>
               </div>
@@ -758,7 +834,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   Autentikasi & Whitelist Administrator
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Memastikan hanya email terverifikasi yang dapat masuk ke Panel Admin Pena Ameen
+                  Memastikan hanya email terverifikasi yang dapat masuk ke Panel
+                  Admin Pena Ameen
                 </p>
               </div>
 
@@ -773,13 +850,17 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                     onChange={(e) =>
                       setSettings((s) => ({
                         ...s,
-                        clerkAuth: { ...s.clerkAuth, adminEmails: e.target.value },
+                        clerkAuth: {
+                          ...s.clerkAuth,
+                          adminEmails: e.target.value,
+                        },
                       }))
                     }
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
-                    Email yang diizinkan mengakses panel ini: <code>ihsanzz099@gmail.com,admin@penaameen.com</code>
+                    Email yang diizinkan mengakses panel ini:{" "}
+                    <code>ihsanzz099@gmail.com,admin@penaameen.com</code>
                   </span>
                 </div>
 

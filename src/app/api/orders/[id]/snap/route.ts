@@ -14,7 +14,7 @@ function getMidtransClient() {
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -65,6 +65,9 @@ export async function POST(
     }
   } catch (error) {
     console.error("Error creating snap token:", error);
-    return NextResponse.json({ error: "Failed to generate snap token" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to generate snap token" },
+      { status: 500 },
+    );
   }
 }

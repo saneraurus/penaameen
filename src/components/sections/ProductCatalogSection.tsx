@@ -64,7 +64,8 @@ export function ProductCatalogSection() {
                 Perangkat Belajar yang Dirancang untuk Digunakan.
               </h2>
               <p className="text-sm sm:text-base text-supporting-600 mt-2 leading-relaxed">
-                Semua produk kami dirancang ramah anak, nyaman dipegang, tahan lama, dan memberikan pengalaman belajar yang menyenangkan.
+                Semua produk kami dirancang ramah anak, nyaman dipegang, tahan
+                lama, dan memberikan pengalaman belajar yang menyenangkan.
               </p>
             </div>
 
@@ -74,7 +75,10 @@ export function ProductCatalogSection() {
               <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-supporting-200 shadow-2xs">
                 {CATEGORIES.map((cat) => {
                   const isActive = activeCategory === cat;
-                  const count = cat === "Semua" ? products.length : products.filter((p) => p.category === cat).length;
+                  const count =
+                    cat === "Semua"
+                      ? products.length
+                      : products.filter((p) => p.category === cat).length;
                   return (
                     <button
                       key={cat}
@@ -87,7 +91,9 @@ export function ProductCatalogSection() {
                       }`}
                     >
                       <span>{cat}</span>
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${isActive ? "bg-white/20 text-white" : "bg-supporting-100 text-supporting-500"}`}>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-md ${isActive ? "bg-white/20 text-white" : "bg-supporting-100 text-supporting-500"}`}
+                      >
                         {count}
                       </span>
                     </button>
@@ -127,7 +133,9 @@ export function ProductCatalogSection() {
             {filteredProducts.map((product) => {
               const rich = getProductRichDetail(product.slug);
               const isAdded = addedIds[product.id];
-              const isFlagship = product.slug.includes("home-learning") || product.slug.includes("200-menit");
+              const isFlagship =
+                product.slug.includes("home-learning") ||
+                product.slug.includes("200-menit");
 
               return (
                 <div
@@ -199,7 +207,9 @@ export function ProductCatalogSection() {
                             Harga Resmi
                           </span>
                           <span className="text-base sm:text-lg font-bold font-serif text-emerald-700">
-                            {product.price > 0 ? `Rp${product.price.toLocaleString("id-ID")}` : "Unduh Gratis"}
+                            {product.price > 0
+                              ? `Rp${product.price.toLocaleString("id-ID")}`
+                              : "Unduh Gratis"}
                           </span>
                         </div>
                         {rich?.originalPrice && (
@@ -209,7 +219,11 @@ export function ProductCatalogSection() {
                             </span>
                             {rich.savings && (
                               <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.2 rounded">
-                                Hemat {Math.round((rich.savings / rich.originalPrice) * 100)}%
+                                Hemat{" "}
+                                {Math.round(
+                                  (rich.savings / rich.originalPrice) * 100,
+                                )}
+                                %
                               </span>
                             )}
                           </div>
@@ -260,13 +274,16 @@ export function ProductCatalogSection() {
           <div className="mt-8 pt-6 border-t border-supporting-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-supporting-600">
               <span className="flex items-center gap-1.5">
-                <span className="text-emerald-600 font-bold">✓</span> 100% Produk Orisinal Bersegel
+                <span className="text-emerald-600 font-bold">✓</span> 100%
+                Produk Orisinal Bersegel
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="text-emerald-600 font-bold">✓</span> Garansi Penggantian Cacat Kirim
+                <span className="text-emerald-600 font-bold">✓</span> Garansi
+                Penggantian Cacat Kirim
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="text-emerald-600 font-bold">✓</span> Kirim Cepat ke Seluruh Indonesia
+                <span className="text-emerald-600 font-bold">✓</span> Kirim
+                Cepat ke Seluruh Indonesia
               </span>
             </div>
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 
@@ -34,13 +33,46 @@ interface Order {
   items: OrderItem[];
 }
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; icon: string }> = {
-  PENDING_PAYMENT: { label: "Menunggu Pembayaran", bg: "bg-amber-50 border-amber-200", text: "text-amber-700", icon: "⏳" },
-  PAID: { label: "Pembayaran Terverifikasi", bg: "bg-blue-50 border-blue-200", text: "text-blue-700", icon: "💳" },
-  PROCESSING: { label: "Sedang Dikemas di Gudang", bg: "bg-indigo-50 border-indigo-200", text: "text-indigo-700", icon: "📦" },
-  SHIPPED: { label: "Dalam Pengiriman", bg: "bg-purple-50 border-purple-200", text: "text-purple-700", icon: "🚚" },
-  DELIVERED: { label: "Pesanan Selesai", bg: "bg-emerald-50 border-emerald-300", text: "text-emerald-800", icon: "✅" },
-  CANCELLED: { label: "Dibatalkan", bg: "bg-red-50 border-red-200", text: "text-red-700", icon: "✕" },
+const statusConfig: Record<
+  string,
+  { label: string; bg: string; text: string; icon: string }
+> = {
+  PENDING_PAYMENT: {
+    label: "Menunggu Pembayaran",
+    bg: "bg-amber-50 border-amber-200",
+    text: "text-amber-700",
+    icon: "⏳",
+  },
+  PAID: {
+    label: "Pembayaran Terverifikasi",
+    bg: "bg-blue-50 border-blue-200",
+    text: "text-blue-700",
+    icon: "💳",
+  },
+  PROCESSING: {
+    label: "Sedang Dikemas di Gudang",
+    bg: "bg-indigo-50 border-indigo-200",
+    text: "text-indigo-700",
+    icon: "📦",
+  },
+  SHIPPED: {
+    label: "Dalam Pengiriman",
+    bg: "bg-purple-50 border-purple-200",
+    text: "text-purple-700",
+    icon: "🚚",
+  },
+  DELIVERED: {
+    label: "Pesanan Selesai",
+    bg: "bg-emerald-50 border-emerald-300",
+    text: "text-emerald-800",
+    icon: "✅",
+  },
+  CANCELLED: {
+    label: "Dibatalkan",
+    bg: "bg-red-50 border-red-200",
+    text: "text-red-700",
+    icon: "✕",
+  },
 };
 
 export default function OrdersPage() {
@@ -48,9 +80,11 @@ export default function OrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("ALL");
-  const [expandedOrderIds, setExpandedOrderIds] = useState<Record<string, boolean>>({});
+  const [expandedOrderIds, setExpandedOrderIds] = useState<
+    Record<string, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
     setExpandedOrderIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -91,7 +125,10 @@ export default function OrdersPage() {
           const apiOrders = data.orders ?? [];
           if (apiOrders.length > 0) {
             setOrders(apiOrders);
-            localStorage.setItem("penaameen_orders_history", JSON.stringify(apiOrders));
+            localStorage.setItem(
+              "penaameen_orders_history",
+              JSON.stringify(apiOrders),
+            );
             setIsLoading(false);
             return;
           }
@@ -132,7 +169,8 @@ export default function OrdersPage() {
   const filteredOrders = orders.filter((order) => {
     if (activeFilter === "ALL") return true;
     if (activeFilter === "UNPAID") return order.status === "PENDING_PAYMENT";
-    if (activeFilter === "PACKING") return order.status === "PROCESSING" || order.status === "PAID";
+    if (activeFilter === "PACKING")
+      return order.status === "PROCESSING" || order.status === "PAID";
     if (activeFilter === "SHIPPED") return order.status === "SHIPPED";
     if (activeFilter === "COMPLETED") return order.status === "DELIVERED";
     return true;
@@ -143,7 +181,9 @@ export default function OrdersPage() {
       <div className="min-h-screen bg-background-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto" />
-          <p className="text-supporting-600 text-xs font-semibold">Memuat daftar pesanan Anda...</p>
+          <p className="text-supporting-600 text-xs font-semibold">
+            Memuat daftar pesanan Anda...
+          </p>
         </div>
       </div>
     );
@@ -157,15 +197,20 @@ export default function OrdersPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-xs text-supporting-500 mb-1.5 font-medium">
-                <Link href="/" className="hover:text-primary-600">Beranda</Link>
+                <Link href="/" className="hover:text-primary-600">
+                  Beranda
+                </Link>
                 <span>/</span>
-                <span className="text-primary-800 font-semibold">Akun Saya</span>
+                <span className="text-primary-800 font-semibold">
+                  Akun Saya
+                </span>
               </div>
               <h1 className="text-2xl md:text-3xl font-serif font-bold text-primary-950">
                 Pesanan Saya & Tracking Resi
               </h1>
               <p className="text-xs text-supporting-500 mt-1">
-                Lacak status pengiriman buku dan paket belajar Pena Ameen Anda secara real-time.
+                Lacak status pengiriman buku dan paket belajar Pena Ameen Anda
+                secara real-time.
               </p>
             </div>
 
@@ -238,7 +283,11 @@ export default function OrdersPage() {
 
               const isExpanded = expandedOrderIds[order.id];
               const uniqueItemsCount = order.items?.length || 1;
-              const totalPieces = order.items?.reduce((s, i) => s + (Number(i.quantity) || 1), 0) || 1;
+              const totalPieces =
+                order.items?.reduce(
+                  (s, i) => s + (Number(i.quantity) || 1),
+                  0,
+                ) || 1;
 
               return (
                 <div
@@ -254,24 +303,30 @@ export default function OrdersPage() {
                           {order.orderNumber}
                         </span>
                         <span className="text-[11px] text-supporting-400">
-                          {new Date(order.createdAt).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {order.trackingNumber && order.status !== "PENDING_PAYMENT" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-50 text-primary-700 border border-primary-100">
-                          Resi: {order.trackingNumber}
-                        </span>
-                      )}
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold border ${cfg.bg} ${cfg.text}`}>
+                      {order.trackingNumber &&
+                        order.status !== "PENDING_PAYMENT" && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-50 text-primary-700 border border-primary-100">
+                            Resi: {order.trackingNumber}
+                          </span>
+                        )}
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold border ${cfg.bg} ${cfg.text}`}
+                      >
                         {cfg.label}
                       </span>
                     </div>
@@ -299,13 +354,20 @@ export default function OrdersPage() {
                                   {item.product?.name || "Produk Pena Ameen"}
                                 </h4>
                                 <p className="text-[11px] text-supporting-500 mt-0.5">
-                                  {item.quantity} unit • Rp{Number(item.price || 0).toLocaleString("id-ID")}
+                                  {item.quantity} unit • Rp
+                                  {Number(item.price || 0).toLocaleString(
+                                    "id-ID",
+                                  )}
                                 </p>
                               </div>
                             </div>
 
                             <span className="text-xs font-mono font-bold text-primary-800 shrink-0">
-                              Rp{Number(item.subtotal || Number(item.price) * Number(item.quantity)).toLocaleString("id-ID")}
+                              Rp
+                              {Number(
+                                item.subtotal ||
+                                  Number(item.price) * Number(item.quantity),
+                              ).toLocaleString("id-ID")}
                             </span>
                           </div>
                         );
@@ -360,8 +422,18 @@ export default function OrdersPage() {
                           className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
                         >
                           <span>Lacak Pesanan & Invoice</span>
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          <svg
+                            className="w-3.5 h-3.5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 5l7 7-7 7"
+                            />
                           </svg>
                         </Link>
                       )}

@@ -27,7 +27,8 @@ export async function PATCH(
         targetId: createResourceId(id),
         outcome: "denied",
         correlationId,
-        reason: "Tracking number cannot be stored yet (shipment storage unavailable)",
+        reason:
+          "Tracking number cannot be stored yet (shipment storage unavailable)",
       });
       return NextResponse.json(
         {
@@ -78,7 +79,16 @@ export async function PATCH(
 
     // Update Prisma DB when available
     try {
-      const prismaStatusMap: Record<string, "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"> = {
+      const prismaStatusMap: Record<
+        string,
+        | "PENDING_PAYMENT"
+        | "PAID"
+        | "PROCESSING"
+        | "SHIPPED"
+        | "DELIVERED"
+        | "CANCELLED"
+        | "REFUNDED"
+      > = {
         pending: "PENDING_PAYMENT",
         processing: "PROCESSING",
         completed: "DELIVERED",

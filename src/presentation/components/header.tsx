@@ -79,7 +79,8 @@ const productItems: NavItem[] = [
   {
     title: "Buku Aktivitas & Latihan",
     href: "/produk",
-    description: "Buku kerja menulis arab, mewarnai islami, dan latihan tajwid.",
+    description:
+      "Buku kerja menulis arab, mewarnai islami, dan latihan tajwid.",
     icon: NotebookPen,
   },
 ];
@@ -88,7 +89,8 @@ const aboutItems: NavItem[] = [
   {
     title: "Tentang PENA AMEEN",
     href: "/tentang",
-    description: "Mengenal dedikasi, visi, dan perjalanan pendidikan Al-Qur'an.",
+    description:
+      "Mengenal dedikasi, visi, dan perjalanan pendidikan Al-Qur'an.",
     icon: Info,
   },
   {
@@ -169,7 +171,9 @@ function CustomerMenu() {
           unoptimized
           className="rounded-full object-cover ring-1 ring-supporting-200"
         />
-        <span className="hidden text-xs font-medium sm:block">{displayName}</span>
+        <span className="hidden text-xs font-medium sm:block">
+          {displayName}
+        </span>
       </button>
 
       {isOpen && (
@@ -253,7 +257,10 @@ export function Header() {
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden lg:flex items-center" aria-label="Navigasi utama">
+          <nav
+            className="hidden lg:flex items-center"
+            aria-label="Navigasi utama"
+          >
             <NavigationMenu viewport={false}>
               <NavigationMenuList className="gap-1">
                 <NavigationMenuItem>
@@ -436,13 +443,40 @@ export function Header() {
               </button>
             </div>
 
-            <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Navigasi seluler">
-              <MobileLink href="/" label="Beranda" onClose={() => setIsMobileOpen(false)} />
-              <MobileLink href="/metode" label="Metode" onClose={() => setIsMobileOpen(false)} />
-              <MobileLink href="/produk" label="Produk" onClose={() => setIsMobileOpen(false)} />
-              <MobileLink href="/tentang" label="Tentang" onClose={() => setIsMobileOpen(false)} />
-              <MobileLink href="/cabang" label="Cabang" onClose={() => setIsMobileOpen(false)} />
-              <MobileLink href="/artikel" label="Artikel" onClose={() => setIsMobileOpen(false)} />
+            <nav
+              className="flex-1 space-y-1 overflow-y-auto px-3 py-4"
+              aria-label="Navigasi seluler"
+            >
+              <MobileLink
+                href="/"
+                label="Beranda"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/metode"
+                label="Metode"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/produk"
+                label="Produk"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/tentang"
+                label="Tentang"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/cabang"
+                label="Cabang"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/artikel"
+                label="Artikel"
+                onClose={() => setIsMobileOpen(false)}
+              />
 
               <div className="border-t border-supporting-200/70 px-2 pt-4">
                 <Show when="signed-in">

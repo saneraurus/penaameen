@@ -1,9 +1,16 @@
 import { AdminHeader } from "@/presentation/components/admin/AdminHeader";
-import { DataTable, Pagination } from "@/presentation/components/admin/DataTable";
+import {
+  DataTable,
+  Pagination,
+} from "@/presentation/components/admin/DataTable";
 import { ProductStatusButton } from "@/presentation/components/admin/ProductStatusButton";
 import Link from "next/link";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
-import { getProducts, getProductCategories, type AdminProduct } from "@/lib/admin/products";
+import {
+  getProducts,
+  getProductCategories,
+  type AdminProduct,
+} from "@/lib/admin/products";
 
 export default async function AdminProductsPage({
   searchParams,
@@ -165,7 +172,9 @@ export default async function AdminProductsPage({
             >
               <option value="">All Categories</option>
               {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
             <select

@@ -34,12 +34,15 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "price" || name === "stockQuantity" ? Number(value) : value,
+      [name]:
+        name === "price" || name === "stockQuantity" ? Number(value) : value,
     }));
   };
 
@@ -271,7 +274,9 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
               >
                 <option value="published">✓ Published (Tampil di Toko)</option>
                 <option value="draft">⏳ Draft (Disimpan Belum Tampil)</option>
-                <option value="archived">📦 Archived (Diarsipkan / Sembunyi)</option>
+                <option value="archived">
+                  📦 Archived (Diarsipkan / Sembunyi)
+                </option>
               </select>
             </div>
 
@@ -300,7 +305,10 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
 
             <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
               <Image
-                src={formData.image || "/images/penaameen/products/home-learning.jpg"}
+                src={
+                  formData.image ||
+                  "/images/penaameen/products/home-learning.jpg"
+                }
                 alt={formData.name}
                 fill
                 className="object-cover"

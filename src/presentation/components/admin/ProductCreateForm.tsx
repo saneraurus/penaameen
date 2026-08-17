@@ -37,12 +37,18 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
     setFormData((prev) => ({
       ...prev,
       name,
-      slug: prev.slug === "" || prev.slug === prev.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") ? generatedSlug : prev.slug,
+      slug:
+        prev.slug === "" ||
+        prev.slug === prev.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+          ? generatedSlug
+          : prev.slug,
     }));
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -65,7 +71,9 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
         body: JSON.stringify({
           ...formData,
           price: Number(formData.price),
-          salePrice: formData.salePrice ? Number(formData.salePrice) : undefined,
+          salePrice: formData.salePrice
+            ? Number(formData.salePrice)
+            : undefined,
           stockQuantity: Number(formData.stockQuantity) || 0,
         }),
       });
@@ -85,7 +93,10 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 shadow-xs space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 shadow-xs space-y-6"
+    >
       {errorMessage && (
         <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm font-medium flex items-center justify-between shadow-xs">
           <span>⚠️ {errorMessage}</span>
@@ -178,7 +189,9 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           >
-            <option value="published">✓ Published (Langsung Tampil di Toko)</option>
+            <option value="published">
+              ✓ Published (Langsung Tampil di Toko)
+            </option>
             <option value="draft">⏳ Draft (Disimpan Belum Tampil)</option>
             <option value="archived">📦 Archived (Diarsipkan)</option>
           </select>

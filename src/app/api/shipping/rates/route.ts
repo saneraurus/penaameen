@@ -51,7 +51,9 @@ async function loadRajaOngkirCities(apiKey: string): Promise<CityCache> {
     throw new Error(`RajaOngkir city lookup failed: ${response.status}`);
   }
   const data = (await response.json()) as {
-    rajaongkir?: { results?: Array<{ city_id: string; city_name: string; province: string }> };
+    rajaongkir?: {
+      results?: Array<{ city_id: string; city_name: string; province: string }>;
+    };
   };
 
   const byName = new Map<string, number>();
@@ -130,14 +132,19 @@ export async function POST(request: Request) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "RajaOngkir API key belum dikonfigurasi (Admin → API Access)." },
+        {
+          error: "RajaOngkir API key belum dikonfigurasi (Admin → API Access).",
+        },
         { status: 503 },
       );
     }
 
     if (!originCityId) {
       return NextResponse.json(
-        { error: "Kota asal pengiriman belum dikonfigurasi (Admin → API Access). Ongkir tidak dapat dihitung tanpa asal yang benar." },
+        {
+          error:
+            "Kota asal pengiriman belum dikonfigurasi (Admin → API Access). Ongkir tidak dapat dihitung tanpa asal yang benar.",
+        },
         { status: 503 },
       );
     }
@@ -157,10 +164,7 @@ export async function POST(request: Request) {
     });
 
     if (!cart || cart.items.length === 0) {
-      return NextResponse.json(
-        { error: "Keranjang kosong" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Keranjang kosong" }, { status: 400 });
     }
 
     const address = await prisma.address.findFirst({
@@ -187,7 +191,10 @@ export async function POST(request: Request) {
 
     if (destinationCityId === null) {
       return NextResponse.json(
-        { error: "Kota tujuan tidak ditemukan pada data RajaOngkir. Periksa nama kota/provinsi alamat." },
+        {
+          error:
+            "Kota tujuan tidak ditemukan pada data RajaOngkir. Periksa nama kota/provinsi alamat.",
+        },
         { status: 503 },
       );
     }
@@ -202,24 +209,26 @@ export async function POST(request: Request) {
 
     if (!ratesResponse?.rajaongkir?.results) {
       return NextResponse.json(
-        { error: "Layanan ongkir tidak merespons. Tidak ada tarif inventif yang digunakan; coba lagi nanti." },
+        {
+          error:
+            "Layanan ongkir tidak merespons. Tidak ada tarif inventif yang digunakan; coba lagi nanti.",
+        },
         { status: 503 },
       );
     }
 
-    const formattedRates = ratesResponse.rajaongkir.results.flatMap(
-      (courier) =>
-        courier.costs.flatMap((cost) =>
-          cost.cost.map((c) => ({
-            courier: courier.code,
-            courierName: courier.name,
-            service: cost.service,
-            description: cost.description,
-            cost: c.value,
-            etd: c.etd,
-            note: c.note,
-          })),
-        ),
+    const formattedRates = ratesResponse.rajaongkir.results.flatMap((courier) =>
+      courier.costs.flatMap((cost) =>
+        cost.cost.map((c) => ({
+          courier: courier.code,
+          courierName: courier.name,
+          service: cost.service,
+          description: cost.description,
+          cost: c.value,
+          etd: c.etd,
+          note: c.note,
+        })),
+      ),
     );
 
     if (formattedRates.length === 0) {
@@ -236,7 +245,10 @@ export async function POST(request: Request) {
     }
     console.error("Error in shipping rates API:", error);
     return NextResponse.json(
-      { error: "Gagal menghitung ongkir. Tidak ada tarif inventif yang digunakan." },
+      {
+        error:
+          "Gagal menghitung ongkir. Tidak ada tarif inventif yang digunakan.",
+      },
       { status: 503 },
     );
   }

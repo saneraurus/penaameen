@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { LearningJourneySection } from "@/components/sections/LearningJourneySection";
@@ -8,8 +7,6 @@ import { FeaturedProductSection } from "@/components/sections/FeaturedProductSec
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { EditorialStorySection } from "@/components/sections/EditorialStorySection";
 import { ProductCatalogSection } from "@/components/sections/ProductCatalogSection";
-
-const formatPrice = (price: number) => `Rp${price.toLocaleString("id-ID")}`;
 
 const articles = [
   {
@@ -85,7 +82,14 @@ export default function HomePage() {
                   </h2>
 
                   <p className="text-sm sm:text-base text-supporting-600 leading-relaxed mb-6">
-                    PENA AMEEN hadir menemani jutaan keluarga Indonesia mewujudkan proses belajar membaca yang sederhana, praktis, dan menyenangkan. Melalui dua metode legendaris—<strong>AL-BARQY</strong> (Metode Cepat Baca Al-Qur&apos;an 200 Menit Anti-Lupa) dan <strong>ACM</strong> (Aku Cepat Membaca Tanpa Mengeja)—kami telah mendampingi lebih dari 8.000+ keluarga dan 500+ TPQ/sekolah di Indonesia dan Asia Tenggara.
+                    PENA AMEEN hadir menemani jutaan keluarga Indonesia
+                    mewujudkan proses belajar membaca yang sederhana, praktis,
+                    dan menyenangkan. Melalui dua metode legendaris—
+                    <strong>AL-BARQY</strong> (Metode Cepat Baca Al-Qur&apos;an
+                    200 Menit Anti-Lupa) dan <strong>ACM</strong> (Aku Cepat
+                    Membaca Tanpa Mengeja)—kami telah mendampingi lebih dari
+                    8.000+ keluarga dan 500+ TPQ/sekolah di Indonesia dan Asia
+                    Tenggara.
                   </p>
 
                   {/* 3 Pillars / Value Checkpoints */}
@@ -104,13 +108,20 @@ export default function HomePage() {
                         desc: "Dipercaya dalam program literasi Pemda, CSR perusahaan nasional, dan kurikulum TPQ.",
                       },
                     ].map((pillar, idx) => (
-                      <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl bg-supporting-50/70 border border-supporting-200/80">
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 p-3 rounded-2xl bg-supporting-50/70 border border-supporting-200/80"
+                      >
                         <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                           ✓
                         </span>
                         <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-primary-950">{pillar.title}</h4>
-                          <p className="text-[11px] sm:text-xs text-supporting-600 leading-snug">{pillar.desc}</p>
+                          <h4 className="text-xs sm:text-sm font-bold text-primary-950">
+                            {pillar.title}
+                          </h4>
+                          <p className="text-[11px] sm:text-xs text-supporting-600 leading-snug">
+                            {pillar.desc}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -615,7 +626,8 @@ export default function HomePage() {
                 Mulai Perjalanan Belajar Hari Ini.
               </h2>
               <p className="mb-8 text-base sm:text-lg text-white/90 leading-relaxed max-w-xl mx-auto drop-shadow-xs">
-                Temukan metode dan perangkat belajar yang paling sesuai untuk Anda dan keluarga.
+                Temukan metode dan perangkat belajar yang paling sesuai untuk
+                Anda dan keluarga.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link

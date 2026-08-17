@@ -11,7 +11,9 @@ export type ClerkOrgRole =
   | "seo_manager"
   | "customer_support";
 
-export const ROLE_CAPABILITY_MAP: Readonly<Record<ClerkOrgRole, ReadonlySet<string>>> = {
+export const ROLE_CAPABILITY_MAP: Readonly<
+  Record<ClerkOrgRole, ReadonlySet<string>>
+> = {
   admin: new Set([
     "catalog:read",
     "catalog:write",
@@ -150,13 +152,16 @@ export async function getStaffActor(): Promise<StaffActor | null> {
     try {
       const client = await clerkClient();
       const user = await client.users.getUser(userId);
-      const userEmails = user.emailAddresses.map((e) => e.emailAddress.toLowerCase());
+      const userEmails = user.emailAddresses.map((e) =>
+        e.emailAddress.toLowerCase(),
+      );
 
       if (!userEmail && userEmails.length > 0) {
         userEmail = userEmails[0] || "";
       }
       if (!userFullName) {
-        userFullName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || null;
+        userFullName =
+          `${user.firstName || ""} ${user.lastName || ""}`.trim() || null;
       }
 
       // Check if any of the user's registered emails match ADMIN_EMAILS
@@ -199,17 +204,23 @@ export async function getStaffActor(): Promise<StaffActor | null> {
         const orgList = await client.organizations.getOrganizationList();
         for (const org of orgList.data || []) {
           try {
-            const invitations = await client.organizations.getOrganizationInvitationList({
-              organizationId: org.id,
-            });
+            const invitations =
+              await client.organizations.getOrganizationInvitationList({
+                organizationId: org.id,
+              });
 
             const matchedInvite = invitations.data?.find((inv) =>
-              userEmails.includes(inv.emailAddress.toLowerCase())
+              userEmails.includes(inv.emailAddress.toLowerCase()),
             );
 
             if (matchedInvite) {
-              const rawRole = (matchedInvite.role || "admin").replace(/^org:/, "");
-              resolvedRole = (rawRole in ROLE_CAPABILITY_MAP ? rawRole : "admin") as ClerkOrgRole;
+              const rawRole = (matchedInvite.role || "admin").replace(
+                /^org:/,
+                "",
+              );
+              resolvedRole = (
+                rawRole in ROLE_CAPABILITY_MAP ? rawRole : "admin"
+              ) as ClerkOrgRole;
               break;
             }
           } catch {
@@ -218,7 +229,11 @@ export async function getStaffActor(): Promise<StaffActor | null> {
         }
       }
     } catch (e) {
-      console.warn("[Clerk Auth] Error during staff resolution for user:", userId, e);
+      console.warn(
+        "[Clerk Auth] Error during staff resolution for user:",
+        userId,
+        e,
+      );
     }
   }
 

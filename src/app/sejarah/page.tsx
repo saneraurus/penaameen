@@ -412,8 +412,10 @@ export default function HistoryPage() {
                 Pemberantasan Buta Aksara Al-Qur&apos;an &amp; Latin
               </h2>
               <p className="text-white/90 leading-relaxed text-sm sm:text-base max-w-2xl mx-auto">
-                PENA AMEEN menjadi penyedia metode pembelajaran untuk pendidikan anak dan orang dewasa penyandang
-                buta aksara di seluruh Indonesia melalui kemitraan bersama berbagai Pemda dan CSR perusahaan nasional.
+                PENA AMEEN menjadi penyedia metode pembelajaran untuk pendidikan
+                anak dan orang dewasa penyandang buta aksara di seluruh
+                Indonesia melalui kemitraan bersama berbagai Pemda dan CSR
+                perusahaan nasional.
               </p>
             </div>
           </Reveal>
@@ -444,7 +446,8 @@ export default function HistoryPage() {
                 Lanjutkan Penjelajahan Bersama Pena Ameen
               </h2>
               <p className="text-supporting-600 mb-8 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                Kenali PENA AMEEN lebih dekat, pelajari metodenya, atau temukan modul perangkat belajar yang Anda butuhkan.
+                Kenali PENA AMEEN lebih dekat, pelajari metodenya, atau temukan
+                modul perangkat belajar yang Anda butuhkan.
               </p>
               <div className="flex flex-wrap gap-3.5 justify-center">
                 <Link

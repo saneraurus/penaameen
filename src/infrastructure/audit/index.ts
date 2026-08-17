@@ -10,7 +10,8 @@ const fileStore = new FileAuditStore();
 export function getAuditStore(): AuditStore {
   return {
     isAvailable: true,
-    append: (event) => prismaStore.append(event).catch(() => fileStore.append(event)),
+    append: (event) =>
+      prismaStore.append(event).catch(() => fileStore.append(event)),
     list: async (options) => {
       try {
         return await prismaStore.list(options);

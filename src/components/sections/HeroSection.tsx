@@ -38,7 +38,11 @@ const showcaseTabs: ShowcaseTab[] = [
     ctaHref: "/produk/paket-home-learning-albarqy",
     secondaryCtaText: "Pelajari Panduan Belajar",
     secondaryCtaHref: "/artikel",
-    highlights: ["Modul Praktis Orang Tua", "Flashcard Interaktif", "Evaluasi Bertahap"],
+    highlights: [
+      "Modul Praktis Orang Tua",
+      "Flashcard Interaktif",
+      "Evaluasi Bertahap",
+    ],
   },
   {
     id: "albarqy",
@@ -72,7 +76,11 @@ const showcaseTabs: ShowcaseTab[] = [
     ctaHref: "/produk",
     secondaryCtaText: "Pelajari Metode ACM",
     secondaryCtaHref: "/metode/acm",
-    highlights: ["Bermain Sambil Belajar", "Buku Aktivitas Bergambar", "Menumbuhkan Minat Baca"],
+    highlights: [
+      "Bermain Sambil Belajar",
+      "Buku Aktivitas Bergambar",
+      "Menumbuhkan Minat Baca",
+    ],
   },
   {
     id: "perangkat",
@@ -89,16 +97,12 @@ const showcaseTabs: ShowcaseTab[] = [
     ctaHref: "/produk",
     secondaryCtaText: "Konsultasi Lembaga",
     secondaryCtaHref: "/tentang",
-    highlights: ["Poster Klasikal Besar", "Digunakan di 500+ TPQ", "Panduan Pengajar"],
+    highlights: [
+      "Poster Klasikal Besar",
+      "Digunakan di 500+ TPQ",
+      "Panduan Pengajar",
+    ],
   },
-];
-
-const quickKeywords = [
-  { label: "Paket 200 Menit", href: "/produk/paket-albarqy-200-menit" },
-  { label: "Home Learning", href: "/produk/paket-home-learning-albarqy" },
-  { label: "Flashcard Edukasi", href: "/produk" },
-  { label: "Metode ACM", href: "/metode/acm" },
-  { label: "Al-Barqy Klasikal", href: "/metode/al-barqy" },
 ];
 
 export function HeroSection() {
@@ -148,9 +152,19 @@ export function HeroSection() {
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed max-w-2xl mx-auto drop-shadow-xs font-normal">
-            Metode revolusioner <strong className="text-amber-200 font-semibold">Al-Barqy (Cepat 200 Menit)</strong> dan{" "}
-            <strong className="text-amber-200 font-semibold">ACM (Aku Cepat Membaca)</strong> yang telah dipercaya lebih dari{" "}
-            <strong className="text-emerald-300 font-semibold">8.000+ keluarga</strong>, guru, dan santri di seluruh Indonesia.
+            Metode revolusioner{" "}
+            <strong className="text-amber-200 font-semibold">
+              Al-Barqy (Cepat 200 Menit)
+            </strong>{" "}
+            dan{" "}
+            <strong className="text-amber-200 font-semibold">
+              ACM (Aku Cepat Membaca)
+            </strong>{" "}
+            yang telah dipercaya lebih dari{" "}
+            <strong className="text-emerald-300 font-semibold">
+              8.000+ keluarga
+            </strong>
+            , guru, dan santri di seluruh Indonesia.
           </p>
         </div>
 
@@ -163,8 +177,18 @@ export function HeroSection() {
               className="px-7 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all inline-flex items-center gap-2 cursor-pointer"
             >
               <span>Jelajahi Paket &amp; Produk</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
               </svg>
             </Link>
 
@@ -182,8 +206,18 @@ export function HeroSection() {
             className="relative w-full flex items-center shadow-lg rounded-2xl bg-white/95 backdrop-blur-md p-1.5 focus-within:ring-2 focus-within:ring-emerald-400 transition-all text-gray-900"
           >
             <div className="pl-3.5 pr-2 text-gray-400 flex items-center pointer-events-none">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </div>
             <input
@@ -231,7 +265,9 @@ export function HeroSection() {
             </div>
             <div>
               <p className="text-xs font-bold text-white">500+ Lembaga</p>
-              <p className="text-[10px] text-white/70">TPQ &amp; Sekolah Binaan</p>
+              <p className="text-[10px] text-white/70">
+                TPQ &amp; Sekolah Binaan
+              </p>
             </div>
           </div>
 
@@ -240,7 +276,9 @@ export function HeroSection() {
               🛡️
             </div>
             <div>
-              <p className="text-xs font-bold text-white">100% Asli &amp; Teruji</p>
+              <p className="text-xs font-bold text-white">
+                100% Asli &amp; Teruji
+              </p>
               <p className="text-[10px] text-white/70">Perangkat Fisik Resmi</p>
             </div>
           </div>

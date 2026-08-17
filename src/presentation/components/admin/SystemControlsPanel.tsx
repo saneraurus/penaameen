@@ -62,11 +62,15 @@ export function SystemControlsPanel() {
   }
 
   if (loading) {
-    return <div className="py-12 text-center text-sm text-gray-500">Memuat...</div>;
+    return (
+      <div className="py-12 text-center text-sm text-gray-500">Memuat...</div>
+    );
   }
 
   if (error && controls.length === 0) {
-    return <div className="py-12 text-center text-sm text-red-600">{error}</div>;
+    return (
+      <div className="py-12 text-center text-sm text-red-600">{error}</div>
+    );
   }
 
   return (

@@ -125,12 +125,17 @@ export default function AboutPage() {
                   <span>PROFIL PENERBIT &amp; LEMBAGA EDUKASI</span>
                 </div>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-serif font-bold text-white leading-[1.15] mb-6">
-                  Membuka Gerbang Literasi Membaca &amp; Mengaji untuk Seluruh Generasi.
+                  Membuka Gerbang Literasi Membaca &amp; Mengaji untuk Seluruh
+                  Generasi.
                 </h1>
                 <p className="text-base sm:text-lg text-white/90 leading-relaxed mb-8 max-w-2xl font-normal">
-                  <strong className="text-emerald-300 font-semibold">Penerbit Pena Ameen (Ameen Educare)</strong> hadir
-                  sebagai pelopor metodologi belajar membaca Al-Qur&apos;an dan huruf Latin yang aplikatif, cepat, anti
-                  lupa, dan membahagiakan bagi anak-anak, orang tua, santri, hingga dewasa di seluruh Nusantara.
+                  <strong className="text-emerald-300 font-semibold">
+                    Penerbit Pena Ameen (Ameen Educare)
+                  </strong>{" "}
+                  hadir sebagai pelopor metodologi belajar membaca
+                  Al-Qur&apos;an dan huruf Latin yang aplikatif, cepat, anti
+                  lupa, dan membahagiakan bagi anak-anak, orang tua, santri,
+                  hingga dewasa di seluruh Nusantara.
                 </p>
                 <div className="flex flex-wrap items-center gap-4">
                   <Link
@@ -164,8 +169,13 @@ export default function AboutPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/40 backdrop-blur-md border border-white/20 text-white text-xs">
-                    <p className="font-semibold text-emerald-300">Dedikasi untuk Keluarga Indonesia</p>
-                    <p className="text-[11px] text-white/80">Menghadirkan momen belajar Al-Qur&apos;an yang hangat di rumah.</p>
+                    <p className="font-semibold text-emerald-300">
+                      Dedikasi untuk Keluarga Indonesia
+                    </p>
+                    <p className="text-[11px] text-white/80">
+                      Menghadirkan momen belajar Al-Qur&apos;an yang hangat di
+                      rumah.
+                    </p>
                   </div>
                 </div>
               </Reveal>
@@ -185,10 +195,16 @@ export default function AboutPage() {
                     <span className="text-3xl sm:text-4xl font-serif font-black text-primary-950">
                       {item.number}
                     </span>
-                    <span className="text-sm font-bold text-primary-700">{item.unit}</span>
+                    <span className="text-sm font-bold text-primary-700">
+                      {item.unit}
+                    </span>
                   </div>
-                  <h2 className="text-xs sm:text-sm font-bold text-supporting-900 mb-1">{item.label}</h2>
-                  <p className="text-[11px] text-supporting-500 leading-tight">{item.desc}</p>
+                  <h2 className="text-xs sm:text-sm font-bold text-supporting-900 mb-1">
+                    {item.label}
+                  </h2>
+                  <p className="text-[11px] text-supporting-500 leading-tight">
+                    {item.desc}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -213,8 +229,12 @@ export default function AboutPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 text-white text-xs">
-                    <p className="font-semibold text-amber-300">Pelatihan &amp; Sertifikasi Pengajar</p>
-                    <p className="text-[11px] text-white/80">Mencetak ribuan guru Al-Qur&apos;an profesional dan sabar.</p>
+                    <p className="font-semibold text-amber-300">
+                      Pelatihan &amp; Sertifikasi Pengajar
+                    </p>
+                    <p className="text-[11px] text-white/80">
+                      Mencetak ribuan guru Al-Qur&apos;an profesional dan sabar.
+                    </p>
                   </div>
                 </div>
               </Reveal>
@@ -222,28 +242,47 @@ export default function AboutPage() {
 
             <div className="lg:col-span-6">
               <Reveal delay={0.1}>
-                <span className="eyebrow text-primary-700">Kisah &amp; Sejarah Kami</span>
+                <span className="eyebrow text-primary-700">
+                  Kisah &amp; Sejarah Kami
+                </span>
                 <h2 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950 leading-tight">
                   Dari Kepedulian Nyata, Lahir Sebuah Terobosan Metodologi.
                 </h2>
                 <div className="mt-6 space-y-4 text-sm sm:text-base leading-relaxed text-supporting-600">
                   <p>
-                    Perjalanan <strong className="text-supporting-900 font-semibold">Pena Ameen</strong> berakar dari kepedulian
-                    mendalam terhadap banyaknya anak-anak, santri, hingga orang dewasa yang merasa kesulitan, canggung, atau
-                    bahkan putus asa saat belajar membaca Al-Qur&apos;an karena metode ejaan huruf konvensional yang kaku dan
-                    membutuhkan waktu bertahun-tahun.
+                    Perjalanan{" "}
+                    <strong className="text-supporting-900 font-semibold">
+                      Pena Ameen
+                    </strong>{" "}
+                    berakar dari kepedulian mendalam terhadap banyaknya
+                    anak-anak, santri, hingga orang dewasa yang merasa
+                    kesulitan, canggung, atau bahkan putus asa saat belajar
+                    membaca Al-Qur&apos;an karena metode ejaan huruf
+                    konvensional yang kaku dan membutuhkan waktu bertahun-tahun.
                   </p>
                   <p>
-                    Melalui dedikasi panjang para pakar pendidikan Islam, dirumuskanlah metode revolusioner{" "}
-                    <strong className="text-primary-800 font-semibold">Al-Barqy (Sistem 200 Menit Anti Lupa)</strong> karya{" "}
-                    <strong className="text-supporting-900 font-semibold">Ust. Muhadjir Sulthon</strong>. Dengan pendekatan
-                    struktur bunyi kata berpasangan, santri dapat membaca huruf sambung secara alami tanpa rasa terbebani.
+                    Melalui dedikasi panjang para pakar pendidikan Islam,
+                    dirumuskanlah metode revolusioner{" "}
+                    <strong className="text-primary-800 font-semibold">
+                      Al-Barqy (Sistem 200 Menit Anti Lupa)
+                    </strong>{" "}
+                    karya{" "}
+                    <strong className="text-supporting-900 font-semibold">
+                      Ust. Muhadjir Sulthon
+                    </strong>
+                    . Dengan pendekatan struktur bunyi kata berpasangan, santri
+                    dapat membaca huruf sambung secara alami tanpa rasa
+                    terbebani.
                   </p>
                   <p>
                     Tak berhenti di sana, Pena Ameen mengembangkan metode{" "}
-                    <strong className="text-primary-800 font-semibold">ACM (Aku Cepat Membaca)</strong> untuk membaca huruf Latin
-                    bagi anak usia dini (3–8 tahun), menghadirkan buku bergambar penuh warna, kartu peraga, dan lembar pantau yang
-                    menjadikan membaca sebagai aktivitas bermain yang ditunggu-tunggu setiap hari.
+                    <strong className="text-primary-800 font-semibold">
+                      ACM (Aku Cepat Membaca)
+                    </strong>{" "}
+                    untuk membaca huruf Latin bagi anak usia dini (3–8 tahun),
+                    menghadirkan buku bergambar penuh warna, kartu peraga, dan
+                    lembar pantau yang menjadikan membaca sebagai aktivitas
+                    bermain yang ditunggu-tunggu setiap hari.
                   </p>
                 </div>
               </Reveal>
@@ -257,12 +296,15 @@ export default function AboutPage() {
         <div className="container px-4 sm:px-6 mx-auto max-w-5xl">
           <Reveal>
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="eyebrow text-primary-700">Fondasi Pergerakan</span>
+              <span className="eyebrow text-primary-700">
+                Fondasi Pergerakan
+              </span>
               <h2 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950">
                 Visi &amp; Misi Mulia Kami
               </h2>
               <p className="mt-3 text-sm text-supporting-600">
-                Komitmen berkelanjutan menghadirkan sarana literasi berkualitas bagi seluruh lapisan masyarakat.
+                Komitmen berkelanjutan menghadirkan sarana literasi berkualitas
+                bagi seluruh lapisan masyarakat.
               </p>
             </div>
           </Reveal>
@@ -274,11 +316,15 @@ export default function AboutPage() {
                   <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center font-bold">
                     <Award className="h-5 w-5" />
                   </div>
-                  <h3 className="font-serif text-2xl font-bold text-primary-950">Visi Kami</h3>
+                  <h3 className="font-serif text-2xl font-bold text-primary-950">
+                    Visi Kami
+                  </h3>
                 </div>
                 <p className="text-sm sm:text-base leading-relaxed text-supporting-600">
-                  Menjadi pusat penerbitan dan lembaga edukasi terdepan di Indonesia yang menghadirkan metodologi belajar membaca,
-                  menulis, dan memahami Al-Qur&apos;an secara inovatif, membahagiakan, inklusif, dan berkesinambungan bagi seluruh
+                  Menjadi pusat penerbitan dan lembaga edukasi terdepan di
+                  Indonesia yang menghadirkan metodologi belajar membaca,
+                  menulis, dan memahami Al-Qur&apos;an secara inovatif,
+                  membahagiakan, inklusif, dan berkesinambungan bagi seluruh
                   generasi umat.
                 </p>
               </div>
@@ -290,20 +336,31 @@ export default function AboutPage() {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
-                  <h3 className="font-serif text-2xl font-bold text-primary-950">Misi Kami</h3>
+                  <h3 className="font-serif text-2xl font-bold text-primary-950">
+                    Misi Kami
+                  </h3>
                 </div>
                 <ul className="space-y-2.5 text-sm sm:text-base text-supporting-600">
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-600 font-bold">•</span>
-                    <span>Menyediakan buku dan alat peraga edukasi yang sistematis, terbukti efektif, dan mudah diaplikasikan.</span>
+                    <span>
+                      Menyediakan buku dan alat peraga edukasi yang sistematis,
+                      terbukti efektif, dan mudah diaplikasikan.
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-600 font-bold">•</span>
-                    <span>Memberdayakan orang tua agar mampu menjadi pendidik utama Al-Qur&apos;an di lingkungan keluarga.</span>
+                    <span>
+                      Memberdayakan orang tua agar mampu menjadi pendidik utama
+                      Al-Qur&apos;an di lingkungan keluarga.
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-emerald-600 font-bold">•</span>
-                    <span>Menyelenggarakan pelatihan dan standardisasi guru TPQ serta sekolah di seluruh pelosok negeri.</span>
+                    <span>
+                      Menyelenggarakan pelatihan dan standardisasi guru TPQ
+                      serta sekolah di seluruh pelosok negeri.
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -317,12 +374,15 @@ export default function AboutPage() {
         <div className="container px-4 sm:px-6 mx-auto max-w-6xl">
           <Reveal>
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <span className="eyebrow text-primary-700">Nilai &amp; Keunggulan</span>
+              <span className="eyebrow text-primary-700">
+                Nilai &amp; Keunggulan
+              </span>
               <h2 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950">
                 4 Pilar Utama Metodologi Pena Ameen
               </h2>
               <p className="mt-3 text-sm sm:text-base text-supporting-600">
-                Prinsip yang membedakan produk dan pendekatan kami dari metode konvensional lainnya.
+                Prinsip yang membedakan produk dan pendekatan kami dari metode
+                konvensional lainnya.
               </p>
             </div>
           </Reveal>
@@ -362,12 +422,15 @@ export default function AboutPage() {
         <div className="container px-4 sm:px-6 mx-auto max-w-6xl">
           <Reveal>
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <span className="eyebrow text-primary-700">Ekosistem Terpadu</span>
+              <span className="eyebrow text-primary-700">
+                Ekosistem Terpadu
+              </span>
               <h2 className="mt-3 text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950">
                 Solusi Lengkap Belajar &amp; Mengajar
               </h2>
               <p className="mt-3 text-sm sm:text-base text-supporting-600">
-                Pilih modul dan program yang paling tepat untuk kebutuhan buah hati, keluarga, maupun lembaga Anda.
+                Pilih modul dan program yang paling tepat untuk kebutuhan buah
+                hati, keluarga, maupun lembaga Anda.
               </p>
             </div>
           </Reveal>
@@ -431,8 +494,9 @@ export default function AboutPage() {
                 Siap Menghadirkan Momen Belajar yang Menggembirakan?
               </h2>
               <p className="text-sm sm:text-base leading-relaxed text-white/80 max-w-2xl mx-auto mb-8">
-                Dapatkan paket perangkat resmi Al-Barqy, ACM, dan Home Learning sekarang dengan jaminan 100% produk asli
-                dan bimbingan langsung dari tim konsultan pendidikan kami.
+                Dapatkan paket perangkat resmi Al-Barqy, ACM, dan Home Learning
+                sekarang dengan jaminan 100% produk asli dan bimbingan langsung
+                dari tim konsultan pendidikan kami.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link

@@ -4,11 +4,15 @@ import { auditStore } from "@/infrastructure/audit";
 import { recordStaffAudit } from "@/application/audit/audit-store";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
-import { getProductById, updateProduct, deleteProduct } from "@/lib/admin/products";
+import {
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from "@/lib/admin/products";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await requireStaffActor("catalog:read");
@@ -26,7 +30,7 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const actor = await requireStaffActor("catalog:write");
@@ -41,16 +45,26 @@ export async function PATCH(
       ...(body.name !== undefined ? { name: body.name } : {}),
       ...(body.slug !== undefined ? { slug: body.slug } : {}),
       ...(body.category !== undefined ? { category: body.category } : {}),
-      ...(body.description !== undefined ? { description: body.description } : {}),
-      ...(body.shortDescription !== undefined ? { shortDescription: body.shortDescription } : {}),
+      ...(body.description !== undefined
+        ? { description: body.description }
+        : {}),
+      ...(body.shortDescription !== undefined
+        ? { shortDescription: body.shortDescription }
+        : {}),
       ...(body.price !== undefined ? { price: Number(body.price) } : {}),
-      ...(body.salePrice !== undefined ? { salePrice: body.salePrice ? Number(body.salePrice) : undefined } : {}),
-      ...(body.stockQuantity !== undefined ? { stockQuantity: Number(body.stockQuantity) } : {}),
+      ...(body.salePrice !== undefined
+        ? { salePrice: body.salePrice ? Number(body.salePrice) : undefined }
+        : {}),
+      ...(body.stockQuantity !== undefined
+        ? { stockQuantity: Number(body.stockQuantity) }
+        : {}),
       ...(body.image !== undefined ? { image: body.image } : {}),
       ...(body.status !== undefined ? { status: body.status } : {}),
       ...(body.sku !== undefined ? { sku: body.sku } : {}),
       ...(body.seoTitle !== undefined ? { seoTitle: body.seoTitle } : {}),
-      ...(body.seoDescription !== undefined ? { seoDescription: body.seoDescription } : {}),
+      ...(body.seoDescription !== undefined
+        ? { seoDescription: body.seoDescription }
+        : {}),
     });
 
     if (!updated) {
@@ -72,21 +86,34 @@ export async function PATCH(
       outcome: "succeeded",
       correlationId,
       before: before
-        ? { name: before.name, slug: before.slug, price: before.price, status: before.status }
+        ? {
+            name: before.name,
+            slug: before.slug,
+            price: before.price,
+            status: before.status,
+          }
         : undefined,
-      after: { name: updated.name, slug: updated.slug, price: updated.price, status: updated.status },
+      after: {
+        name: updated.name,
+        slug: updated.slug,
+        price: updated.price,
+        status: updated.status,
+      },
     });
 
     return NextResponse.json({ success: true, product: updated });
   } catch (error) {
     console.error("Error updating product:", error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update product" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const actor = await requireStaffActor("catalog:write");
@@ -114,15 +141,16 @@ export async function DELETE(
       targetId: createResourceId(id),
       outcome: "succeeded",
       correlationId,
-      before: before
-        ? { name: before.name, slug: before.slug }
-        : undefined,
+      before: before ? { name: before.name, slug: before.slug } : undefined,
       reason: "Destructive action; no hard-delete of order history affected",
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting product:", error);
-    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete product" },
+      { status: 500 },
+    );
   }
 }

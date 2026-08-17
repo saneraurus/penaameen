@@ -34,15 +34,16 @@ export default function AdminError({
             {isAuthError
               ? "Autentikasi Admin Diperlukan"
               : isPermissionError
-              ? "Akses Dibatasi"
-              : "Terjadi Kendala Memuat Admin"}
+                ? "Akses Dibatasi"
+                : "Terjadi Kendala Memuat Admin"}
           </h2>
           <p className="text-xs text-gray-500 mt-2 leading-relaxed">
             {isAuthError
               ? "Halaman ini khusus untuk staff dan pengelola Pena Ameen. Silakan masuk dengan akun yang memiliki hak akses admin."
               : isPermissionError
-              ? "Akun Anda saat ini tidak memiliki izin (Organization Role: Admin / Staff) untuk mengakses fitur ini."
-              : error.message || "Terjadi kesalahan saat memuat dashboard operasional."}
+                ? "Akun Anda saat ini tidak memiliki izin (Organization Role: Admin / Staff) untuk mengakses fitur ini."
+                : error.message ||
+                  "Terjadi kesalahan saat memuat dashboard operasional."}
           </p>
         </div>
 

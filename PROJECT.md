@@ -144,6 +144,9 @@ PHASE 7 — PARTIAL
 Current Objective:
 The authorized non-provider, non-migration, non-production foundation has been implemented: executable Next.js/TypeScript shell, semantic presentation foundation, strict configuration, domain/application/port boundaries, error/logging/audit/idempotency/authorization primitives, abstract repositories, provider-neutral contracts, tests, security baseline, and local developer tooling. Browser E2E validation is blocked by environment tooling and CI platform configuration remains client-gated.
 
+Step 1 control-plane close (2026-08-17):
+The Admin Control Center Step 1 package (`docs/ADMIN-CONTROL-CENTER-PLAN.md`) is DONE and evidenced. Committed by the owner: control-plane code in `e85992b` (audit write path + `/admin/audit`, AES-256-GCM secret hygiene with masking, invented-data removal, notification center, emergency controls, real integration health checks) and the PostgreSQL migration in `c21cf55` (schema applied to embedded Postgres in `.pgdata/`, JSON file fallbacks removed). Closed in the working tree the same day: honest checkout/payment flow (no fabricated VA/QRIS/tracking/order refs/addresses/customer data or payment-success claims; `api/orders` fails closed), repo-wide Prettier format, and full lint/type hygiene. Acceptance gates verified: `npm run check` green (prettier, eslint `--max-warnings=0`, `tsc --noEmit`, 91/91 vitest, production build). `NEXT_PUBLIC_ADMIN_WHATSAPP` is the documented source for the customer-facing admin WhatsApp number (see `.env.example`).
+
 Next Phase:
 PHASE 8 — QA / Acceptance (NOT STARTED; Phase 7 exit criteria are not fully evidenced)
 

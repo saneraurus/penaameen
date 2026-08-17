@@ -53,7 +53,10 @@ export async function GET() {
     return NextResponse.json({ items, total: total.toString(), itemCount });
   } catch (error) {
     console.error("Error fetching cart:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -76,13 +79,16 @@ export async function POST(request: Request) {
     }
 
     if (!product.isActive) {
-      return NextResponse.json({ error: "Product is not available" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Product is not available" },
+        { status: 400 },
+      );
     }
 
     if (product.stock < quantity) {
       return NextResponse.json(
         { error: "Insufficient stock", available: product.stock },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -107,7 +113,7 @@ export async function POST(request: Request) {
     if (product.stock < newQuantity) {
       return NextResponse.json(
         { error: "Insufficient stock", available: product.stock },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -132,6 +138,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Error adding to cart:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

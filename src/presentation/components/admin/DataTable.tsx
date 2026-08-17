@@ -25,9 +25,7 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        {emptyMessage}
-      </div>
+      <div className="text-center py-12 text-gray-500">{emptyMessage}</div>
     );
   }
 
@@ -53,8 +51,15 @@ export function DataTable<T>({
               className={`transition-colors ${rowClassName?.(row) ?? ""}`}
             >
               {columns.map((column) => (
-                <td key={column.key} className={`px-4 py-3 text-gray-900 ${column.className ?? ""}`}>
-                  {column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? "")}
+                <td
+                  key={column.key}
+                  className={`px-4 py-3 text-gray-900 ${column.className ?? ""}`}
+                >
+                  {column.render
+                    ? column.render(row)
+                    : String(
+                        (row as Record<string, unknown>)[column.key] ?? "",
+                      )}
                 </td>
               ))}
             </tr>
@@ -84,7 +89,7 @@ export function Pagination({
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const visiblePages = pages.filter(
-    (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1
+    (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1,
   );
 
   return (

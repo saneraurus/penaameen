@@ -1,13 +1,14 @@
-import type {
-  AuditEventInput,
-  AuditRecord,
-} from "@/domain/audit/audit-event";
+import type { AuditEventInput, AuditRecord } from "@/domain/audit/audit-event";
 import type {
   AuditListOptions,
   AuditListResult,
   AuditStore,
 } from "@/application/audit/audit-store";
-import type { ActorId, CorrelationId, ResourceId } from "@/domain/common/identifiers";
+import type {
+  ActorId,
+  CorrelationId,
+  ResourceId,
+} from "@/domain/common/identifiers";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma";
 

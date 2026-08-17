@@ -70,7 +70,9 @@ export default async function AdminAuditPage() {
                     <td className="px-5 py-3">
                       <div className="text-xs font-semibold text-gray-900">
                         {event.actorEmail ||
-                          (event.actorKind === "system" ? "Sistem" : event.actorId)}
+                          (event.actorKind === "system"
+                            ? "Sistem"
+                            : event.actorId)}
                       </div>
                       <div className="text-[10px] text-gray-400">
                         {event.actorRole || event.actorKind}

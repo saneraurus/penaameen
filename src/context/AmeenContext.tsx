@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 
 interface AmeenContextValue {
   searchQuery: string;
@@ -17,7 +23,9 @@ export function AmeenProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AmeenContext.Provider value={{ searchQuery, setSearchQuery: handleSetSearchQuery }}>
+    <AmeenContext.Provider
+      value={{ searchQuery, setSearchQuery: handleSetSearchQuery }}
+    >
       {children}
     </AmeenContext.Provider>
   );

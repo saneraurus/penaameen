@@ -33,7 +33,8 @@ import {
   type ApiSettings,
 } from "@/lib/admin/api-settings";
 
-const VALID_KEY = "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0e1f2a3b4c5d6a7b8c9d0e1f2";
+const VALID_KEY =
+  "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6a7b8c9d0e1f2a3b4c5d6a7b8c9d0e1f2";
 
 function setEnv(overrides: Record<string, string | undefined>) {
   for (const [key, value] of Object.entries(overrides)) {
@@ -105,7 +106,10 @@ describe("api-settings secret handling", () => {
     const current = getApiSettings();
     const updated: ApiSettings = {
       ...current,
-      midtrans: { ...current.midtrans, serverKey: maskSecret("new-midtrans-key") },
+      midtrans: {
+        ...current.midtrans,
+        serverKey: maskSecret("new-midtrans-key"),
+      },
     };
     saveApiSettings(updated);
 

@@ -8,7 +8,7 @@ import { setProductStatus, getProductById } from "@/lib/admin/products";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const actor = await requireStaffActor("catalog:write");
@@ -58,6 +58,9 @@ export async function PATCH(
     return NextResponse.json({ success: true, product: updated });
   } catch (error) {
     console.error("Error setting product status:", error);
-    return NextResponse.json({ error: "Failed to update product status" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update product status" },
+      { status: 500 },
+    );
   }
 }

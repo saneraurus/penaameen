@@ -27,7 +27,10 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching products:", error);
-    return NextResponse.json({ error: "Unauthorized or failed to fetch products" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized or failed to fetch products" },
+      { status: 401 },
+    );
   }
 }
 
@@ -48,7 +51,10 @@ export async function POST(request: Request) {
         correlationId,
         reason: "Missing required fields (name/price)",
       });
-      return NextResponse.json({ error: "Nama produk dan harga wajib diisi" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Nama produk dan harga wajib diisi" },
+        { status: 400 },
+      );
     }
 
     const slug =
@@ -86,6 +92,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, product: newProduct });
   } catch (error) {
     console.error("Error creating product:", error);
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 },
+    );
   }
 }

@@ -3,7 +3,11 @@ import { WorkQueueCard } from "@/presentation/components/admin/WorkQueueCard";
 import { RevenueChartHero } from "@/presentation/components/admin/RevenueChartHero";
 import Link from "next/link";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
-import { getOrderStatusCounts, getOrders, getSalesAnalytics } from "@/lib/admin/orders";
+import {
+  getOrderStatusCounts,
+  getOrders,
+  getSalesAnalytics,
+} from "@/lib/admin/orders";
 
 export default async function AdminDashboardPage() {
   void (await requireStaffActor("orders:read"));
@@ -53,7 +57,9 @@ export default async function AdminDashboardPage() {
             <p className="text-2xl font-bold text-gray-900 font-mono">
               {counts.fulfillmentReady}
             </p>
-            <span className="text-xs font-semibold text-indigo-600">Pesanan</span>
+            <span className="text-xs font-semibold text-indigo-600">
+              Pesanan
+            </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">Siap dikemas di gudang</p>
         </div>
@@ -69,9 +75,13 @@ export default async function AdminDashboardPage() {
             <p className="text-2xl font-bold text-amber-600 font-mono">
               {counts.paymentPending}
             </p>
-            <span className="text-xs font-semibold text-amber-600">Menunggu</span>
+            <span className="text-xs font-semibold text-amber-600">
+              Menunggu
+            </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">QRIS / VA / Konfirmasi CS</p>
+          <p className="text-xs text-gray-500 mt-1">
+            QRIS / VA / Konfirmasi CS
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs">
@@ -127,7 +137,9 @@ export default async function AdminDashboardPage() {
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900">Pesanan Masuk Terbaru (Real-Time)</h3>
+            <h3 className="font-semibold text-gray-900">
+              Pesanan Masuk Terbaru (Real-Time)
+            </h3>
             <p className="text-xs text-gray-500 mt-0.5">
               Daftar pesanan aktif dari toko Pena Ameen
             </p>
@@ -163,19 +175,29 @@ export default async function AdminDashboardPage() {
                           : "bg-amber-50 text-amber-700 border border-amber-200"
                       }`}
                     >
-                      {ord.paymentStatus === "paid" ? "✓ Terbayar" : "Menunggu Bayar"}
+                      {ord.paymentStatus === "paid"
+                        ? "✓ Terbayar"
+                        : "Menunggu Bayar"}
                     </span>
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-700">
                       {ord.status}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600">
-                    <span className="font-bold text-gray-900">Pesanan dari {ord.customerName}</span>{" "}
-                    <span className="text-gray-500">({ord.customerEmail})</span> •{" "}
+                    <span className="font-bold text-gray-900">
+                      Pesanan dari {ord.customerName}
+                    </span>{" "}
+                    <span className="text-gray-500">({ord.customerEmail})</span>{" "}
+                    •{" "}
                     <span className="font-semibold text-primary-700">
-                      {ord.items.length} Macam Produk ({ord.items.reduce((s, i) => s + (i.quantity || 1), 0)} pcs)
+                      {ord.items.length} Macam Produk (
+                      {ord.items.reduce((s, i) => s + (i.quantity || 1), 0)}{" "}
+                      pcs)
                     </span>
-                    : {ord.items.map((i) => `${i.quantity}x ${i.productName}`).join(", ")}
+                    :{" "}
+                    {ord.items
+                      .map((i) => `${i.quantity}x ${i.productName}`)
+                      .join(", ")}
                   </p>
                   <p className="text-[11px] text-gray-400">
                     {new Date(ord.createdAt).toLocaleDateString("id-ID", {
@@ -190,7 +212,9 @@ export default async function AdminDashboardPage() {
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <span className="text-xs text-gray-400 block">Total Tagihan</span>
+                    <span className="text-xs text-gray-400 block">
+                      Total Tagihan
+                    </span>
                     <span className="font-mono font-bold text-base text-gray-900">
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
@@ -214,35 +238,48 @@ export default async function AdminDashboardPage() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Aksi Cepat</h2>
+        <h2 className="text-base font-semibold text-gray-900 mb-4">
+          Aksi Cepat
+        </h2>
         <div className="grid gap-4 md:grid-cols-3">
           <Link
             href="/admin/products/new"
             className="p-5 bg-white border border-gray-200 rounded-2xl hover:border-gray-300 hover:shadow-xs transition-all"
           >
             <div className="text-2xl mb-2">➕</div>
-            <h3 className="font-semibold text-gray-900 text-sm">Tambah Produk Baru</h3>
-            <p className="text-xs text-gray-500 mt-1">Buat katalog buku atau paket belajar baru</p>
+            <h3 className="font-semibold text-gray-900 text-sm">
+              Tambah Produk Baru
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Buat katalog buku atau paket belajar baru
+            </p>
           </Link>
           <Link
             href="/admin/orders"
             className="p-5 bg-white border border-gray-200 rounded-2xl hover:border-gray-300 hover:shadow-xs transition-all"
           >
             <div className="text-2xl mb-2">🧾</div>
-            <h3 className="font-semibold text-gray-900 text-sm">Kelola Seluruh Pesanan</h3>
-            <p className="text-xs text-gray-500 mt-1">Lihat riwayat transaksi dan input nomor resi</p>
+            <h3 className="font-semibold text-gray-900 text-sm">
+              Kelola Seluruh Pesanan
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Lihat riwayat transaksi dan input nomor resi
+            </p>
           </Link>
           <Link
             href="/admin/settings/access"
             className="p-5 bg-white border border-gray-200 rounded-2xl hover:border-gray-300 hover:shadow-xs transition-all"
           >
             <div className="text-2xl mb-2">👥</div>
-            <h3 className="font-semibold text-gray-900 text-sm">Akses & Tim Staff</h3>
-            <p className="text-xs text-gray-500 mt-1">Kelola hak akses administrator dan operator</p>
+            <h3 className="font-semibold text-gray-900 text-sm">
+              Akses & Tim Staff
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Kelola hak akses administrator dan operator
+            </p>
           </Link>
         </div>
       </div>
     </div>
   );
 }
-

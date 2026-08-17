@@ -78,7 +78,10 @@ function getEncryptionKey(): Buffer | null {
 function encryptSecret(plain: string, key: Buffer): string {
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const encrypted = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
+  const encrypted = Buffer.concat([
+    cipher.update(plain, "utf8"),
+    cipher.final(),
+  ]);
   const tag = cipher.getAuthTag();
   return `v1:${iv.toString("base64")}:${tag.toString("base64")}:${encrypted.toString("base64")}`;
 }
@@ -159,7 +162,9 @@ function readStoredSettings(): Partial<ApiSettings> | null {
     if (!fs.existsSync(SETTINGS_FILE)) return null;
     const raw = fs.readFileSync(SETTINGS_FILE, "utf-8");
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? (parsed as Partial<ApiSettings>) : null;
+    return parsed && typeof parsed === "object"
+      ? (parsed as Partial<ApiSettings>)
+      : null;
   } catch (e) {
     console.warn("Could not read api_settings.json:", e);
     return null;
@@ -182,7 +187,9 @@ function normalizeStoredSettings(
     const result = { ...envGroup, ...storedGroup };
 
     for (const field of SECRET_FIELDS[group]) {
-      const storedValue = (storedGroup as Record<string, unknown>)[field as string];
+      const storedValue = (storedGroup as Record<string, unknown>)[
+        field as string
+      ];
       const envValue = (envGroup as Record<string, string>)[field as string];
       if (typeof storedValue !== "string" || storedValue === "") {
         (result as Record<string, unknown>)[field as string] = envValue || "";
@@ -225,8 +232,9 @@ export function maskSecrets(settings: ApiSettings): ApiSettings {
   for (const group of Object.keys(SECRET_FIELDS) as (keyof ApiSettings)[]) {
     for (const field of SECRET_FIELDS[group]) {
       const value = (masked[group] as Record<string, string>)[field as string];
-      (masked[group] as Record<string, string>)[field as string] =
-        maskSecret(value ?? "");
+      (masked[group] as Record<string, string>)[field as string] = maskSecret(
+        value ?? "",
+      );
     }
   }
   return masked;
@@ -240,8 +248,10 @@ export function saveApiSettings(settings: ApiSettings): void {
 
   for (const group of Object.keys(SECRET_FIELDS) as (keyof ApiSettings)[]) {
     for (const field of SECRET_FIELDS[group]) {
-      const incoming = (serializable[group] as Record<string, string>)[field as string] ?? "";
-      const existingFull = (current[group] as Record<string, string>)[field as string] ?? "";
+      const incoming =
+        (serializable[group] as Record<string, string>)[field as string] ?? "";
+      const existingFull =
+        (current[group] as Record<string, string>)[field as string] ?? "";
 
       let storedValue = "";
       if (isMaskedSecret(incoming)) {
@@ -263,7 +273,8 @@ export function saveApiSettings(settings: ApiSettings): void {
         }
       }
 
-      (serializable[group] as Record<string, string>)[field as string] = storedValue;
+      (serializable[group] as Record<string, string>)[field as string] =
+        storedValue;
     }
   }
 
@@ -272,7 +283,11 @@ export function saveApiSettings(settings: ApiSettings): void {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(serializable, null, 2), "utf-8");
+    fs.writeFileSync(
+      SETTINGS_FILE,
+      JSON.stringify(serializable, null, 2),
+      "utf-8",
+    );
   } catch (e) {
     console.warn("Could not write api_settings.json:", e);
   }

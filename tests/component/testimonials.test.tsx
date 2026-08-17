@@ -7,7 +7,9 @@ describe("TestimonialsSection Component", () => {
     render(<TestimonialsSection />);
 
     expect(
-      screen.getByRole("heading", { name: /Kisah Nyata Ibu, Ayah & Guru di Seluruh Indonesia/i }),
+      screen.getByRole("heading", {
+        name: /Kisah Nyata Ibu, Ayah & Guru di Seluruh Indonesia/i,
+      }),
     ).toBeInTheDocument();
 
     expect(screen.getByText(/4.9 \/ 5.0/i)).toBeInTheDocument();
@@ -21,8 +23,12 @@ describe("TestimonialsSection Component", () => {
   it("navigates next and previous using carousel control buttons", () => {
     render(<TestimonialsSection />);
 
-    const nextBtn = screen.getByRole("button", { name: /Testimoni Selanjutnya/i });
-    const prevBtn = screen.getByRole("button", { name: /Testimoni Sebelumnya/i });
+    const nextBtn = screen.getByRole("button", {
+      name: /Testimoni Selanjutnya/i,
+    });
+    const prevBtn = screen.getByRole("button", {
+      name: /Testimoni Sebelumnya/i,
+    });
 
     expect(nextBtn).toBeInTheDocument();
     expect(prevBtn).toBeInTheDocument();

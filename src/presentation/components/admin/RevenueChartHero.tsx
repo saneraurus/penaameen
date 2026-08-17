@@ -11,7 +11,8 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
   const [timeframe, setTimeframe] = useState<"7d" | "30d">("7d");
   const [hoveredPoint, setHoveredPoint] = useState<SalesDataPoint | null>(null);
 
-  const activeData = timeframe === "7d" ? analytics.points7d : analytics.points30d;
+  const activeData =
+    timeframe === "7d" ? analytics.points7d : analytics.points30d;
 
   const totalCalculated = activeData.reduce((sum, d) => sum + d.revenue, 0);
   const maxRevenue = Math.max(...activeData.map((d) => d.revenue), 100000);
@@ -25,7 +26,9 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
     const x = paddingX + (i / divisor) * (chartWidth - paddingX * 2);
     const y =
       maxRevenue > 0
-        ? chartHeight - paddingY - (d.revenue / maxRevenue) * (chartHeight - paddingY * 2)
+        ? chartHeight -
+          paddingY -
+          (d.revenue / maxRevenue) * (chartHeight - paddingY * 2)
         : chartHeight - paddingY;
     return { x, y, ...d };
   });
@@ -84,7 +87,8 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
               </span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Grafik penjualan real-time yang dihitung murni dari database transaksi pesanan
+              Grafik penjualan real-time yang dihitung murni dari database
+              transaksi pesanan
             </p>
           </div>
 
@@ -169,7 +173,8 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
 
               {/* Grid Lines */}
               {[0.25, 0.5, 0.75, 1].map((ratio, idx) => {
-                const y = chartHeight - paddingY - ratio * (chartHeight - paddingY * 2);
+                const y =
+                  chartHeight - paddingY - ratio * (chartHeight - paddingY * 2);
                 return (
                   <g key={idx}>
                     <line
@@ -222,7 +227,9 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
                     onMouseLeave={() => setHoveredPoint(null)}
                   />
                   {/* Date labels */}
-                  {(activeData.length <= 10 || i % Math.ceil(activeData.length / 7) === 0 || i === activeData.length - 1) && (
+                  {(activeData.length <= 10 ||
+                    i % Math.ceil(activeData.length / 7) === 0 ||
+                    i === activeData.length - 1) && (
                     <text
                       x={p.x}
                       y={chartHeight - 6}
@@ -243,14 +250,18 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
         {/* Micro KPI Bar at bottom of Hero */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-800/80">
           <div className="space-y-0.5">
-            <span className="text-[11px] text-slate-400 font-medium">Transaksi Terbayar</span>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Transaksi Terbayar
+            </span>
             <p className="text-base sm:text-lg font-bold font-mono text-white">
               {analytics.paidOrdersCount} Pesanan
             </p>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[11px] text-slate-400 font-medium">Rata-rata Order (AOV)</span>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Rata-rata Order (AOV)
+            </span>
             <p className="text-base sm:text-lg font-bold font-mono text-white">
               {new Intl.NumberFormat("id-ID", {
                 style: "currency",
@@ -261,14 +272,18 @@ export function RevenueChartHero({ analytics }: RevenueChartHeroProps) {
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[11px] text-slate-400 font-medium">Total Pesanan Tercatat</span>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Total Pesanan Tercatat
+            </span>
             <p className="text-base sm:text-lg font-bold font-mono text-emerald-400">
               {analytics.totalOrders} Transaksi
             </p>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[11px] text-slate-400 font-medium">Integritas Data</span>
+            <span className="text-[11px] text-slate-400 font-medium">
+              Integritas Data
+            </span>
             <p className="text-base sm:text-lg font-bold font-mono text-cyan-400">
               100% Real Database
             </p>

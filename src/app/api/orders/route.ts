@@ -1,8 +1,16 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import Midtrans from "midtrans-client";
+import type { Prisma } from "@/generated/prisma";
+
+type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: {
+    items: { include: { product: true } };
+    statusHistory: true;
+  };
+}>;
 
 const createOrderSchema = z.object({
   addressId: z.string().min(1),
@@ -11,25 +19,29 @@ const createOrderSchema = z.object({
   shippingRate: z.any().optional(),
   customerEmail: z.string().optional(),
   customerName: z.string().optional(),
-  items: z.array(
-    z.object({
-      productId: z.string().min(1),
-      quantity: z.number().int().positive(),
-      price: z.number().int().nonnegative().optional(),
-      name: z.string().optional(),
-      image: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1),
+        quantity: z.number().int().positive(),
+        price: z.number().int().nonnegative().optional(),
+        name: z.string().optional(),
+        image: z.string().optional(),
+      }),
+    )
+    .optional(),
+  shippingAddress: z
+    .object({
+      recipientName: z.string().optional(),
+      phone: z.string().optional(),
+      email: z.string().optional(),
+      addressLine1: z.string().optional(),
+      addressLine2: z.string().optional().nullable(),
+      city: z.string().optional(),
+      province: z.string().optional(),
+      postalCode: z.string().optional(),
     })
-  ).optional(),
-  shippingAddress: z.object({
-    recipientName: z.string().optional(),
-    phone: z.string().optional(),
-    email: z.string().optional(),
-    addressLine1: z.string().optional(),
-    addressLine2: z.string().optional().nullable(),
-    city: z.string().optional(),
-    province: z.string().optional(),
-    postalCode: z.string().optional(),
-  }).optional(),
+    .optional(),
 });
 
 function getMidtransClient() {
@@ -47,7 +59,9 @@ function generateOrderNumber(): string {
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, "0");
   const dd = String(date.getDate()).padStart(2, "0");
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, "0");
   return `PA-${yyyy}${mm}${dd}-${random}`;
 }
 
@@ -59,8 +73,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { addressId, shippingMethod, shippingCost, shippingRate, items: clientItems, shippingAddress: clientAddress } =
-      createOrderSchema.parse(body);
+    const {
+      addressId,
+      shippingMethod,
+      shippingCost,
+      shippingRate,
+      items: clientItems,
+      shippingAddress: clientAddress,
+    } = createOrderSchema.parse(body);
 
     const orderNumber = generateOrderNumber();
 
@@ -98,13 +118,24 @@ export async function POST(request: Request) {
     }
 
     // Fallback to clientItems if DB cart was empty
-    if (orderItemsToSave.length === 0 && clientItems && clientItems.length > 0) {
+    if (
+      orderItemsToSave.length === 0 &&
+      clientItems &&
+      clientItems.length > 0
+    ) {
+      const missingPrice = clientItems.some((i) => i.price == null);
+      if (missingPrice) {
+        return NextResponse.json(
+          { error: "Item price is required" },
+          { status: 400 },
+        );
+      }
       orderItemsToSave = clientItems.map((i) => ({
         productId: i.productId,
         quantity: i.quantity,
-        price: i.price || 150000,
-        name: i.name || `Produk ${i.productId}`,
-        image: i.image || "/images/penaameen/products/home-learning.jpg",
+        price: i.price as number,
+        name: i.name || "",
+        image: i.image || "",
       }));
     }
 
@@ -113,14 +144,9 @@ export async function POST(request: Request) {
     }
 
     // 2. Determine Address
-    let addressSnapshot = clientAddress || {
-      recipientName: "Pelanggan Pena Ameen",
-      phone: "08123456789",
-      addressLine1: "Jl. Margorejo Indah No. 12",
-      city: "Surabaya",
-      province: "Jawa Timur",
-      postalCode: "60238",
-    };
+    let addressSnapshot:
+      z.infer<typeof createOrderSchema.shape.shippingAddress> | undefined =
+      clientAddress ?? undefined;
 
     try {
       const dbAddress = await prisma.address.findFirst({
@@ -140,10 +166,20 @@ export async function POST(request: Request) {
       // ignore
     }
 
-    const subtotal = orderItemsToSave.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (!addressSnapshot) {
+      return NextResponse.json(
+        { error: "Shipping address is required" },
+        { status: 400 },
+      );
+    }
+
+    const subtotal = orderItemsToSave.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
     const total = subtotal + shippingCost;
 
-    let savedOrderId = "ord-" + Date.now();
+    let savedOrderId: string | null = null;
 
     // 3. Try to save into Prisma DB
     try {
@@ -184,23 +220,15 @@ export async function POST(request: Request) {
         savedOrderId = order.id;
       }
     } catch (dbErr) {
-      console.warn("Could not save order directly to MySQL DB:", dbErr);
+      console.warn("Could not save order to database:", dbErr);
     }
 
-    // Resolve actual authenticated user identity
-    const clerkUser = await currentUser();
-    const realEmail =
-      clerkUser?.emailAddresses?.[0]?.emailAddress ||
-      body.customerEmail ||
-      addressSnapshot.email ||
-      "ihsanzz099@gmail.com";
-
-    const realName =
-      clerkUser?.fullName ||
-      (clerkUser?.firstName ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim() : null) ||
-      body.customerName ||
-      addressSnapshot.recipientName ||
-      "Ihsan";
+    if (!savedOrderId) {
+      return NextResponse.json(
+        { error: "Failed to create order in database" },
+        { status: 500 },
+      );
+    }
 
     // 5. Try Midtrans Snap token
     let snapToken: string | undefined = undefined;
@@ -251,14 +279,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Error creating order:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function GET() {
   try {
     const { userId } = await auth();
-    let dbOrders: any[] = [];
+    let dbOrders: OrderWithRelations[] = [];
     try {
       if (userId) {
         dbOrders = await prisma.order.findMany({
@@ -278,6 +309,9 @@ export async function GET() {
     return NextResponse.json({ orders: dbOrders });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

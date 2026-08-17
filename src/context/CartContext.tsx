@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+} from "react";
 
 import { products as catalogProducts } from "@/data/products";
 
@@ -14,9 +21,19 @@ interface CartItem {
     category: string;
     price: string;
     image: string;
-    stock: number;
+    stock?: number;
   };
   subtotal: number;
+}
+
+interface CartProductInput {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  price: string | number;
+  image: string;
+  stock?: number;
 }
 
 interface CartState {
@@ -28,14 +45,20 @@ interface CartState {
 }
 
 interface CartContextType extends CartState {
-  addToCart: (productId: string, quantity?: number, productData?: any) => Promise<void>;
+  addToCart: (
+    productId: string,
+    quantity?: number,
+    productData?: CartProductInput,
+  ) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => void;
   refetch: () => Promise<void>;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+export const CartContext = createContext<CartContextType | undefined>(
+  undefined,
+);
 
 const STORAGE_KEY = "penaameen_local_cart";
 
@@ -113,11 +136,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     fetchCart();
   }, [fetchCart]);
 
-  const addToCart = async (productId: string, quantity = 1, productData?: any) => {
+  const addToCart = async (
+    productId: string,
+    quantity = 1,
+    productData?: CartProductInput,
+  ) => {
     // 1. Optimistically find the product
     let prod = productData;
     if (!prod) {
-      const matched = catalogProducts.find((p) => p.id === productId || p.slug === productId);
+      const matched = catalogProducts.find(
+        (p) => p.id === productId || p.slug === productId,
+      );
       if (matched) {
         prod = {
           id: matched.id,
@@ -126,26 +155,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
           category: matched.category,
           price: String(matched.price),
           image: matched.image,
-          stock: 50,
         };
       }
     }
 
     if (!prod) {
-      prod = {
-        id: productId,
-        slug: productId,
-        name: "Produk",
-        category: "Umum",
-        price: "0",
-        image: "/images/penaameen/products/home-learning.jpg",
-        stock: 50,
-      };
+      throw new Error(
+        "Produk tidak ditemukan. Silakan muat ulang halaman dan coba lagi.",
+      );
     }
 
     setState((prev) => {
       const existingIndex = prev.items.findIndex(
-        (item) => item.product.id === productId || item.product.slug === prod.slug
+        (item) =>
+          item.product.id === productId || item.product.slug === prod.slug,
       );
       let updatedItems: CartItem[];
 
@@ -163,7 +186,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
       } else {
         const newItem: CartItem = {
-          id: "item-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5),
+          id:
+            "item-" +
+            Date.now() +
+            "-" +
+            Math.random().toString(36).substr(2, 5),
           quantity,
           product: {
             id: prod.id,
@@ -172,7 +199,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             category: prod.category,
             price: String(prod.price),
             image: prod.image,
-            stock: prod.stock ?? 50,
+            ...(prod.stock !== undefined ? { stock: prod.stock } : {}),
           },
           subtotal: Number(prod.price) * quantity,
         };
@@ -208,7 +235,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setState((prev) => {
       const updatedItems = prev.items
         .map((item) => {
-          if (item.product.id === productId || item.product.slug === productId) {
+          if (
+            item.product.id === productId ||
+            item.product.slug === productId
+          ) {
             return {
               ...item,
               quantity,
@@ -244,7 +274,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeFromCart = async (productId: string) => {
     setState((prev) => {
       const updatedItems = prev.items.filter(
-        (item) => item.product.id !== productId && item.product.slug !== productId
+        (item) =>
+          item.product.id !== productId && item.product.slug !== productId,
       );
       const { total, itemCount } = calculateTotals(updatedItems);
       saveToLocalStorage(updatedItems);
@@ -267,7 +298,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = useCallback(() => {
-    setState({ items: [], total: 0, itemCount: 0, isLoading: false, error: null });
+    setState({
+      items: [],
+      total: 0,
+      itemCount: 0,
+      isLoading: false,
+      error: null,
+    });
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY);
     }

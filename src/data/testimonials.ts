@@ -31,7 +31,8 @@ export const testimonials: Testimonial[] = [
     date: "12 Februari 2026",
     productUsed: "Paket Home Learning Al-Barqy",
     category: "orangtua",
-    title: "Anak 5 tahun langsung lancar baca hijaiyah dalam 2 minggu tanpa drama!",
+    title:
+      "Anak 5 tahun langsung lancar baca hijaiyah dalam 2 minggu tanpa drama!",
     content:
       "Awalnya Rayhan sering malas kalau diajak belajar mengaji konvensional karena cepat bosan dan bingung menghafal huruf yang mirip-mirip. Begitu coba metode Al-Barqy lewat Paket Home Learning dari PENA AMEEN, masyaAllah langsung antusias! Kartu dan bukunya sangat interaktif. Dalam 14 hari sudah hafal pola huruf dan sekarang sudah masuk juz amma. Pendampingan di rumah jadi sangat tenang dan menyenangkan.",
     highlight: "Lancar Mengaji dlm 14 Hari",
@@ -50,7 +51,8 @@ export const testimonials: Testimonial[] = [
     date: "28 Januari 2026",
     productUsed: "Paket Klasikal & Alat Peraga Guru TPQ",
     category: "guru",
-    title: "Metode Al-Barqy 200 Menit sangat membantu ketuntasan santri di kelas",
+    title:
+      "Metode Al-Barqy 200 Menit sangat membantu ketuntasan santri di kelas",
     content:
       "Kami menerapkan metode Al-Barqy untuk 80+ santri baru di TPQ kami. Luar biasa, poster klasikal besar dan kartu peraga guru sangat memudahkan pengajaran massal. Formula asosiasi kata bunyi Al-Barqy benar-benar 'Anti Lupa'—anak yang biasanya butuh 6 bulan untuk kenal makhraj huruf, sekarang selesai dalam hitungan pekan. Modul kurikulumnya sangat terstruktur untuk guru.",
     highlight: "Digunakan di 80+ Santri TPQ",
@@ -69,7 +71,8 @@ export const testimonials: Testimonial[] = [
     date: "18 Januari 2026",
     productUsed: "Paket Flashcard & Buku Aktivitas ACM",
     category: "anak",
-    title: "Belajar membaca latin jadi momen bermain paling ditunggu setiap sore!",
+    title:
+      "Belajar membaca latin jadi momen bermain paling ditunggu setiap sore!",
     content:
       "Sebagai ibu bekerja, waktu saya mendampingi anak terbatas hanya 30 menit sepulang kantor. Metode ACM ini penyelamat banget! Bukunya penuh ilustrasi ceria, tanpa ejaan mengeja yang bikin anak frustasi. Naura menganggap belajar ini seperti main tebak kartu. Usia 4 tahun sudah bisa membaca kata-kata pendek dengan fasih dan penuh rasa percaya diri.",
     highlight: "Hanya 20-30 Menit Sehari",
@@ -139,4 +142,3 @@ export const testimonials: Testimonial[] = [
 export const getTestimonialBySlug = (slug: string) => {
   return testimonials.find((testimonial) => testimonial.slug === slug);
 };
-

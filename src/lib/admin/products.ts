@@ -147,9 +147,7 @@ export async function getProductCategories(): Promise<string[]> {
   return categories.map((c) => c.name);
 }
 
-export async function getProductById(
-  id: string,
-): Promise<AdminProduct | null> {
+export async function getProductById(id: string): Promise<AdminProduct | null> {
   const product = await prisma.product.findFirst({
     where: { OR: [{ id }, { slug: id }] },
     include: { category: true },

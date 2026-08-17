@@ -27,7 +27,10 @@ export async function GET() {
       });
     }
   } catch (error) {
-    console.warn("Database query failed, using persistent live products file:", error);
+    console.warn(
+      "Database query failed, using persistent live products file:",
+      error,
+    );
   }
 
   // Fallback: static catalog (source of truth until DB is populated)

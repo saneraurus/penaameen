@@ -58,10 +58,7 @@ function resolveStaffRole(
     ...(memberships ?? []).map((m) => m.role.replace(/^org:/, "")),
   ];
   for (const candidate of candidates) {
-    if (
-      typeof candidate === "string" &&
-      candidate in ROLE_CAPABILITY_MAP
-    ) {
+    if (typeof candidate === "string" && candidate in ROLE_CAPABILITY_MAP) {
       return candidate as ClerkOrgRole;
     }
   }
@@ -76,7 +73,10 @@ export async function getStaffMembers(): Promise<
     const client = await clerkClient();
     users = await client.users.getUserList({ limit: 100 });
   } catch (error) {
-    console.warn("[Staff] Clerk API unavailable; serving empty staff directory:", error);
+    console.warn(
+      "[Staff] Clerk API unavailable; serving empty staff directory:",
+      error,
+    );
     return [];
   }
 
@@ -115,7 +115,9 @@ export async function getStaffMembers(): Promise<
       fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || null,
       role,
       status: "active",
-      lastActiveAt: user.lastActiveAt ? new Date(user.lastActiveAt).toISOString() : null,
+      lastActiveAt: user.lastActiveAt
+        ? new Date(user.lastActiveAt).toISOString()
+        : null,
       createdAt: new Date(user.createdAt).toISOString(),
     });
   }
@@ -158,8 +160,7 @@ export async function getStaffMemberById(
     return withCapabilities({
       id: user.id,
       email,
-      fullName:
-        `${user.firstName || ""} ${user.lastName || ""}`.trim() || null,
+      fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || null,
       role,
       status: "active",
       lastActiveAt: user.lastActiveAt
@@ -204,8 +205,7 @@ export async function updateStaffRole(
     return withCapabilities({
       id: user.id,
       email,
-      fullName:
-        `${user.firstName || ""} ${user.lastName || ""}`.trim() || null,
+      fullName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || null,
       role,
       status: "active",
       lastActiveAt: user.lastActiveAt

@@ -39,14 +39,15 @@ function buildMethodsSection(): string {
 }
 
 function buildBranchesSection(): string {
-  return branches
-    .map((b) => `- ${b.region} (${b.city})`)
-    .join("\n");
+  return branches.map((b) => `- ${b.region} (${b.city})`).join("\n");
 }
 
 function buildArticlesSection(): string {
   return articles
-    .map((a) => `- ${a.title} (Kategori: ${a.category}, ${a.readTime} menit baca) - ${a.excerpt.slice(0, 200)}`)
+    .map(
+      (a) =>
+        `- ${a.title} (Kategori: ${a.category}, ${a.readTime} menit baca) - ${a.excerpt.slice(0, 200)}`,
+    )
     .join("\n");
 }
 

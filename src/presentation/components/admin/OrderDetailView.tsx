@@ -19,7 +19,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
   const handleUpdateStatus = async (
     status: string,
     fulfillmentStatus: string,
-    note?: string
+    note?: string,
   ) => {
     setIsUpdating(true);
     try {
@@ -42,8 +42,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
   };
 
   const carrier = order.fulfillmentHistory?.[0]?.carrier || null;
-  const trackingNumber =
-    order.fulfillmentHistory?.[0]?.trackingNumber || null;
+  const trackingNumber = order.fulfillmentHistory?.[0]?.trackingNumber || null;
 
   return (
     <div className="space-y-6">
@@ -69,22 +68,23 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
             <span>Print Resi Pengiriman</span>
           </button>
 
-          {order.fulfillmentStatus !== "fulfilled" && order.fulfillmentStatus !== "shipped" && (
-            <button
-              type="button"
-              onClick={() =>
-                handleUpdateStatus(
-                  "processing",
-                  "fulfilled",
-                  "Pesanan sedang dikemas di gudang."
-                )
-              }
-              disabled={isUpdating}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
-            >
-              ✓ Tandai Sedang Dikemas
-            </button>
-          )}
+          {order.fulfillmentStatus !== "fulfilled" &&
+            order.fulfillmentStatus !== "shipped" && (
+              <button
+                type="button"
+                onClick={() =>
+                  handleUpdateStatus(
+                    "processing",
+                    "fulfilled",
+                    "Pesanan sedang dikemas di gudang.",
+                  )
+                }
+                disabled={isUpdating}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                ✓ Tandai Sedang Dikemas
+              </button>
+            )}
 
           {order.fulfillmentStatus !== "shipped" && (
             <button
@@ -93,7 +93,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                 handleUpdateStatus(
                   "processing",
                   "shipped",
-                  "Paket telah diserahkan ke kurir ekspedisi."
+                  "Paket telah diserahkan ke kurir ekspedisi.",
                 )
               }
               disabled={isUpdating}
@@ -119,7 +119,9 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
             <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
               <span>📚</span>
-              <span>Daftar Produk ({order.items?.length || 1} Macam Produk)</span>
+              <span>
+                Daftar Produk ({order.items?.length || 1} Macam Produk)
+              </span>
             </h3>
 
             <div className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
@@ -176,7 +178,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                     minimumFractionDigits: 0,
                   }).format(
                     order.items?.reduce((s, i) => s + i.totalPrice, 0) ||
-                      order.totalAmount
+                      order.totalAmount,
                   )}
                 </span>
               </div>
@@ -235,9 +237,15 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                 </div>
                 <div className="text-gray-700 mt-1 leading-relaxed">
                   {order.shippingAddress?.address1}
-                  {order.shippingAddress?.city ? `, ${order.shippingAddress.city}` : ""}
-                  {order.shippingAddress?.province ? `, ${order.shippingAddress.province}` : ""}
-                  {order.shippingAddress?.postalCode ? ` (${order.shippingAddress.postalCode})` : ""}
+                  {order.shippingAddress?.city
+                    ? `, ${order.shippingAddress.city}`
+                    : ""}
+                  {order.shippingAddress?.province
+                    ? `, ${order.shippingAddress.province}`
+                    : ""}
+                  {order.shippingAddress?.postalCode
+                    ? ` (${order.shippingAddress.postalCode})`
+                    : ""}
                 </div>
               </div>
             </div>

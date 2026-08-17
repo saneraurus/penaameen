@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +35,13 @@ export default function CheckoutAddressPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const { items: cartItems, total: cartTotal, itemCount, updateQuantity, removeFromCart } = useCart();
+  const {
+    items: cartItems,
+    total: cartTotal,
+    itemCount,
+    updateQuantity,
+    removeFromCart,
+  } = useCart();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -60,7 +66,9 @@ export default function CheckoutAddressPage() {
   // 1. Auth Guard (Redirect to sign-in if not logged in)
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      router.push("/sign-in?redirect_url=" + encodeURIComponent("/checkout/address"));
+      router.push(
+        "/sign-in?redirect_url=" + encodeURIComponent("/checkout/address"),
+      );
     }
   }, [isLoaded, isSignedIn, router]);
 
@@ -70,7 +78,9 @@ export default function CheckoutAddressPage() {
 
     const dynamicName =
       user?.fullName ||
-      (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Pelanggan");
+      (user?.firstName
+        ? `${user.firstName} ${user.lastName || ""}`.trim()
+        : "Pelanggan");
 
     const dynamicDefaultAddress: Address = {
       id: "addr-default-1",
@@ -164,7 +174,12 @@ export default function CheckoutAddressPage() {
   // Handle Add Address
   const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.recipientName || !form.phone || !form.addressLine1 || !form.city) {
+    if (
+      !form.recipientName ||
+      !form.phone ||
+      !form.addressLine1 ||
+      !form.city
+    ) {
       setError("Mohon lengkapi semua field alamat wajib.");
       return;
     }
@@ -189,7 +204,10 @@ export default function CheckoutAddressPage() {
     setShowAddModal(false);
 
     try {
-      localStorage.setItem("penaameen_checkout_addresses", JSON.stringify(updated));
+      localStorage.setItem(
+        "penaameen_checkout_addresses",
+        JSON.stringify(updated),
+      );
       await fetch("/api/addresses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -235,7 +253,9 @@ export default function CheckoutAddressPage() {
       <div className="min-h-screen bg-background-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto" />
-          <p className="text-supporting-600 text-sm font-medium">Menyiapkan checkout...</p>
+          <p className="text-supporting-600 text-sm font-medium">
+            Menyiapkan checkout...
+          </p>
         </div>
       </div>
     );
@@ -252,8 +272,18 @@ export default function CheckoutAddressPage() {
                 href="/produk"
                 className="text-xs text-supporting-500 hover:text-primary-700 flex items-center gap-1.5 transition-colors font-medium"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
                 Kembali ke Belanja
               </Link>
@@ -294,7 +324,10 @@ export default function CheckoutAddressPage() {
               <span className="text-base">⚠️</span>
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 text-xs font-bold">
+            <button
+              onClick={() => setError(null)}
+              className="text-red-500 hover:text-red-700 text-xs font-bold"
+            >
               ✕
             </button>
           </div>
@@ -306,9 +339,12 @@ export default function CheckoutAddressPage() {
             <div className="w-16 h-16 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center mx-auto mb-4 text-2xl">
               🛒
             </div>
-            <h2 className="text-xl font-serif font-bold text-primary-950 mb-2">Keranjang Anda Masih Kosong</h2>
+            <h2 className="text-xl font-serif font-bold text-primary-950 mb-2">
+              Keranjang Anda Masih Kosong
+            </h2>
             <p className="text-supporting-600 text-sm mb-6 leading-relaxed">
-              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari katalog kami terlebih dahulu.
+              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari
+              katalog kami terlebih dahulu.
             </p>
             <Link
               href="/produk"
@@ -329,8 +365,12 @@ export default function CheckoutAddressPage() {
                       📍
                     </span>
                     <div>
-                      <h2 className="text-lg font-serif font-bold text-primary-950">Alamat Pengiriman</h2>
-                      <p className="text-xs text-supporting-500">Pilih atau tambah alamat tujuan pengiriman</p>
+                      <h2 className="text-lg font-serif font-bold text-primary-950">
+                        Alamat Pengiriman
+                      </h2>
+                      <p className="text-xs text-supporting-500">
+                        Pilih atau tambah alamat tujuan pengiriman
+                      </p>
                     </div>
                   </div>
 
@@ -367,8 +407,12 @@ export default function CheckoutAddressPage() {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-bold text-primary-950">{addr.recipientName}</span>
-                            <span className="text-xs font-medium text-supporting-500">• {addr.phone}</span>
+                            <span className="text-sm font-bold text-primary-950">
+                              {addr.recipientName}
+                            </span>
+                            <span className="text-xs font-medium text-supporting-500">
+                              • {addr.phone}
+                            </span>
                             <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-supporting-100 text-supporting-700">
                               {addr.label}
                             </span>
@@ -395,25 +439,34 @@ export default function CheckoutAddressPage() {
                     🚚
                   </span>
                   <div>
-                    <h2 className="text-lg font-serif font-bold text-primary-950">Pilihan Kurir & Ekspedisi</h2>
-                    <p className="text-xs text-supporting-500">Pilih kurir pengiriman yang Anda inginkan</p>
+                    <h2 className="text-lg font-serif font-bold text-primary-950">
+                      Pilihan Kurir & Ekspedisi
+                    </h2>
+                    <p className="text-xs text-supporting-500">
+                      Pilih kurir pengiriman yang Anda inginkan
+                    </p>
                   </div>
                 </div>
 
                 {isLoadingRates ? (
                   <div className="py-8 text-center space-y-3">
                     <div className="animate-spin rounded-full h-8 w-8 border-3 border-primary-600 border-t-transparent mx-auto" />
-                    <p className="text-xs text-supporting-500 font-medium">Menghitung ongkos kirim terbaik...</p>
+                    <p className="text-xs text-supporting-500 font-medium">
+                      Menghitung ongkos kirim terbaik...
+                    </p>
                   </div>
                 ) : rates.length === 0 ? (
                   <div className="p-6 bg-supporting-50 rounded-2xl text-center text-xs text-supporting-600">
-                    Silakan pilih alamat di atas untuk melihat tarif kurir yang tersedia.
+                    Silakan pilih alamat di atas untuk melihat tarif kurir yang
+                    tersedia.
                   </div>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
                     {rates.map((rate, idx) => {
                       const key = `${rate.courier}-${rate.service}-${idx}`;
-                      const isSelected = selectedRate?.courier === rate.courier && selectedRate?.service === rate.service;
+                      const isSelected =
+                        selectedRate?.courier === rate.courier &&
+                        selectedRate?.service === rate.service;
 
                       return (
                         <label
@@ -452,7 +505,9 @@ export default function CheckoutAddressPage() {
                           </div>
 
                           <div className="mt-3 pt-2.5 border-t border-supporting-100/80 flex items-center justify-between">
-                            <span className="text-[10px] text-supporting-400 font-medium">Ongkos Kirim</span>
+                            <span className="text-[10px] text-supporting-400 font-medium">
+                              Ongkos Kirim
+                            </span>
                             <span className="text-sm font-bold text-primary-800">
                               Rp{rate.cost.toLocaleString("id-ID")}
                             </span>
@@ -478,10 +533,16 @@ export default function CheckoutAddressPage() {
                 {/* Cart Items List */}
                 <div className="divide-y divide-supporting-100 max-h-72 overflow-y-auto pr-1 scrollbar-thin mb-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="py-3.5 flex items-center gap-3">
+                    <div
+                      key={item.id}
+                      className="py-3.5 flex items-center gap-3"
+                    >
                       <div className="relative w-14 h-14 rounded-xl bg-supporting-100 overflow-hidden flex-shrink-0 border border-supporting-200">
                         <Image
-                          src={item.product.image || "/images/penaameen/products/home-learning.jpg"}
+                          src={
+                            item.product.image ||
+                            "/images/penaameen/products/home-learning.jpg"
+                          }
                           alt={item.product.name}
                           fill
                           className="object-cover"
@@ -489,9 +550,12 @@ export default function CheckoutAddressPage() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-semibold text-primary-950 truncate">{item.product.name}</h4>
+                        <h4 className="text-xs font-semibold text-primary-950 truncate">
+                          {item.product.name}
+                        </h4>
                         <p className="text-[11px] text-supporting-500">
-                          Rp{Number(item.product.price).toLocaleString("id-ID")} x {item.quantity}
+                          Rp{Number(item.product.price).toLocaleString("id-ID")}{" "}
+                          x {item.quantity}
                         </p>
 
                         {/* Quantity controls */}
@@ -501,7 +565,10 @@ export default function CheckoutAddressPage() {
                               type="button"
                               onClick={() => {
                                 if (item.quantity > 1) {
-                                  updateQuantity(item.product.id, item.quantity - 1);
+                                  updateQuantity(
+                                    item.product.id,
+                                    item.quantity - 1,
+                                  );
                                 } else {
                                   removeFromCart(item.product.id);
                                 }
@@ -510,10 +577,17 @@ export default function CheckoutAddressPage() {
                             >
                               -
                             </button>
-                            <span className="px-2 text-xs font-semibold text-primary-900">{item.quantity}</span>
+                            <span className="px-2 text-xs font-semibold text-primary-900">
+                              {item.quantity}
+                            </span>
                             <button
                               type="button"
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              onClick={() =>
+                                updateQuantity(
+                                  item.product.id,
+                                  item.quantity + 1,
+                                )
+                              }
                               className="px-2 py-0.5 text-xs text-supporting-600 hover:bg-supporting-200 transition-colors"
                             >
                               +
@@ -543,25 +617,35 @@ export default function CheckoutAddressPage() {
                 <div className="space-y-2.5 pt-4 border-t border-supporting-100 text-xs">
                   <div className="flex justify-between text-supporting-600">
                     <span>Subtotal Produk</span>
-                    <span className="font-semibold text-primary-950">Rp{cartTotal.toLocaleString("id-ID")}</span>
+                    <span className="font-semibold text-primary-950">
+                      Rp{cartTotal.toLocaleString("id-ID")}
+                    </span>
                   </div>
 
                   <div className="flex justify-between text-supporting-600">
                     <span>Biaya Pengiriman</span>
                     <span className="font-semibold text-primary-950">
-                      {shippingCost > 0 ? `Rp${shippingCost.toLocaleString("id-ID")}` : "Pilih kurir"}
+                      {shippingCost > 0
+                        ? `Rp${shippingCost.toLocaleString("id-ID")}`
+                        : "Pilih kurir"}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-supporting-600">
                     <span>Biaya Layanan</span>
-                    <span className="font-semibold text-emerald-600">GRATIS</span>
+                    <span className="font-semibold text-emerald-600">
+                      GRATIS
+                    </span>
                   </div>
 
                   <div className="pt-3 border-t border-supporting-200 flex justify-between items-baseline">
                     <div>
-                      <span className="text-sm font-bold text-primary-950 block">Total Pembayaran</span>
-                      <span className="text-[10px] text-supporting-400">Sudah termasuk PPN & Ongkir</span>
+                      <span className="text-sm font-bold text-primary-950 block">
+                        Total Pembayaran
+                      </span>
+                      <span className="text-[10px] text-supporting-400">
+                        Sudah termasuk PPN & Ongkir
+                      </span>
                     </div>
                     <span className="text-xl font-bold text-primary-700">
                       Rp{grandTotal.toLocaleString("id-ID")}
@@ -577,8 +661,18 @@ export default function CheckoutAddressPage() {
                   className="w-full mt-6 py-3.5 px-6 bg-primary-600 hover:bg-primary-700 disabled:bg-supporting-300 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-2xl transition-all shadow-md shadow-primary-900/10 active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   <span>Lanjut ke Pembayaran</span>
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
                   </svg>
                 </button>
 
@@ -604,7 +698,9 @@ export default function CheckoutAddressPage() {
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-supporting-100">
-              <h3 className="text-lg font-serif font-bold text-primary-950">Tambah Alamat Baru</h3>
+              <h3 className="text-lg font-serif font-bold text-primary-950">
+                Tambah Alamat Baru
+              </h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="text-supporting-400 hover:text-supporting-600 text-lg font-bold"
@@ -615,7 +711,9 @@ export default function CheckoutAddressPage() {
 
             <form onSubmit={handleAddAddress} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-supporting-700 mb-1">Label Alamat</label>
+                <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                  Label Alamat
+                </label>
                 <input
                   type="text"
                   placeholder="Contoh: Rumah, Kantor, Toko"
@@ -628,23 +726,31 @@ export default function CheckoutAddressPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">Nama Penerima</label>
+                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                    Nama Penerima
+                  </label>
                   <input
                     type="text"
                     placeholder="Nama lengkap"
                     value={form.recipientName}
-                    onChange={(e) => setForm({ ...form, recipientName: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, recipientName: e.target.value })
+                    }
                     className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">Nomor Telepon / WhatsApp</label>
+                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                    Nomor Telepon / WhatsApp
+                  </label>
                   <input
                     type="tel"
                     placeholder="08123456789"
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
                     className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
                     required
                   />
@@ -652,12 +758,16 @@ export default function CheckoutAddressPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-supporting-700 mb-1">Alamat Lengkap</label>
+                <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                  Alamat Lengkap
+                </label>
                 <textarea
                   rows={2}
                   placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan"
                   value={form.addressLine1}
-                  onChange={(e) => setForm({ ...form, addressLine1: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, addressLine1: e.target.value })
+                  }
                   className="w-full px-3.5 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none resize-none"
                   required
                 />
@@ -665,7 +775,9 @@ export default function CheckoutAddressPage() {
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">Kota/Kab</label>
+                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                    Kota/Kab
+                  </label>
                   <input
                     type="text"
                     placeholder="Surabaya"
@@ -676,23 +788,31 @@ export default function CheckoutAddressPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">Provinsi</label>
+                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                    Provinsi
+                  </label>
                   <input
                     type="text"
                     placeholder="Jawa Timur"
                     value={form.province}
-                    onChange={(e) => setForm({ ...form, province: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, province: e.target.value })
+                    }
                     className="w-full px-3 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-supporting-700 mb-1">Kode Pos</label>
+                  <label className="block text-xs font-semibold text-supporting-700 mb-1">
+                    Kode Pos
+                  </label>
                   <input
                     type="text"
                     placeholder="60238"
                     value={form.postalCode}
-                    onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, postalCode: e.target.value })
+                    }
                     className="w-full px-3 py-2 bg-background-50 border border-supporting-200 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none"
                     required
                   />

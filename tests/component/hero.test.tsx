@@ -23,7 +23,9 @@ describe("HeroSection Component", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       /Kuasai Membaca & Mengaji/i,
     );
-    expect(screen.getByRole("link", { name: /Jelajahi Paket & Produk/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Jelajahi Paket & Produk/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders showcase multi-view switcher tabs and switches content on click", () => {
@@ -46,9 +48,7 @@ describe("HeroSection Component", () => {
     expect(perangkatTab).toBeInTheDocument();
 
     // Default is "Home Learning Keluarga"
-    expect(
-      screen.getByText(/Solusi Belajar di Rumah/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Solusi Belajar di Rumah/i)).toBeInTheDocument();
 
     // Click "Metode Al-Barqy (200 Menit)"
     fireEvent.click(albarqyTab);
@@ -78,8 +78,8 @@ describe("HeroSection Component", () => {
     expect(mockPush).toHaveBeenCalledWith("/produk?q=Al-Barqy");
 
     expect(
-      screen.getAllByRole("link", { name: /Jelajahi Paket|Lihat Paket/i }).length,
+      screen.getAllByRole("link", { name: /Jelajahi Paket|Lihat Paket/i })
+        .length,
     ).toBeGreaterThan(0);
   });
 });
-

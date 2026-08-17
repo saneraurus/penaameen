@@ -26,10 +26,7 @@ export interface SystemControlState {
   updatedAt: string | null;
 }
 
-const CONTROLS_FILE = path.join(
-  process.cwd(),
-  "src/data/system_controls.json",
-);
+const CONTROLS_FILE = path.join(process.cwd(), "src/data/system_controls.json");
 
 type StoredControl =
   | boolean
@@ -67,7 +64,12 @@ function saveFileControls(
 let prismaUnavailable = false;
 
 export async function getSystemControls(): Promise<SystemControlState[]> {
-  let rows: Array<{ key: string; value: boolean; updatedById: string | null; updatedAt: Date }> = [];
+  let rows: Array<{
+    key: string;
+    value: boolean;
+    updatedById: string | null;
+    updatedAt: Date;
+  }> = [];
 
   if (!prismaUnavailable) {
     try {
@@ -86,8 +88,7 @@ export async function getSystemControls(): Promise<SystemControlState[]> {
       typeof stored === "object" && stored !== null
         ? stored.value
         : (stored as boolean | undefined);
-    const value =
-      row !== undefined ? row.value : (storedValue ?? false);
+    const value = row !== undefined ? row.value : (storedValue ?? false);
     return {
       key,
       label: SYSTEM_CONTROL_LABELS[key],
@@ -95,14 +96,13 @@ export async function getSystemControls(): Promise<SystemControlState[]> {
       updatedById:
         row?.updatedById ??
         (typeof stored === "object" && stored !== null
-          ? stored.updatedById ?? null
+          ? (stored.updatedById ?? null)
           : null),
-      updatedAt:
-        row?.updatedAt
-          ? row.updatedAt.toISOString()
-          : typeof stored === "object" && stored !== null
-            ? stored.updatedAt ?? null
-            : null,
+      updatedAt: row?.updatedAt
+        ? row.updatedAt.toISOString()
+        : typeof stored === "object" && stored !== null
+          ? (stored.updatedAt ?? null)
+          : null,
     };
   });
 }

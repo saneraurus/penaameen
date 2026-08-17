@@ -54,11 +54,15 @@ describe("emergency system controls (file fallback)", () => {
   });
 
   it("sets a control and persists it", async () => {
-    await setSystemControl("disable_payment_webhook_processing", true, "staff-1");
-
-    expect(await isSystemControlEnabled("disable_payment_webhook_processing")).toBe(
+    await setSystemControl(
+      "disable_payment_webhook_processing",
       true,
+      "staff-1",
     );
+
+    expect(
+      await isSystemControlEnabled("disable_payment_webhook_processing"),
+    ).toBe(true);
     const controls = await getSystemControls();
     const control = controls.find(
       (c) => c.key === "disable_payment_webhook_processing",

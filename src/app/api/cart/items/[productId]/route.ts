@@ -9,7 +9,7 @@ const updateCartItemSchema = z.object({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<{ productId: string }> },
 ) {
   try {
     const { userId } = await auth();
@@ -50,7 +50,7 @@ export async function PATCH(
     if (cartItem.product.stock < quantity) {
       return NextResponse.json(
         { error: "Insufficient stock", available: cartItem.product.stock },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -65,13 +65,16 @@ export async function PATCH(
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Error updating cart item:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<{ productId: string }> },
 ) {
   try {
     const { userId } = await auth();
@@ -106,6 +109,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error removing cart item:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

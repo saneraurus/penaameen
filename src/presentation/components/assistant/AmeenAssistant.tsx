@@ -104,7 +104,9 @@ export function AmeenAssistant() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: nextMessages.slice(-12).map((m) => ({ role: m.role, content: m.content })),
+            messages: nextMessages
+              .slice(-12)
+              .map((m) => ({ role: m.role, content: m.content })),
             pagePath: pathname,
             searchQuery,
             cartItemCount: itemCount,
@@ -116,7 +118,10 @@ export function AmeenAssistant() {
         if (!res.ok || !data.reply) {
           setError(data.error ?? "Maaf, terjadi kendala. Silakan coba lagi.");
         } else {
-          setMessages((prev) => [...prev, { role: "assistant", content: data.reply as string }]);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: data.reply as string },
+          ]);
         }
       } catch {
         setError("Maaf, terjadi kendala jaringan. Silakan coba lagi.");
@@ -124,7 +129,7 @@ export function AmeenAssistant() {
         setIsSending(false);
       }
     },
-    [isSending, pathname, searchQuery, itemCount]
+    [isSending, pathname, searchQuery, itemCount],
   );
 
   const resetChat = () => {
@@ -168,8 +173,18 @@ export function AmeenAssistant() {
                 aria-label="Mulai ulang percakapan"
                 className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0114.9-2M20 14a8 8 0 01-14.9 2" />
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0114.9-2M20 14a8 8 0 01-14.9 2"
+                  />
                 </svg>
               </button>
               <button
@@ -178,8 +193,18 @@ export function AmeenAssistant() {
                 aria-label="Tutup TANYA AMEEN"
                 className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -264,8 +289,18 @@ export function AmeenAssistant() {
               aria-label="Kirim pesan"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white transition-colors hover:bg-primary-700 disabled:opacity-40 cursor-pointer"
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l18-8-8 18-2-8-8-2z" />
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 11l18-8-8 18-2-8-8-2z"
+                />
               </svg>
             </button>
           </form>
@@ -281,19 +316,43 @@ export function AmeenAssistant() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        aria-label={isOpen ? "Tutup TANYA AMEEN" : "Buka TANYA AMEEN - Customer Service Pena Ameen"}
+        aria-label={
+          isOpen
+            ? "Tutup TANYA AMEEN"
+            : "Buka TANYA AMEEN - Customer Service Pena Ameen"
+        }
         aria-expanded={isOpen}
         className={`flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-xl shadow-primary-900/30 transition-all hover:bg-primary-700 hover:scale-105 cursor-pointer ${
           isOpen ? "rotate-90" : ""
         }`}
       >
         {isOpen ? (
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         ) : (
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8-1.036 0-2.039-.132-2.968-.38L3 21l1.286-3.67C3.47 16.103 3 14.107 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <svg
+            className="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8-1.036 0-2.039-.132-2.968-.38L3 21l1.286-3.67C3.47 16.103 3 14.107 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
         )}
       </button>

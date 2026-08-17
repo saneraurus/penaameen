@@ -33,11 +33,15 @@ export function TestimonialsSection() {
   const safeIndex = Math.min(currentIndex, maxIndex);
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : filteredTestimonials.length - 1));
+    setCurrentIndex((prev) =>
+      prev > 0 ? prev - 1 : filteredTestimonials.length - 1,
+    );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev < filteredTestimonials.length - 1 ? prev + 1 : 0));
+    setCurrentIndex((prev) =>
+      prev < filteredTestimonials.length - 1 ? prev + 1 : 0,
+    );
   };
 
   const handleCategoryChange = (cat: CategoryFilter) => {
@@ -74,16 +78,21 @@ export function TestimonialsSection() {
             </h2>
 
             <p className="text-base sm:text-lg text-supporting-600 leading-relaxed mb-6">
-              Lebih dari <strong className="text-primary-700 font-semibold">8.000+ keluarga dan 500+ TPQ</strong> telah membuktikan kemudahan mendampingi anak dan pemula lancar membaca dan mengaji dengan metode teruji.
+              Lebih dari{" "}
+              <strong className="text-primary-700 font-semibold">
+                8.000+ keluarga dan 500+ TPQ
+              </strong>{" "}
+              telah membuktikan kemudahan mendampingi anak dan pemula lancar
+              membaca dan mengaji dengan metode teruji.
             </p>
 
             {/* Overall Rating Stats Pill */}
             <div className="inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-white/90 backdrop-blur-md p-3 sm:px-6 sm:py-2.5 rounded-2xl border border-supporting-200/80 shadow-xs">
               <div className="flex items-center gap-2">
-                <div className="flex text-accent-500 text-sm">
-                  {"★★★★★"}
-                </div>
-                <span className="text-sm font-bold text-supporting-900">4.9 / 5.0</span>
+                <div className="flex text-accent-500 text-sm">{"★★★★★"}</div>
+                <span className="text-sm font-bold text-supporting-900">
+                  4.9 / 5.0
+                </span>
               </div>
               <span className="hidden sm:inline text-supporting-300">•</span>
               <span className="text-xs sm:text-sm font-medium text-supporting-600">
@@ -91,8 +100,16 @@ export function TestimonialsSection() {
               </span>
               <span className="hidden sm:inline text-supporting-300">•</span>
               <span className="text-xs sm:text-sm font-semibold text-primary-700 inline-flex items-center gap-1">
-                <svg className="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 text-primary-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 100% Pembeli Terverifikasi
               </span>
@@ -143,7 +160,12 @@ export function TestimonialsSection() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
             <button
@@ -158,7 +180,12 @@ export function TestimonialsSection() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -182,7 +209,8 @@ export function TestimonialsSection() {
             >
               {/* Render 3 cards starting from safeIndex (with wrap-around) */}
               {[0, 1, 2].map((offset) => {
-                const itemIndex = (safeIndex + offset) % filteredTestimonials.length;
+                const itemIndex =
+                  (safeIndex + offset) % filteredTestimonials.length;
                 const item = filteredTestimonials[itemIndex];
                 if (!item) return null;
 
@@ -316,7 +344,9 @@ export function TestimonialsSection() {
                   <h4 className="text-sm font-bold text-supporting-900">
                     Bukti Ulasan Asli: {selectedProof.name}
                   </h4>
-                  <p className="text-xs text-supporting-500">{selectedProof.role}</p>
+                  <p className="text-xs text-supporting-500">
+                    {selectedProof.role}
+                  </p>
                 </div>
                 <button
                   type="button"

@@ -53,7 +53,7 @@ F = Foundation (this Step 1 package).
 | Step | Content | Exit criteria |
 |---|---|---|
 | 0 | Governance reconciliation (this doc, decision log, unknown registry) | Documents committed; no feature code |
-| 1 | Control-plane foundations: audit write path + `/admin/audit`, secret encryption/masking, invented-data removal, persistence unification (products → Prisma), notification center, emergency controls, real integration health checks | All new units tested; `npm run check` green |
+| 1 | Control-plane foundations: audit write path + `/admin/audit`, secret encryption/masking, invented-data removal, persistence unification (products → Prisma), notification center, emergency controls, real integration health checks | All new units tested; `npm run check` green — **DONE 2026-08-17**: `npm run check` green (prettier, eslint `--max-warnings=0`, `tsc --noEmit`, 91/91 vitest, production build). Owner committed the control-plane code in `e85992b` and the PostgreSQL persistence migration in `c21cf55`; honest checkout/payment fix, repo-wide format, and lint/type hygiene closed in the working tree on 2026-08-17 |
 | 2 | Commerce modules: orders (notes, assignment), products (categories, variants), inventory movement ledger, customers | Typecheck + tests green |
 | 3 | Integrations: Midtrans/RajaOngkir/email adapters behind existing ports; admin payment/shipping modules | Typecheck + tests green |
 | 4 | Workforce + CS inbox (no AI): workers, assignments, tasks, conversation states | Typecheck + tests green |
@@ -75,11 +75,11 @@ F = Foundation (this Step 1 package).
 
 ## 5. Repository hygiene backlog (found during analysis)
 
-1. Plaintext secrets in `src/data/api_settings.json` + `TEST-KEY-*` fallbacks — Step 1.
-2. Invented tracking numbers (`JP...`), fallback courier rates, mock staff — Step 1.
-3. Split-brain persistence (Prisma vs JSON) with admin writes to JSON only — Step 1 (products), Step 2 (rest).
-4. No audit writes despite type/interface — Step 1.
-5. No `prisma/migrations` directory; schema never migrated — Step 1 attempt, environment-limited.
+1. Plaintext secrets in `src/data/api_settings.json` + `TEST-KEY-*` fallbacks — Step 1 (resolved).
+2. Invented tracking numbers (`JP...`), fallback courier rates, mock staff — Step 1 (resolved).
+3. Split-brain persistence (Prisma vs JSON) with admin writes to JSON only — Step 1 (products), Step 2 (rest); owner removed the JSON file fallbacks entirely in `c21cf55` (PostgreSQL migration).
+4. No audit writes despite type/interface — Step 1 (resolved).
+5. No `prisma/migrations` directory; schema never migrated — Step 1 attempt, environment-limited; resolved locally by the PostgreSQL migration in `c21cf55` (embedded Postgres via `npm run db:start`, data in `.pgdata/`).
 6. Stale E2E test (`foundation.spec.ts` references removed copy) — Step 8.
 7. Docs/code drift (PROJECT.md describes foundation-only; code contains full
    e-commerce + admin) — Step 0 records it; PROJECT.md updated in Step 1 close.
@@ -87,20 +87,25 @@ F = Foundation (this Step 1 package).
 ## 6. Definition of done (Step 1)
 
 - AuditLog/Notification/SystemControl models exist; Prisma generated client updated;
-  `db push` attempted and result documented.
-
-**Environment-limited check (documented per AGENTS.md rule 8):** `npx prisma db push`
-failed with P1001 (no MySQL server at localhost:3306 on 2026-08-17). Schema is valid
-(`prisma validate` green) and the generated client is updated. All new persistence
-paths implement the existing Prisma-first / append-only-file-fallback pattern, so the
-admin application remains functional without a database. The schema must be applied
-(`prisma db push` or a proper migration) when a database is available.
+  schema applied to the local embedded PostgreSQL (`npm run db:start`, data in `.pgdata/`)
+  by the owner's migration commit `c21cf55` (2026-08-17). The earlier P1001/MySQL
+  environment limitation is superseded: the stack is now PostgreSQL-only and the JSON
+  file fallbacks were removed in `c21cf55`.
 - Audit events recorded for: order transitions, product create/update/status,
   staff role change, API settings change, midtrans webhook outcomes,
   emergency control changes. `/admin/audit` page reads them.
 - Secrets: encrypted at rest when `APP_SETTINGS_ENCRYPTION_KEY` set; masked in API
   and UI; no fake fallback keys; real health checks in `/api/admin/settings/api/test`.
-- No invented tracking numbers, courier rates, or staff records remain.
+- No invented tracking numbers, courier rates, staff records, or customer records remain.
+  The checkout flow was made honest on 2026-08-17: `src/app/checkout/payment/page.tsx`
+  no longer fabricates VA numbers, QRIS codes, tracking numbers, order refs, fallback
+  addresses/customer data, or payment-success claims; `src/app/api/orders/route.ts`
+  fails closed (400/500) instead of inventing prices, addresses, or order IDs; the
+  admin WhatsApp number comes from `NEXT_PUBLIC_ADMIN_WHATSAPP` (see `.env.example`);
+  invented contact values in `src/data/api_settings.json` were cleared.
 - Admin product writes persist through Prisma (dev fallback to JSON documented).
 - Notification center + emergency controls functional with elevated permission.
-- Unit tests added; `npm run check` green.
+- Unit tests added; `npm run check` green (prettier, eslint `--max-warnings=0`,
+  `tsc --noEmit`, 91/91 vitest, production build). Only known build warning:
+  Next.js deprecates the `middleware` file convention in favor of `proxy` (pre-existing,
+  deferred).

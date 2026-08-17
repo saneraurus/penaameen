@@ -17,7 +17,9 @@ export default async function AdminOrderDetailPage({
     return (
       <div className="space-y-6 max-w-5xl">
         <AdminHeader title="Pesanan Tidak Ditemukan" />
-        <p className="text-gray-600">Pesanan yang diminta tidak ada di sistem.</p>
+        <p className="text-gray-600">
+          Pesanan yang diminta tidak ada di sistem.
+        </p>
         <Link
           href="/admin/orders"
           className="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 inline-block"

@@ -15,7 +15,9 @@ export function ProductStatusButton({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleStatusChange = async (newStatus: "published" | "draft" | "archived") => {
+  const handleStatusChange = async (
+    newStatus: "published" | "draft" | "archived",
+  ) => {
     if (isLoading) return;
     setIsLoading(true);
     try {
@@ -37,7 +39,9 @@ export function ProductStatusButton({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Apakah Anda yakin ingin menghapus produk ini secara permanen?")) {
+    if (
+      !confirm("Apakah Anda yakin ingin menghapus produk ini secara permanen?")
+    ) {
       return;
     }
     setIsLoading(true);

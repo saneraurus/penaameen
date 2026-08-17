@@ -98,7 +98,11 @@ describe("notification center (file fallback)", () => {
     await createNotification({ type: "b", severity: "info", title: "Dua" });
     await markNotificationRead(created.id);
 
-    const unread = await getNotifications({ page: 1, perPage: 10, unreadOnly: true });
+    const unread = await getNotifications({
+      page: 1,
+      perPage: 10,
+      unreadOnly: true,
+    });
     expect(unread.total).toBe(1);
     expect(unread.notifications[0]?.title).toBe("Dua");
 

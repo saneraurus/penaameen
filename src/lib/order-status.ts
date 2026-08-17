@@ -31,7 +31,8 @@ export function mapMidtransStatus(
   }
 }
 
-export type PaymentOutcome = "paid" | "pending" | "cancelled" | "refunded" | "unchanged";
+export type PaymentOutcome =
+  "paid" | "pending" | "cancelled" | "refunded" | "unchanged";
 
 export function classifyMidtransOutcome(
   transactionStatus: string,
