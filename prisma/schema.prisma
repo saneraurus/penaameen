@@ -120,7 +120,11 @@ model Order {
   shippingRate    Json?        // full rate quote snapshot
   midtransOrderId String?      @unique
   midtransToken   String?      // Snap token
-  paidAt          DateTime?
+  casakuTransactionId String?  @unique // Casaku QRIS transaction reference
+  casakuTotalAmount BigInt?    // QR total incl. unique code (amount to verify)
+  casakuQrString   String?     // QRIS payload string (server-rendered only)
+  casakuExpiresAt  DateTime?   // QR expiry
+  paidAt           DateTime?
   shippedAt       DateTime?
   deliveredAt     DateTime?
   cancelledAt     DateTime?
@@ -206,4 +210,96 @@ model SystemControl {
   label       String
   updatedById String?
   updatedAt   DateTime  @updatedAt
+}
+
+model Article {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String
+  content   String
+  date      DateTime
+  category  String
+  image     String
+  readTime  Int      @default(5)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  region    String
+  city      String
+  address   String
+  contact   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Method {
+  id                 String @id @default(cuid())
+  slug               String @unique
+  name               String
+  tagline            String
+  officialReference  String
+  officialDomain     String
+  description        String
+  philosophy         String
+  suitableFor        String
+  image              String
+  targetDuration     String
+  composition        Json
+  keyStats           Json
+  advantages         Json
+  steps              Json
+  comparison         Json
+  benefits           Json
+  faqs               Json
+  relatedProductSlugs Json
+  seo                Json
+  isActive           Boolean @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model HistoryMilestone {
+  id         String   @id @default(cuid())
+  period     String
+  navLabel   String
+  eyebrow    String
+  title      String
+  summary    String
+  narrative  String
+  highlights Json
+  image      String
+  imageAlt   String
+  caption    String
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Testimonial {
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  name           String
+  role           String
+  location       String
+  avatar         String
+  rating         Int
+  date           String
+  productUsed    String
+  category       String
+  title          String
+  content        String
+  highlight      String
+  verifiedBuyer  Boolean @default(false)
+  image          String
+  label          String
+  isActive       Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

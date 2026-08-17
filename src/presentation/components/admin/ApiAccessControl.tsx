@@ -10,8 +10,8 @@ interface ApiAccessControlProps {
 export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
   const [settings, setSettings] = useState<ApiSettings>(initialSettings);
   const [activeTab, setActiveTab] = useState<
-    "midtrans" | "rajaongkir" | "email" | "forwarding" | "auth"
-  >("midtrans");
+    "casaku" | "midtrans" | "rajaongkir" | "email" | "forwarding" | "auth"
+  >("casaku");
 
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +50,9 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
     }
   };
 
-  const handleTest = async (service: "midtrans" | "rajaongkir" | "email") => {
+  const handleTest = async (
+    service: "casaku" | "midtrans" | "rajaongkir" | "email",
+  ) => {
     setTestingService(service);
     try {
       let payload: Record<string, unknown> = { service };
@@ -135,8 +137,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             <span>Pusat Kontrol API & Integrasi Backend</span>
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Kelola kredensial resmi Midtrans, RajaOngkir, Auto-Email, dan
-            Webhooks Pena Ameen
+            Kelola kredensial resmi Casaku QRIS, Midtrans, RajaOngkir,
+            Auto-Email, dan Webhooks Pena Ameen
           </p>
         </div>
 
@@ -157,6 +159,24 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
       <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs">
         {/* Navigation Tabs Bar */}
         <div className="flex overflow-x-auto border-b border-gray-200 bg-gray-50/70 p-2 gap-1.5 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setActiveTab("casaku")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === "casaku"
+                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            }`}
+          >
+            <span>🪙</span>
+            <span>QRIS (Casaku)</span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                settings.casaku.enabled ? "bg-emerald-500" : "bg-amber-500"
+              }`}
+            />
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab("midtrans")}
@@ -236,6 +256,250 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
         {/* Tab Body Content */}
         <div className="p-6 md:p-8">
+          {/* TAB 0: CASAKU QRIS (PRIMARY) */}
+          {activeTab === "casaku" && (
+            <div className="space-y-6 max-w-4xl">
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">
+                    Konfigurasi Casaku QRIS (Primary Gateway)
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Dynamic QRIS — nominal menyesuaikan total pesanan. Migrasi
+                    dari Cashify ke Casaku.id (docs: casaku.id/docs)
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSettings((s) => ({
+                      ...s,
+                      casaku: { ...s.casaku, enabled: !s.casaku.enabled },
+                    }))
+                  }
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    settings.casaku.enabled
+                      ? "bg-emerald-600 text-white shadow-xs"
+                      : "bg-gray-100 text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  {settings.casaku.enabled ? "🟢 Aktif" : "⚪ Nonaktif"}
+                </button>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    License Key *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showSecrets.casakuLicense ? "text" : "password"}
+                      value={settings.casaku.licenseKey}
+                      onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          casaku: {
+                            ...s.casaku,
+                            licenseKey: e.target.value,
+                          },
+                        }))
+                      }
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleSecret("casakuLicense")}
+                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                    >
+                      {showSecrets.casakuLicense ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Diperoleh dari Casaku Dashboard → API Keys (awalan
+                    cashify_[REDACTED]/casaku_)
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Webhook Secret *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showSecrets.casakuWebhook ? "text" : "password"}
+                      value={settings.casaku.webhookSecret}
+                      onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          casaku: {
+                            ...s.casaku,
+                            webhookSecret: e.target.value,
+                          },
+                        }))
+                      }
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleSecret("casakuWebhook")}
+                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                    >
+                      {showSecrets.casakuWebhook ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    QRIS Merchant ID *
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.casaku.qrId}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        casaku: { ...s.casaku, qrId: e.target.value },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Kedaluwarsa QR (menit)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={settings.casaku.expiryMinutes}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        casaku: {
+                          ...s.casaku,
+                          expiryMinutes: Number(e.target.value) || 15,
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Package IDs (pisahkan dengan koma)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.casaku.packageIds.join(",")}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        casaku: {
+                          ...s.casaku,
+                          packageIds: e.target.value
+                            .split(",")
+                            .map((value) => value.trim())
+                            .filter(Boolean),
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Contoh:
+                    id.dana,com.gojek.gopaymerchant,com.shopee.id,com.bca.msb
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    API Base URL
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.casaku.apiBaseUrl}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        casaku: { ...s.casaku, apiBaseUrl: e.target.value },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Webhook Notification URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={settings.casaku.webhookUrl}
+                      className="w-full px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-mono text-gray-600 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        copyToClipboard(
+                          settings.casaku.webhookUrl,
+                          "Webhook Casaku",
+                        )
+                      }
+                      className="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Daftarkan di Casaku Dashboard → Webhook Settings
+                  </span>
+                </div>
+              </div>
+
+              {/* Test Ping Action */}
+              <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="text-xs">
+                  {testResults.casaku && (
+                    <div
+                      className={`p-3 rounded-xl border font-medium ${
+                        testResults.casaku.success
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          : "bg-red-50 text-red-800 border-red-200"
+                      }`}
+                    >
+                      {testResults.casaku.success ? "✓ " : "⚠️ "}
+                      {testResults.casaku.message}
+                      {testResults.casaku.latencyMs && (
+                        <span className="text-xs opacity-75">
+                          {" "}
+                          ({testResults.casaku.latencyMs}ms)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleTest("casaku")}
+                  disabled={testingService === "casaku"}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {testingService === "casaku"
+                    ? "Menguji Koneksi..."
+                    : "⚡ Uji Ping Koneksi Casaku"}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: MIDTRANS GATEWAY */}
           {activeTab === "midtrans" && (
             <div className="space-y-6 max-w-4xl">

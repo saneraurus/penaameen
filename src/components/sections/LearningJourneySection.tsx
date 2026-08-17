@@ -27,27 +27,25 @@ export const journeyStages: JourneyStage[] = [
     number: "01",
     stepName: "Kenali Kebutuhan",
     title: "Identifikasi Gaya & Kesiapan Belajar",
-    subtitle:
-      "Menemukan titik awal yang paling ramah dan nyaman bagi pembelajar.",
+    subtitle: "Menemukan titik awal yang paling ramah dan nyaman bagi pembelajar.",
     description:
-      "Setiap anak dan pembelajar dewasa memiliki kecepatan serta gaya belajar yang unik (visual, auditori, atau kinestetik). Kami membantu orang tua dan pendidik mengidentifikasi kesiapan awal agar proses belajar tidak menimbulkan stres.",
-    badge: "Langkah Awal • Tanpa Tekanan",
-    tagline: "✨ Pondasi Nyaman Sejak Awal",
+      "Setiap anak memiliki kesiapan dan kecepatan belajar yang berbeda. Evaluasi awal dilakukan secara informal tanpa tes yang membebani, memastikan anak merasa nyaman sejak hari pertama.",
+    badge: "Langkah Awal",
+    tagline: "Pondasi Belajar",
     image: "/images/penaameen/journey/step-1-kenali.jpg",
-    imageAlt:
-      "Ibu dan anak berdiskusi hangat memeriksa kartu kesiapan belajar membaca",
+    imageAlt: "Ibu dan anak berdiskusi hangat memeriksa kartu kesiapan belajar membaca",
     highlights: [
       {
-        label: "Evaluasi Ramah",
-        desc: "Kenali minat awal tanpa tes yang membebani psikologis anak.",
+        label: "Evaluasi Informal",
+        desc: "Mengenali kesiapan anak tanpa beban tes akademis.",
       },
       {
-        label: "Pemetaan Gaya",
-        desc: "Tentukan apakah anak lebih responsif dengan warna, bunyi, atau gerakan.",
+        label: "Pemetaan Minat",
+        desc: "Menyesuaikan materi dengan respon visual dan audio anak.",
       },
       {
         label: "Target Realistis",
-        desc: "Susun ritme belajar bertahap yang fleksibel sesuai rutinitas harian keluarga.",
+        desc: "Menyusun jadwal belajar 15 menit per hari yang teratur.",
       },
     ],
     ctaText: "Mulai Panduan Belajar",
@@ -58,26 +56,25 @@ export const journeyStages: JourneyStage[] = [
     number: "02",
     stepName: "Pilih Metode",
     title: "Pilih Jalur Belajar yang Teruji",
-    subtitle:
-      "ACM untuk membaca huruf Latin, atau AL-BARQY untuk mengaji Al-Qur'an.",
+    subtitle: "ACM untuk membaca huruf Latin, atau AL-BARQY untuk mengaji Al-Qur'an.",
     description:
-      "PENA AMEEN menyediakan dua metodologi unggulan terstruktur: ACM (Aku Cepat Membaca) dengan pendekatan bermain ceria untuk anak usia dini, dan AL-BARQY dengan formula kata anti-lupa cepat 200 menit untuk membaca Al-Qur'an.",
-    badge: "Kurikulum Terbukti",
-    tagline: "🎯 Metode Cepat & Melekat Kuat",
+      "PENA AMEEN menghadirkan dua metode rujukan: ACM (Aku Cepat Membaca) tanpa mengeja untuk anak usia dini, dan AL-BARQY dengan formula kata anti-lupa 200 menit untuk membaca Al-Qur'an.",
+    badge: "Kurikulum Teruji",
+    tagline: "Metode Terarah",
     image: "/images/penaameen/methods/method-albarqy.jpg",
     imageAlt: "Santri membaca Al-Qur'an dengan panduan metode terstruktur",
     highlights: [
       {
         label: "Jalur ACM (Latin)",
-        desc: "Lancar membaca kata & kalimat tanpa mengeja huruf satu per satu.",
+        desc: "Lancar membaca kata dan kalimat tanpa proses mengeja.",
       },
       {
         label: "Jalur AL-BARQY (Al-Qur'an)",
-        desc: "Sistem bunyi terstruktur 200 menit, mudah diingat seumur hidup.",
+        desc: "Formula kata fonetik 200 menit langsung lancar tartil.",
       },
       {
-        label: "Pendekatan Integratif",
-        desc: "Bisa dipelajari secara bertahap atau bersamaan untuk hasil optimal.",
+        label: "Fleksibel",
+        desc: "Dapat dipelajari bertahap di rumah maupun di kelas TPQ.",
       },
     ],
     ctaText: "Jelajahi Pilihan Metode",
@@ -88,27 +85,25 @@ export const journeyStages: JourneyStage[] = [
     number: "03",
     stepName: "Gunakan Perangkat",
     title: "Lengkapi Media Pembelajaran Praktis",
-    subtitle:
-      "Buku panduan, poster klasikal, flashcard interaktif & blok aktivitas.",
+    subtitle: "Buku panduan, poster klasikal, flashcard interaktif & modul aktivitas.",
     description:
-      "Perangkat fisik PENA AMEEN dirancang ergonomis dengan visual menarik dan ramah anak. Media bantu ini mengubah teori menjadi pengalaman multisensori yang memikat rasa ingin tahu.",
-    badge: "Media Lengkap & Menyenangkan",
-    tagline: "📚 Alat Peraga Edukatif Interaktif",
+      "Perangkat fisik PENA AMEEN dirancang ergonomis dengan kertas tebal ramah anak. Media bantu ini memudahkan anak memahami materi secara visual dan kinestetik.",
+    badge: "Media Lengkap",
+    tagline: "Alat Peraga Edukatif",
     image: "/images/penaameen/journey/step-3-perangkat.jpg",
-    imageAlt:
-      "Koleksi buku, kartu belajar hijaiyah, dan perangkat edukasi PENA AMEEN",
+    imageAlt: "Koleksi buku, kartu belajar hijaiyah, dan perangkat edukasi PENA AMEEN",
     highlights: [
       {
         label: "Buku Panduan Step-by-Step",
-        desc: "Tata letak bersih, font ramah anak, dan ilustrasi kontekstual.",
+        desc: "Tata letak bersih, font jelas, dan mudah dipahami anak.",
       },
       {
-        label: "Flashcard & Kartu Kata",
-        desc: "Mempercepat daya ingat visual melalui permainan tebak kata gembira.",
+        label: "Flashcard Hijaiyah",
+        desc: "Kartu tebal 2 sisi untuk stimulasi daya ingat visual.",
       },
       {
-        label: "Poster Klasikal & Dinding",
-        desc: "Menciptakan lingkungan literasi yang terus terlihat di ruang belajar.",
+        label: "Poster Edukasi Dinding",
+        desc: "Bagan peraga dinding agar anak terbiasa melihat huruf setiap hari.",
       },
     ],
     ctaText: "Lihat Katalog Perangkat",
@@ -119,27 +114,25 @@ export const journeyStages: JourneyStage[] = [
     number: "04",
     stepName: "Latih Konsisten",
     title: "Pendampingan 15–20 Menit Setiap Hari",
-    subtitle:
-      "Membangun kebiasaan positif dan ikatan kasih sayang (bonding) yang hangat.",
+    subtitle: "Membangun kebiasaan positif dan rutinitas belajar yang teratur.",
     description:
-      "Kunci keberhasilan belajar bukan pada durasi yang lama dan melelahkan, melainkan pada konsistensi yang ceria. 15 hingga 20 menit pendampingan setiap hari sudah cukup menghasilkan lompatan kemampuan yang nyata.",
-    badge: "Rutinitas Ceria",
-    tagline: "⏱️ Cukup 15–20 Menit / Hari",
+      "Kunci keberhasilan belajar terletak pada konsistensi harian. Cukup 15 hingga 20 menit pendampingan setiap hari untuk menghasilkan kemajuan membaca yang nyata dan stabil.",
+    badge: "Rutinitas Harian",
+    tagline: "15–20 Menit/Hari",
     image: "/images/penaameen/journey/step-4-latihan.jpg",
-    imageAlt:
-      "Ayah dan anak gembira berlatih menulis dan membaca bersama di meja rumah",
+    imageAlt: "Ayah dan anak berlatih menulis dan membaca bersama di meja rumah",
     highlights: [
       {
-        label: "Bebas Rasa Bosan",
-        desc: "Sesi singkat dengan variasi permainan menjaga antusiasme tetap tinggi.",
+        label: "Durasi Efektif",
+        desc: "Sesi singkat menjaga fokus dan daya konsentrasi anak tetap optimal.",
       },
       {
-        label: "Modul Panduan Guru & Orang Tua",
-        desc: "Instruksi praktis bagi pendamping tanpa perlu latar belakang pedagogi rumit.",
+        label: "Modul Pendamping",
+        desc: "Instruksi praktis langkah demi langkah untuk orang tua dan guru.",
       },
       {
-        label: "Apresiasi Berkala",
-        desc: "Fokus pada kemajuan kecil untuk membangun kepercayaan diri anak.",
+        label: "Kemajuan Terukur",
+        desc: "Evaluasi bertahap untuk memantau kelancaran membaca anak.",
       },
     ],
     ctaText: "Lihat Paket Home Learning",
@@ -150,27 +143,25 @@ export const journeyStages: JourneyStage[] = [
     number: "05",
     stepName: "Tumbuh & Mandiri",
     title: "Kemandirian Literasi & Karakter Mulia",
-    subtitle:
-      "Mampu membaca lancar, cinta belajar, dan memiliki akhlak yang baik.",
+    subtitle: "Mampu membaca lancar, gemar belajar, dan memiliki kesiapan sekolah.",
     description:
-      "Hasil akhir dari ekosistem PENA AMEEN bukan hanya sekadar kelancaran mengeja atau membaca teks, melainkan tumbuhnya cinta membaca seumur hidup, kecintaan pada Al-Qur'an, dan karakter percaya diri.",
-    badge: "Hasil Nyata & Karakter",
-    tagline: "🏆 Mandiri, Cerdas & Berakhlak",
+      "Hasil akhir dari proses belajar adalah tumbuhnya kemandirian membaca, kepercayaan diri menghadapi kurikulum sekolah dasar, serta kecintaan pada Al-Qur'an.",
+    badge: "Hasil Nyata",
+    tagline: "Mandiri & Berkarakter",
     image: "/images/penaameen/journey/step-5-tumbuh.jpg",
-    imageAlt:
-      "Siswi Indonesia berprestasi tersenyum bangga memegang piagam dan membaca buku dengan percaya diri",
+    imageAlt: "Siswi Indonesia berprestasi tersenyum bangga membaca buku dengan percaya diri",
     highlights: [
       {
         label: "Kemandirian Belajar",
-        desc: "Anak mampu membuka dan membaca buku secara mandiri tanpa disuruh.",
+        desc: "Anak terbiasa membuka dan membaca buku secara mandiri.",
       },
       {
-        label: "Kesiapan Jenjang Lanjut",
-        desc: "Pondasi kuat untuk menghadapi kurikulum sekolah dasar dan tilawah Al-Qur'an.",
+        label: "Kesiapan Sekolah",
+        desc: "Pondasi membaca yang kuat sebelum memasuki jenjang SD.",
       },
       {
-        label: "Cinta Nilai Kebajikan",
-        desc: "Membangun kedekatan emosional anak dengan keluarga dan nilai spiritual.",
+        label: "Karakter Positif",
+        desc: "Membentuk rasa percaya diri dan gemar membaca sejak dini.",
       },
     ],
     ctaText: "Mulai Perjalanan Anda",
@@ -183,27 +174,26 @@ export function LearningJourneySection() {
   const activeStage = journeyStages[activeStepIndex] ?? journeyStages[0]!;
 
   return (
-    <section className="py-16 md:py-24 bg-background-100 border-t border-supporting-200/60 overflow-hidden">
-      <div className="container px-4 mx-auto">
+    <section className="py-14 sm:py-16 md:py-24 bg-background-100/80 border-t border-supporting-200/80 overflow-hidden">
+      <div className="container px-4 mx-auto max-w-5xl">
         <Reveal>
-          <div className="max-w-3xl mx-auto text-center mb-10 md:mb-14">
-            <span className="mb-3 inline-block text-xs font-semibold tracking-widest uppercase text-primary-600 bg-primary-50 px-3.5 py-1 rounded-full border border-primary-200/70">
+          <div className="max-w-2xl mx-auto text-center mb-8 sm:mb-12">
+            <span className="mb-2.5 inline-block text-xs font-bold tracking-widest uppercase text-primary-700 bg-primary-100 px-3.5 py-1 rounded-full border border-primary-200/70">
               ALUR PENDAMPINGAN EFEKTIF
             </span>
-            <h2 className="text-section font-serif text-primary-900 leading-tight mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950 leading-tight mb-2.5">
               Perjalanan Belajar Bersama PENA AMEEN
             </h2>
-            <p className="text-supporting-600 text-base sm:text-lg">
-              Sebuah panduan terstruktur 5 langkah dari pengenalan awal hingga
-              kemandirian membaca yang menyenangkan dan berkarakter.
+            <p className="text-xs sm:text-sm text-supporting-600">
+              Panduan terstruktur 5 langkah dari pengenalan awal hingga kemandirian membaca anak.
             </p>
           </div>
         </Reveal>
 
         {/* Step Progress Navigation Bar */}
         <Reveal delay={0.1}>
-          <div className="max-w-4xl mx-auto mb-10 md:mb-12">
-            <div className="grid grid-cols-5 gap-2 sm:gap-3 bg-white p-2 rounded-2xl sm:rounded-3xl shadow-xs border border-supporting-200">
+          <div className="max-w-3xl mx-auto mb-6 sm:mb-8">
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 bg-white p-1.5 sm:p-2 rounded-2xl shadow-2xs border border-supporting-200">
               {journeyStages.map((stage, idx) => {
                 const isActive = idx === activeStepIndex;
                 const isPast = idx < activeStepIndex;
@@ -212,29 +202,29 @@ export function LearningJourneySection() {
                   <button
                     key={stage.id}
                     onClick={() => setActiveStepIndex(idx)}
-                    className={`group relative flex flex-col items-center py-2.5 px-1 sm:px-3 rounded-xl sm:rounded-2xl transition-all duration-300 text-center ${
+                    className={`group relative flex flex-col items-center py-2 px-1 sm:px-2 rounded-xl transition-all duration-200 text-center cursor-pointer ${
                       isActive
-                        ? "bg-primary-600 text-white shadow-sm ring-2 ring-primary-600 ring-offset-2"
+                        ? "bg-primary-600 text-white shadow-xs"
                         : isPast
-                          ? "bg-primary-50 text-primary-800 hover:bg-primary-100"
-                          : "bg-transparent text-supporting-600 hover:bg-background-50"
+                          ? "bg-primary-50 text-primary-900 hover:bg-primary-100"
+                          : "text-supporting-600 hover:bg-supporting-50"
                     }`}
                     aria-label={`Langkah ${stage.number}: ${stage.stepName}`}
                   >
                     <span
-                      className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-bold mb-1 transition-colors ${
+                      className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold mb-0.5 transition-colors ${
                         isActive
                           ? "bg-white text-primary-700"
                           : isPast
-                            ? "bg-primary-200 text-primary-800"
-                            : "bg-supporting-200 text-supporting-700 group-hover:bg-supporting-300"
+                            ? "bg-primary-200 text-primary-900"
+                            : "bg-supporting-100 text-supporting-700"
                       }`}
                     >
                       {stage.number}
                     </span>
                     <span
-                      className={`text-[10px] sm:text-xs font-medium leading-tight line-clamp-1 ${
-                        isActive ? "text-white font-semibold" : ""
+                      className={`text-[9px] sm:text-[11px] font-semibold leading-tight line-clamp-1 ${
+                        isActive ? "text-white" : ""
                       }`}
                     >
                       {stage.stepName}
@@ -248,45 +238,42 @@ export function LearningJourneySection() {
 
         {/* Active Stage Spotlight Panel */}
         <Reveal delay={0.2}>
-          <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm border border-supporting-200/90 transition-all duration-500">
-            <div className="grid gap-8 lg:grid-cols-12 items-center">
+          <div className="bg-white rounded-3xl p-5 sm:p-7 md:p-9 shadow-sm border border-supporting-200 transition-all duration-300">
+            <div className="grid gap-6 lg:grid-cols-12 items-center">
               {/* Left Column: Contextual Details & Guidance */}
-              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-4 sm:space-y-5">
                 <div>
-                  <div className="flex flex-wrap items-center gap-2.5 mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-primary-100 text-primary-800 rounded-full">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-primary-100 text-primary-800 rounded-md">
                       Tahap {activeStage.number} dari 05
                     </span>
-                    <span className="text-xs font-medium text-supporting-500">
+                    <span className="text-[11px] font-medium text-supporting-500">
                       • {activeStage.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-2xl sm:text-3xl font-serif font-bold text-primary-900 leading-tight mb-2">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-primary-950 leading-tight mb-1.5">
                     {activeStage.title}
                   </h3>
-                  <p className="text-sm sm:text-base font-medium text-primary-700 mb-4">
+                  <p className="text-xs sm:text-sm font-semibold text-emerald-800 mb-3">
                     {activeStage.subtitle}
                   </p>
-                  <p className="text-sm sm:text-base text-supporting-600 leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm text-supporting-600 leading-relaxed mb-4">
                     {activeStage.description}
                   </p>
 
                   {/* Highlights checklist */}
-                  <div className="space-y-3 pt-2 border-t border-supporting-100">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-supporting-500">
+                  <div className="space-y-2 pt-3 border-t border-supporting-100">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-supporting-400">
                       Poin Kunci Pendampingan:
                     </h4>
                     {activeStage.highlights.map((h, i) => (
-                      <div key={i} className="flex items-start gap-2.5">
-                        <div className="mt-0.5 w-5 h-5 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      <div key={i} className="flex items-start gap-2 text-xs sm:text-sm">
+                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
                           ✓
-                        </div>
-                        <p className="text-xs sm:text-sm text-supporting-700">
-                          <strong className="text-primary-800">
-                            {h.label}:
-                          </strong>{" "}
-                          {h.desc}
+                        </span>
+                        <p className="text-supporting-700 leading-snug">
+                          <strong className="text-primary-950 font-semibold">{h.label}:</strong> {h.desc}
                         </p>
                       </div>
                     ))}
@@ -294,158 +281,63 @@ export function LearningJourneySection() {
                 </div>
 
                 {/* Stage CTA & Navigation Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-supporting-100">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-supporting-100">
                   <Link
                     href={activeStage.ctaHref}
-                    className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl text-sm inline-flex items-center gap-2 shadow-xs transition-colors"
+                    className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-2xs transition-colors"
                   >
                     <span>{activeStage.ctaText}</span>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                    <span>→</span>
                   </Link>
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() =>
-                        setActiveStepIndex((prev) => Math.max(0, prev - 1))
-                      }
+                      type="button"
+                      onClick={() => setActiveStepIndex((prev) => Math.max(0, prev - 1))}
                       disabled={activeStepIndex === 0}
-                      className="p-2.5 rounded-xl border border-supporting-200 text-supporting-600 hover:bg-background-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                       aria-label="Tahap Sebelumnya"
+                      className="px-3 py-2 text-xs font-bold rounded-xl border border-supporting-200 text-supporting-700 hover:bg-supporting-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
+                      ← Sebelumnya
                     </button>
-                    <span className="text-xs font-semibold text-supporting-500 px-1">
-                      {activeStepIndex + 1} / {journeyStages.length}
-                    </span>
                     <button
+                      type="button"
                       onClick={() =>
                         setActiveStepIndex((prev) =>
-                          Math.min(journeyStages.length - 1, prev + 1),
+                          Math.min(journeyStages.length - 1, prev + 1)
                         )
                       }
                       disabled={activeStepIndex === journeyStages.length - 1}
-                      className="p-2.5 rounded-xl border border-supporting-200 text-supporting-600 hover:bg-background-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                       aria-label="Tahap Selanjutnya"
+                      className="px-3.5 py-2 text-xs font-bold rounded-xl bg-supporting-900 hover:bg-primary-950 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+                      Selanjutnya →
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Visual Stage Showcase */}
-              <div className="lg:col-span-5 relative">
-                <div className="relative aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md border-4 border-white bg-supporting-200 group">
+              {/* Right Column: Visual Stage Illustration */}
+              <div className="lg:col-span-5">
+                <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-md border border-supporting-200 bg-supporting-100">
                   <Image
-                    key={activeStage.id}
                     src={activeStage.image}
                     alt={activeStage.imageAlt}
                     fill
+                    unoptimized
                     sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                    className="object-cover"
                   />
-                  {/* Floating Tagline Badge */}
-                  <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/80 shadow-sm">
-                    <p className="text-xs sm:text-sm font-semibold text-primary-900 text-center">
-                      {activeStage.tagline}
-                    </p>
+                  <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-supporting-200 shadow-2xs flex items-center justify-between text-xs">
+                    <span className="font-bold text-primary-950 text-[11px]">
+                      Langkah {activeStage.number}
+                    </span>
+                    <span className="text-[10px] font-semibold text-emerald-700">
+                      {activeStage.stepName}
+                    </span>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </Reveal>
-
-        {/* Quick Steps Roadmap Preview */}
-        <Reveal delay={0.3}>
-          <div className="mt-12 max-w-5xl mx-auto">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-supporting-500 text-center mb-6">
-              Ringkasan Roadmap Pembelajaran
-            </h4>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {journeyStages.map((stage, idx) => {
-                const isSelected = idx === activeStepIndex;
-                return (
-                  <button
-                    key={stage.id}
-                    onClick={() => setActiveStepIndex(idx)}
-                    className={`text-left p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
-                      isSelected
-                        ? "bg-white border-primary-500 shadow-sm ring-1 ring-primary-400"
-                        : "bg-white/70 border-supporting-200/80 hover:bg-white hover:border-supporting-300"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span
-                          className={`text-xs font-bold px-2 py-0.5 rounded-md ${
-                            isSelected
-                              ? "bg-primary-600 text-white"
-                              : "bg-primary-50 text-primary-700"
-                          }`}
-                        >
-                          {stage.number}
-                        </span>
-                        <span className="text-[11px] text-supporting-400 font-medium">
-                          {stage.badge.split("•")[0]?.trim()}
-                        </span>
-                      </div>
-                      <h5 className="text-sm font-serif font-bold text-primary-800 mb-1 leading-snug">
-                        {stage.stepName}
-                      </h5>
-                      <p className="text-xs text-supporting-500 line-clamp-2">
-                        {stage.subtitle}
-                      </p>
-                    </div>
-                    <span
-                      className={`mt-3 text-[11px] font-medium inline-flex items-center gap-1 ${
-                        isSelected
-                          ? "text-primary-700 font-bold"
-                          : "text-supporting-400"
-                      }`}
-                    >
-                      <span>Lihat Panduan</span>
-                      <span>→</span>
-                    </span>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </Reveal>

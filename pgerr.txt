@@ -1,7 +1,0 @@
-[dev-db] failed to start embedded PostgreSQL: Error: Postgres init script failed (code: 1, signal: null). ERROR OUTPUT: initdb: error: directory ".pgdata" exists but is not empty
-initdb: hint: If you want to create a new database system, either remove or empty the directory ".pgdata" or run initdb with an argument other than ".pgdata".
-
-    at ChildProcess.<anonymous> (file:///C:/Users/HP%20VICTUS/Documents/PROJECTS/SANE%20ONE%20Studio/SANE%20ONE%20Web%20Dev/PENAAMEEN/penaameen%20web/node_modules/embedded-postgres/dist/index.js:176:36)
-    at ChildProcess.emit (node:events:509:28)
-    at maybeClose (node:internal/child_process:1141:16)
-    at ChildProcess._handle.onexit (node:internal/child_process:306:5)

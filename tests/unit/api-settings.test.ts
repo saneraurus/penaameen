@@ -130,3 +130,78 @@ describe("api-settings secret handling", () => {
     expect(getApiSettings().midtrans.serverKey).toBe("env-midtrans-key");
   });
 });
+
+describe("api-settings casaku group", () => {
+  beforeEach(() => {
+    fsMock.mem.clear();
+    setEnv({
+      APP_SETTINGS_ENCRYPTION_KEY: VALID_KEY,
+      CASAKU_LICENSE_KEY: "env-casaku-license",
+      CASAKU_WEBHOOK_SECRET: "env-casaku-webhook",
+      CASAKU_QR_ID: "1364518e-748e-4538-85e0-ddba89a3b4f9",
+      CASAKU_PACKAGE_IDS: "id.dana, com.gojek.gopaymerchant",
+      CASAKU_EXPIRY_MINUTES: "20",
+    });
+  });
+
+  afterEach(() => {
+    setEnv({
+      APP_SETTINGS_ENCRYPTION_KEY: undefined,
+      CASAKU_LICENSE_KEY: undefined,
+      CASAKU_WEBHOOK_SECRET: undefined,
+      CASAKU_QR_ID: undefined,
+      CASAKU_PACKAGE_IDS: undefined,
+      CASAKU_EXPIRY_MINUTES: undefined,
+    });
+  });
+
+  it("reads env defaults into the casaku group", () => {
+    const settings = getApiSettings();
+    expect(settings.casaku).toMatchObject({
+      enabled: true,
+      licenseKey: "env-casaku-license",
+      webhookSecret: "env-casaku-webhook",
+      qrId: "1364518e-748e-4538-85e0-ddba89a3b4f9",
+      expiryMinutes: 20,
+    });
+    expect(settings.casaku.packageIds).toEqual([
+      "id.dana",
+      "com.gojek.gopaymerchant",
+    ]);
+  });
+
+  it("masks casaku secrets in public settings", () => {
+    const publicSettings = getPublicApiSettings();
+    expect(publicSettings.casaku.licenseKey).toBe(
+      maskSecret("env-casaku-license"),
+    );
+    expect(publicSettings.casaku.webhookSecret).toBe(
+      maskSecret("env-casaku-webhook"),
+    );
+    expect(publicSettings.casaku.licenseKey).not.toContain(
+      "env-casaku-license",
+    );
+  });
+
+  it("persists casaku secrets encrypted and decrypts on read", () => {
+    const current = getApiSettings();
+    const updated: ApiSettings = {
+      ...current,
+      casaku: {
+        ...current.casaku,
+        licenseKey: "new-casaku-license",
+        webhookSecret: "new-casaku-webhook",
+      },
+    };
+    saveApiSettings(updated);
+
+    const roundTripped = getApiSettings();
+    expect(roundTripped.casaku.licenseKey).toBe("new-casaku-license");
+    expect(roundTripped.casaku.webhookSecret).toBe("new-casaku-webhook");
+  });
+
+  it("disabled by default when no license key is configured", () => {
+    setEnv({ CASAKU_LICENSE_KEY: undefined });
+    expect(getApiSettings().casaku.enabled).toBe(false);
+  });
+});

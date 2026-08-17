@@ -33,7 +33,7 @@ capability-first RBAC model. D013 approves all spec subsystems in scope.
 | 06 Workforce | Mock staff list (being replaced by Clerk-derived data) | PARTIAL | F + 4 |
 | 07 Automation | Missing | APPROVED, not started | 5 |
 | 08 Shipping | Rates API only; invented fallback rates | PARTIAL | F + 3 |
-| 09 Payments | Snap + webhook + settings; no admin module | PARTIAL | F + 3 |
+| 09 Payments | Casaku QRIS (primary, dynamic) + Midtrans Snap (backup) + webhooks + settings; no admin module | PARTIAL | F + 3 |
 | 10 Content / CMS | Static placeholders | NOT STARTED | 6 |
 | 11 Marketing | Missing (promotions CDR) | BLOCKED | 6 |
 | 12 Analytics | Revenue chart only (GA4/Search Console UNKNOWN) | NOT STARTED | 7 |

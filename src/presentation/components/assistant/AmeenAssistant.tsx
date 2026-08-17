@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useCart } from "@/context/CartContext";
 import { useAmeenContext } from "@/context/AmeenContext";
+import { AmeenAvatar } from "./AmeenAvatar";
+import { PenIcon } from "./PenIcon";
 
 type ChatRole = "user" | "assistant";
 
@@ -148,24 +150,30 @@ export function AmeenAssistant() {
         <section
           role="dialog"
           aria-label="TANYA AMEEN - Customer Service Pena Ameen"
-          className="flex w-[calc(100vw-2.5rem)] max-w-[380px] flex-col overflow-hidden rounded-3xl border border-supporting-200 bg-white shadow-2xl shadow-primary-950/20"
+          className="animate-chat-panel-in flex w-[calc(100vw-2.5rem)] max-w-[380px] flex-col overflow-hidden rounded-3xl border border-supporting-200 bg-white shadow-2xl shadow-primary-950/20"
         >
           {/* Header */}
-          <header className="flex items-center justify-between gap-3 bg-gradient-to-br from-primary-700 to-primary-900 px-4 py-3.5 text-white">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-lg font-bold ring-2 ring-white/30">
-                A
+          <header className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-800 to-primary-950 px-4 py-3.5 text-white">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-6 -top-8 h-24 w-24 rounded-full bg-white/10 blur-xl"
+            />
+            <div className="relative flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <AmeenAvatar className="h-11 w-11" />
+                <div className="min-w-0">
+                  <p className="truncate font-serif text-base font-bold leading-tight">
+                    TANYA AMEEN
+                  </p>
+                  <p className="flex items-center gap-1.5 text-[11px] text-primary-100">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                    </span>
+                    Customer Service • Online
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="truncate font-serif text-base font-bold leading-tight">
-                  TANYA AMEEN
-                </p>
-                <p className="flex items-center gap-1.5 text-[11px] text-primary-100">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                  Customer Service • Online
-                </p>
-              </div>
-            </div>
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -205,25 +213,29 @@ export function AmeenAssistant() {
                     strokeLinejoin="round"
                     d="M6 18L18 6M6 6l12 12"
                   />
-                </svg>
-              </button>
+</svg>
+                </button>
+              </div>
             </div>
           </header>
 
           {/* Messages */}
           <div
             ref={scrollRef}
-            className="flex h-[min(60vh,420px)] flex-col gap-3 overflow-y-auto bg-background-100 px-4 py-4"
+            className="flex h-[min(60vh,420px)] flex-col gap-3 overflow-y-auto scroll-smooth bg-background-100 px-4 py-4"
           >
             {messages.map((message, index) => (
               <div
                 key={`${message.role}-${index}`}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`animate-message-in flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
+                {message.role === "assistant" && (
+                  <AmeenAvatar className="mr-2 mt-0.5 h-6 w-6" />
+                )}
                 <div
-                  className={`max-w-[85%] whitespace-pre-line rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                  className={`max-w-[85%] whitespace-pre-line rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm ${
                     message.role === "user"
-                      ? "rounded-br-md bg-primary-600 text-white"
+                      ? "rounded-br-md bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-primary-800/20"
                       : "rounded-bl-md border border-supporting-200 bg-white text-supporting-800"
                   }`}
                 >
@@ -233,11 +245,17 @@ export function AmeenAssistant() {
             ))}
 
             {isSending && (
-              <div className="flex justify-start">
-                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-supporting-200 bg-white px-4 py-3">
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-500 [animation-delay:0ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-500 [animation-delay:150ms]" />
-                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-500 [animation-delay:300ms]" />
+              <div className="animate-message-in flex justify-start">
+                <AmeenAvatar className="mr-2 mt-0.5 h-6 w-6" />
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="flex items-center gap-2.5 rounded-2xl rounded-bl-md border border-supporting-200 bg-white px-3.5 py-2.5 shadow-sm"
+                >
+                  <PenIcon className="animate-spin-slow h-4 w-4 text-primary-600" />
+                  <span className="text-[12px] font-medium text-supporting-600">
+                    Ameen sedang Berfikir..
+                  </span>
                 </div>
               </div>
             )}
@@ -313,19 +331,26 @@ export function AmeenAssistant() {
         </section>
       )}
 
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-label={
-          isOpen
-            ? "Tutup TANYA AMEEN"
-            : "Buka TANYA AMEEN - Customer Service Pena Ameen"
-        }
-        aria-expanded={isOpen}
-        className={`flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-xl shadow-primary-900/30 transition-all hover:bg-primary-700 hover:scale-105 cursor-pointer ${
-          isOpen ? "rotate-90" : ""
-        }`}
-      >
+      <div className="relative">
+        {!isOpen && (
+          <span
+            aria-hidden="true"
+            className="animate-ping-slow absolute inset-0 rounded-full bg-primary-500/50"
+          />
+        )}
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-label={
+            isOpen
+              ? "Tutup TANYA AMEEN"
+              : "Buka TANYA AMEEN - Customer Service Pena Ameen"
+          }
+          aria-expanded={isOpen}
+          className={`relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-900/30 transition-all duration-300 hover:scale-110 hover:shadow-primary-800/40 cursor-pointer ${
+            isOpen ? "rotate-90" : ""
+          }`}
+        >
         {isOpen ? (
           <svg
             className="h-6 w-6"
@@ -356,6 +381,7 @@ export function AmeenAssistant() {
           </svg>
         )}
       </button>
+      </div>
     </div>
   );
 }

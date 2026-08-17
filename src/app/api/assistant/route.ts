@@ -8,6 +8,119 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+const NVIDIA_ENDPOINT =
+  "https://integrate.api.nvidia.com/v1/chat/completions";
+
+type AssistantProvider = {
+  name: string;
+  endpoint: string;
+  apiKey: string;
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  topP: number;
+  reasoningBudget?: number;
+};
+
+function buildAssistantProviders(): AssistantProvider[] {
+  const providers: AssistantProvider[] = [];
+
+  const nvidiaKey = process.env.NVIDIA_API_KEY;
+  if (nvidiaKey) {
+    const nvidiaModel =
+      process.env.NVIDIA_MODEL ??
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning";
+    const nvidiaEndpoint = process.env.NVIDIA_API_URL ?? NVIDIA_ENDPOINT;
+
+    providers.push({
+      name: "nvidia",
+      endpoint: nvidiaEndpoint,
+      apiKey: nvidiaKey,
+      model: nvidiaModel,
+      temperature: 0.6,
+      maxTokens: 65536,
+      topP: 0.95,
+      reasoningBudget: 16384,
+    });
+
+    const nvidiaFallbackKey = process.env.NVIDIA_API_KEY_FALLBACK;
+    if (nvidiaFallbackKey) {
+      providers.push({
+        name: "nvidia-backup",
+        endpoint: nvidiaEndpoint,
+        apiKey: nvidiaFallbackKey,
+        model: nvidiaModel,
+        temperature: 0.6,
+        maxTokens: 65536,
+        topP: 0.95,
+        reasoningBudget: 16384,
+      });
+    }
+  }
+
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey) {
+    providers.push({
+      name: "groq",
+      endpoint: GROQ_ENDPOINT,
+      apiKey: groqKey,
+      model: process.env.GROQ_MODEL ?? "openai/gpt-oss-120b",
+      temperature: 0.3,
+      maxTokens: 700,
+      topP: 0.95,
+    });
+  }
+
+  return providers;
+}
+
+async function callProvider(
+  provider: AssistantProvider,
+  systemPrompt: string,
+  history: ChatMessage[],
+): Promise<{ ok: boolean; reply?: string; status?: number; detail?: string }> {
+  const body: Record<string, unknown> = {
+    model: provider.model,
+    temperature: provider.temperature,
+    max_tokens: provider.maxTokens,
+    top_p: provider.topP,
+    messages: [{ role: "system", content: systemPrompt }, ...history],
+  };
+  if (provider.reasoningBudget != null) {
+    body.reasoning_budget = provider.reasoningBudget;
+  }
+
+  try {
+    const response = await fetch(provider.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${provider.apiKey}`,
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(45000),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text().catch(() => "");
+      return { ok: false, status: response.status, detail: detail.slice(0, 500) };
+    }
+
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    const reply = data.choices?.[0]?.message?.content?.trim();
+    if (!reply) return { ok: false, status: 200, detail: "empty reply" };
+
+    return { ok: true, reply };
+  } catch (error) {
+    return {
+      ok: false,
+      detail:
+        error instanceof Error ? error.message.slice(0, 500) : "network error",
+    };
+  }
+}
 
 const requestSchema = z.object({
   messages: z
@@ -215,9 +328,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      console.error("GROQ_API_KEY is not configured.");
+    const providers = buildAssistantProviders();
+    if (providers.length === 0) {
+      console.error("No AI provider API keys configured.");
       return NextResponse.json(
         { error: "Layanan asisten belum dikonfigurasi. Hubungi admin." },
         { status: 503 },
@@ -245,48 +358,20 @@ export async function POST(request: Request) {
       content: m.content,
     }));
 
-    const model = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
-
-    const groqResponse = await fetch(GROQ_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        max_tokens: 700,
-        top_p: 0.95,
-        messages: [{ role: "system", content: systemPrompt }, ...history],
-      }),
-      signal: AbortSignal.timeout(45000),
-    });
-
-    if (!groqResponse.ok) {
-      const detail = await groqResponse.text().catch(() => "");
+    for (const provider of providers) {
+      const result = await callProvider(provider, systemPrompt, history);
+      if (result.ok && result.reply) {
+        return NextResponse.json({ reply: result.reply });
+      }
       console.error(
-        `GROQ request failed: ${groqResponse.status} ${detail.slice(0, 500)}`,
-      );
-      return NextResponse.json(
-        { error: "Asisten sedang sibuk. Silakan coba lagi sebentar lagi." },
-        { status: 502 },
+        `Assistant provider "${provider.name}" failed (${result.status ?? "network"}): ${result.detail ?? "unknown"}`,
       );
     }
 
-    const groqData = (await groqResponse.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-
-    const reply = groqData.choices?.[0]?.message?.content?.trim();
-    if (!reply) {
-      return NextResponse.json(
-        { error: "Asisten tidak memberikan jawaban. Silakan coba lagi." },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json({ reply });
+    return NextResponse.json(
+      { error: "Asisten sedang sibuk. Silakan coba lagi sebentar lagi." },
+      { status: 502 },
+    );
   } catch (error) {
     console.error("Assistant route error:", error);
     return NextResponse.json(

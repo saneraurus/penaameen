@@ -155,11 +155,61 @@ async function testEmail(apiKey: string): Promise<TestResult> {
   }
 }
 
+async function testCasaku(
+  licenseKey: string,
+  baseUrl: string,
+): Promise<TestResult> {
+  const started = Date.now();
+  if (!licenseKey) {
+    return {
+      success: false,
+      message: "License Key Casaku belum dikonfigurasi.",
+      latencyMs: Date.now() - started,
+    };
+  }
+
+  try {
+    const response = await fetch(`${baseUrl.replace(/\/+$/, "")}/api/profile`, {
+      headers: {
+        "x-license-key": licenseKey,
+        Accept: "application/json",
+      },
+    });
+    const body = (await response.json().catch(() => null)) as {
+      status?: number;
+      message?: string;
+      data?: { name?: string; storeName?: string } | null;
+    } | null;
+
+    if (response.ok && body?.status === 200) {
+      return {
+        success: true,
+        message: `Koneksi Casaku terverifikasi (${body.data?.storeName ?? body.data?.name ?? "akun aktif"}).`,
+        latencyMs: Date.now() - started,
+      };
+    }
+    return {
+      success: false,
+      message: `Casaku merespons: ${body?.message ?? `HTTP ${response.status}`}. Periksa license key dan status langganan (https://casaku.id/pricing).`,
+      latencyMs: Date.now() - started,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Gagal menghubungi Casaku: ${
+        error instanceof Error ? error.message : "unknown error"
+      }`,
+      latencyMs: Date.now() - started,
+    };
+  }
+}
+
 export async function POST(request: Request) {
   try {
     await requireStaffActor("access:write");
     const body = await request.json();
-    const service = body.service as "midtrans" | "rajaongkir" | "email";
+    const service = body.service as
+      "midtrans" | "rajaongkir" | "email" | "casaku";
     const settings = getApiSettings();
 
     if (service === "midtrans") {
@@ -177,6 +227,14 @@ export async function POST(request: Request) {
 
     if (service === "email") {
       const result = await testEmail(settings.autoEmail.apiKey);
+      return NextResponse.json(result);
+    }
+
+    if (service === "casaku") {
+      const result = await testCasaku(
+        settings.casaku.licenseKey,
+        settings.casaku.apiBaseUrl,
+      );
       return NextResponse.json(result);
     }
 

@@ -1,4 +1,6 @@
 import EmbeddedPostgres from "embedded-postgres";
+import fs from "fs";
+import path from "path";
 
 const DB_NAME = process.env["DEV_DB_NAME"] || "penaameen";
 const DB_USER = process.env["DEV_DB_USER"] || "postgres";
@@ -15,8 +17,17 @@ const pg = new EmbeddedPostgres({
 });
 
 async function main() {
-  console.log("[dev-db] initialising embedded PostgreSQL...");
-  await pg.initialise();
+  const dirExists = fs.existsSync(DB_DIR);
+  const alreadyInitialised =
+    dirExists && fs.existsSync(path.join(DB_DIR, "PG_VERSION"));
+
+  if (alreadyInitialised) {
+    console.log("[dev-db] reusing existing PostgreSQL data directory");
+  } else {
+    console.log("[dev-db] initialising embedded PostgreSQL...");
+    await pg.initialise();
+  }
+
   console.log("[dev-db] starting PostgreSQL...");
   await pg.start();
   console.log(`[dev-db] ensuring database "${DB_NAME}" exists...`);

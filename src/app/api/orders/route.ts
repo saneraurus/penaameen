@@ -4,6 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import Midtrans from "midtrans-client";
 import type { Prisma } from "@/generated/prisma";
+import { getApiSettings } from "@/lib/admin/api-settings";
+import {
+  buildCasakuConfig,
+  generateQrisForOrder,
+} from "@/lib/payment/casaku-service";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -230,47 +235,76 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Try Midtrans Snap token
+    // 5. Generate payment: Casaku QRIS (primary), Midtrans Snap (backup)
+    let casaku:
+      | (Omit<import("@/lib/payment/casaku").CasakuQrisData, "qrString"> & {
+          qrString?: string;
+          expiresAt: string;
+        })
+      | null = null;
     let snapToken: string | undefined = undefined;
     let redirectUrl: string | undefined = undefined;
 
-    try {
-      const midtrans = getMidtransClient();
-      const parameter = {
-        transaction_details: {
-          order_id: orderNumber,
-          gross_amount: total,
-        },
-        customer_details: {
-          first_name: addressSnapshot.recipientName,
-          phone: addressSnapshot.phone,
-          shipping_address: {
-            first_name: addressSnapshot.recipientName,
-            address: addressSnapshot.addressLine1,
-            city: addressSnapshot.city,
-            postal_code: addressSnapshot.postalCode,
-            phone: addressSnapshot.phone,
-          },
-        },
-        item_details: orderItemsToSave.map((item) => ({
-          id: item.productId,
-          price: item.price,
-          quantity: item.quantity,
-          name: item.name.slice(0, 50),
-        })),
-      };
+    const settings = getApiSettings();
+    if (buildCasakuConfig(settings)) {
+      try {
+        const result = await generateQrisForOrder(
+          savedOrderId,
+          total,
+          settings,
+        );
+        if (result.ok) {
+          casaku = {
+            ...result.data,
+            expiresAt: result.expiresAt.toISOString(),
+          };
+        }
+      } catch (casakuError) {
+        // Casaku unavailable: fall back to Midtrans below.
+        console.warn("Casaku QRIS generation failed:", casakuError);
+      }
+    }
 
-      const midtransResponse = await midtrans.createTransaction(parameter);
-      snapToken = midtransResponse.token;
-      redirectUrl = midtransResponse.redirect_url;
-    } catch {
-      // Mock / Dev mode Snap token
+    if (!casaku) {
+      try {
+        const midtrans = getMidtransClient();
+        const parameter = {
+          transaction_details: {
+            order_id: orderNumber,
+            gross_amount: total,
+          },
+          customer_details: {
+            first_name: addressSnapshot.recipientName,
+            phone: addressSnapshot.phone,
+            shipping_address: {
+              first_name: addressSnapshot.recipientName,
+              address: addressSnapshot.addressLine1,
+              city: addressSnapshot.city,
+              postal_code: addressSnapshot.postalCode,
+              phone: addressSnapshot.phone,
+            },
+          },
+          item_details: orderItemsToSave.map((item) => ({
+            id: item.productId,
+            price: item.price,
+            quantity: item.quantity,
+            name: item.name.slice(0, 50),
+          })),
+        };
+
+        const midtransResponse = await midtrans.createTransaction(parameter);
+        snapToken = midtransResponse.token;
+        redirectUrl = midtransResponse.redirect_url;
+      } catch {
+        // Mock / Dev mode Snap token
+      }
     }
 
     return NextResponse.json({
       orderId: savedOrderId,
       orderNumber,
       total,
+      casaku,
       snapToken,
       redirectUrl,
     });

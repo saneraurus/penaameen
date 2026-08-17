@@ -2,7 +2,7 @@
 
 **Phase:** 3 — Technical Architecture
 
-**Status:** Provider-agnostic architecture. The payment provider, account owner, payment methods, webhook contract, refund policy, settlement behavior, and status mapping are `UNKNOWN` or `CLIENT DECISION REQUIRED`. No production payment provider is selected or implemented.
+**Status:** Provider-agnostic architecture with provider confirmations by implementation: **Casaku QRIS (primary, dynamic — nominal follows order total)** and **Midtrans Snap (backup)** (D011, D017). Refund policy, settlement behavior, and full status mapping remain `UNKNOWN`/`CLIENT DECISION REQUIRED`. Credentials live in environment variables/admin settings (masked, encrypted at rest); no provider secret is committed. Live Casaku calls currently return 403 until the license subscription is active (see D017).
 
 ## 1. Payment architecture principle
 

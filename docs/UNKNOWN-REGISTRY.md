@@ -78,6 +78,16 @@ Rows below are resolved or partially resolved by explicit owner decisions record
 | ADMIN-003 | UNCHANGED — Reporting needs remain UNKNOWN. |
 | DES-001/DES-002, DATA-001..005, LEG-001..003, ANA-001..003, ORD-001..003, CUST-001..003, BR-001..003 | UNCHANGED — not affected by D010-D013. |
 
+## Resolution additions — 2026-08-17 (Casaku QRIS primary gateway, D017)
+
+Client supplied Casaku (ex-Cashify; migrated to Casaku.id) credentials and approved implementation with the Casaku API contract; see `docs/DECISION-LOG.md` D017.
+
+| ID | Resolution |
+|---|---|
+| PAY-001 | RESOLVED — Payment provider: **Casaku QRIS (primary)** + **Midtrans (backup)** (D017; supersedes the PAY-001 Midtrans-only resolution line above). Casaku = `cashify.my.id` rebrand (migrated to `casaku.id`, API `api.casaku.id`); license key, webhook secret, and QRIS Merchant ID supplied by client. |
+| PAY-003 | RESOLVED — Webhook/status mapping implemented for Casaku (HMAC-SHA256 `X-Casaku-Signature` verification, `POST /api/generate/check-status` polling, idempotent paid transition with nominal cross-check) and Midtrans (existing signature verification). Refund/settlement behavior (PAY-004) remains UNKNOWN. |
+| TECH-003 | PARTIAL — Casaku, Midtrans, RajaOngkir, Resend, Clerk confirmed. WhatsApp, Brevo, GA4, Search Console remain UNKNOWN. |
+
 ## Phase 4 data-architecture additions
 
 These entries were added because Phase 4 exposed target-data/migration decisions not represented as separate rows in the original registry. Existing entries remain unchanged; these additions do not resolve or replace them.

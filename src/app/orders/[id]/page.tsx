@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 
 declare global {
@@ -50,6 +51,19 @@ interface Order {
   shippingMethod: string | null;
   items: OrderItem[];
   statusHistory: StatusHistory[];
+  casakuTransactionId?: string | null;
+  casakuTotalAmount?: string | number | null;
+  casakuQrString?: string | null;
+  casakuExpiresAt?: string | null;
+}
+
+function casakuQrImageUrl(data: string): string {
+  const url = new URL("https://larabert-qrgen.hf.space/v1/create-qr-code");
+  url.searchParams.set("size", "300x300");
+  url.searchParams.set("style", "2");
+  url.searchParams.set("color", "111111");
+  url.searchParams.set("data", data);
+  return url.toString();
 }
 
 const statusConfig: Record<
@@ -133,6 +147,10 @@ function OrderDetailInner() {
   const [selectedMidtransMethod, setSelectedMidtransMethod] = useState<
     "qris" | "bca_va" | "mandiri_va" | "bri_va" | "cc"
   >("qris");
+  const [checkingCasaku, setCheckingCasaku] = useState(false);
+  const [casakuError, setCasakuError] = useState<string | null>(null);
+  const [qrImageFailed, setQrImageFailed] = useState(false);
+  const [casakuCountdown, setCasakuCountdown] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isSignedIn || !params?.id) return;
@@ -184,6 +202,70 @@ function OrderDetailInner() {
       window.removeEventListener("focus", loadOrder);
     };
   }, [isSignedIn, params?.id]);
+
+  // Countdown for an active Casaku QR.
+  useEffect(() => {
+    if (!order?.casakuExpiresAt || order.status !== "PENDING_PAYMENT") return;
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        Math.floor(
+          (new Date(order.casakuExpiresAt as string).getTime() - Date.now()) /
+            1000,
+        ),
+      );
+      setCasakuCountdown(remaining);
+      if (remaining === 0) setCasakuCountdown(null);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [order?.casakuExpiresAt, order?.status]);
+
+  const handleCheckCasakuStatus = async () => {
+    if (!order?.casakuTransactionId) return;
+    setCheckingCasaku(true);
+    setCasakuError(null);
+
+    try {
+      const res = await fetch("/api/payments/casaku/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactionId: order.casakuTransactionId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCasakuError(
+          data?.error || "Gagal memeriksa status pembayaran. Coba lagi.",
+        );
+        setCheckingCasaku(false);
+        return;
+      }
+
+      if (data?.order?.status === "PAID") {
+        setOrder((prev) => (prev ? { ...prev, status: "PAID" } : prev));
+        router.refresh();
+        setCheckingCasaku(false);
+        return;
+      }
+
+      if (data?.order?.status === "CANCELLED") {
+        setOrder((prev) => (prev ? { ...prev, status: "CANCELLED" } : prev));
+        setCasakuError(
+          "Pembayaran QRIS tidak ditemukan atau dibatalkan. Silakan hubungi CS.",
+        );
+        setCheckingCasaku(false);
+        return;
+      }
+
+      setCasakuError("Pembayaran belum terdeteksi. Silakan scan ulang QRIS.");
+      setCheckingCasaku(false);
+    } catch {
+      setCasakuError("Gagal memeriksa status pembayaran. Coba lagi.");
+      setCheckingCasaku(false);
+    }
+  };
 
   const handlePayWithMidtrans = async () => {
     if (!order) return;
@@ -354,13 +436,13 @@ function OrderDetailInner() {
       num: 1,
       title: "Pesanan Dibuat",
       desc: isUnpaid
-        ? "Menunggu pembayaran pelanggan via Midtrans"
+        ? "Menunggu pembayaran pelanggan via QRIS / Midtrans"
         : "Pesanan berhasil dicatat",
     },
     {
       num: 2,
       title: "Pembayaran Diterima",
-      desc: "Pembayaran Midtrans Snap terverifikasi lunas",
+      desc: "Pembayaran QRIS / Midtrans terverifikasi lunas",
     },
     {
       num: 3,
@@ -434,8 +516,107 @@ function OrderDetailInner() {
 
       {/* Main Container */}
       <main className="container px-4 mx-auto py-8">
-        {/* PROMINENT MIDTRANS PAYMENT HERO (Displayed when UNPAID) */}
-        {isUnpaid && (
+        {/* PROMINENT PAYMENT HERO (Displayed when UNPAID) */}
+        {isUnpaid && order.casakuTransactionId ? (
+          <div className="mb-8 bg-white rounded-3xl border-2 border-primary-500 p-6 md:p-8 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="relative w-52 h-52 rounded-2xl border border-supporting-200 bg-white p-3 shadow-sm flex-shrink-0">
+                {order.casakuQrString && !qrImageFailed ? (
+                  <Image
+                    src={casakuQrImageUrl(order.casakuQrString)}
+                    alt="Kode QRIS Pena Ameen"
+                    fill
+                    sizes="208px"
+                    className="object-contain rounded-xl"
+                    onError={() => setQrImageFailed(true)}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-center text-[11px] text-supporting-500 px-3">
+                    Gagal memuat QR. Gunakan tombol &quot;Cek Status
+                    Pembayaran&quot; setelah membayar.
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-3 text-sm">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-bold">
+                  <span className="animate-pulse">⏳</span>
+                  <span>Menunggu Pembayaran QRIS (Casaku)</span>
+                </div>
+                <h2 className="text-2xl font-serif font-bold text-primary-950">
+                  Scan QRIS untuk Membayar
+                </h2>
+
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-0.5">
+                    Nominal yang Harus Dibayar
+                  </p>
+                  <p className="text-2xl font-bold font-mono text-emerald-800">
+                    Rp
+                    {Number(
+                      order.casakuTotalAmount ?? order.total,
+                    ).toLocaleString("id-ID")}
+                  </p>
+                </div>
+
+                {casakuCountdown !== null && (
+                  <p className="text-xs text-supporting-600">
+                    QR berlaku hingga:{" "}
+                    <span
+                      className={
+                        casakuCountdown <= 60
+                          ? "text-red-600 font-bold"
+                          : "text-supporting-800 font-semibold"
+                      }
+                    >
+                      {Math.floor(casakuCountdown / 60)}:
+                      {String(casakuCountdown % 60).padStart(2, "0")}
+                    </span>
+                  </p>
+                )}
+
+                {casakuError && (
+                  <p className="text-xs text-red-600 font-medium">
+                    {casakuError}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCheckCasakuStatus}
+                    disabled={checkingCasaku}
+                    className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-2"
+                  >
+                    {checkingCasaku ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
+                        <span>Memeriksa...</span>
+                      </>
+                    ) : (
+                      <span>✓ Saya Sudah Bayar</span>
+                    )}
+                  </button>
+                  {order.casakuQrString && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          order.casakuQrString as string,
+                        );
+                        alert("Kode QRIS berhasil disalin!");
+                      }}
+                      className="px-5 py-2.5 bg-white border border-supporting-300 hover:bg-supporting-50 text-supporting-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                    >
+                      Salin Kode QR
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : isUnpaid ? (
           <div className="mb-8 bg-gradient-to-r from-amber-500/10 via-primary-600/10 to-amber-500/10 rounded-3xl border-2 border-primary-500 p-6 md:p-8 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-bold">
@@ -475,7 +656,7 @@ function OrderDetailInner() {
               </button>
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* 2 COLUMNS LAYOUT: Tracking & Invoice Details */}
         <div className="grid gap-8 lg:grid-cols-12 items-start">

@@ -184,8 +184,9 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
         status: paymentStat === "paid" ? "succeeded" : "pending",
         amount: Number(db.total),
         currency: "IDR",
-        provider: "midtrans",
-        providerReference: db.midtransOrderId || db.orderNumber,
+        provider: db.casakuTransactionId ? "casaku" : "midtrans",
+        providerReference:
+          db.casakuTransactionId || db.midtransOrderId || db.orderNumber,
         createdAt: db.createdAt.toISOString(),
       },
     ],

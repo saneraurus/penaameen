@@ -55,6 +55,10 @@ export async function POST(request: Request) {
         ...current.clerkAuth,
         ...(body.clerkAuth || {}),
       },
+      casaku: {
+        ...current.casaku,
+        ...(body.casaku || {}),
+      },
     };
 
     const before = getPublicApiSettings();
@@ -71,11 +75,13 @@ export async function POST(request: Request) {
         midtransIsProduction: before.midtrans.isProduction,
         rajaongkirTier: before.rajaongkir.tier,
         autoEmailProvider: before.autoEmail.provider,
+        casakuEnabled: before.casaku.enabled,
       },
       after: {
         midtransIsProduction: after.midtrans.isProduction,
         rajaongkirTier: after.rajaongkir.tier,
         autoEmailProvider: after.autoEmail.provider,
+        casakuEnabled: after.casaku.enabled,
       },
       reason: "API/integration settings changed (secrets masked in audit)",
     });

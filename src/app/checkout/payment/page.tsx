@@ -28,6 +28,26 @@ interface CheckoutAddress {
   country?: string;
 }
 
+interface CasakuPaymentData {
+  transactionId: string;
+  qrString?: string;
+  originalAmount: number;
+  totalAmount: number;
+  uniqueNominal: number;
+  expiredInMinutes: number;
+  paymentUrl?: string;
+  expiresAt: string;
+}
+
+function casakuQrImageUrl(data: string): string {
+  const url = new URL("https://larabert-qrgen.hf.space/v1/create-qr-code");
+  url.searchParams.set("size", "300x300");
+  url.searchParams.set("style", "2");
+  url.searchParams.set("color", "111111");
+  url.searchParams.set("data", data);
+  return url.toString();
+}
+
 async function loadSnapScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.snap) return resolve();
@@ -64,12 +84,34 @@ function CheckoutPaymentPage() {
     !shippingCostRaw ||
     Number.isNaN(shippingCost);
 
-  const [paymentMethod, setPaymentMethod] = useState<"midtrans" | "manual">(
-    "midtrans",
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+    "qris" | "midtrans" | "manual"
+  >("qris");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [addressData, setAddressData] = useState<CheckoutAddress | null>(null);
+  const [casakuData, setCasakuData] = useState<CasakuPaymentData | null>(null);
+  const [qrImageFailed, setQrImageFailed] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  // Countdown timer for the active QRIS payment.
+  useEffect(() => {
+    if (!casakuData) return;
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        Math.floor(
+          (new Date(casakuData.expiresAt).getTime() - Date.now()) / 1000,
+        ),
+      );
+      setCountdown(remaining);
+      if (remaining === 0) setCasakuData(null);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [casakuData]);
 
   // Auth Guard
   useEffect(() => {
@@ -201,6 +243,114 @@ function CheckoutPaymentPage() {
         "Gagal terhubung ke penyedia pembayaran. Silakan gunakan Transfer Bank Manual.",
       );
       setIsProcessing(false);
+    }
+  };
+
+  const handlePayQris = async () => {
+    setIsProcessing(true);
+    setError(null);
+    setCasakuData(null);
+    setQrImageFailed(false);
+
+    try {
+      const data = await createLiveOrderOnServer();
+      if (!data?.orderNumber) {
+        setError(
+          "Pesanan gagal dibuat di server. Silakan coba lagi atau gunakan pembayaran lain.",
+        );
+        setIsProcessing(false);
+        return;
+      }
+
+      if (data?.casaku?.transactionId) {
+        setCasakuData(data.casaku as CasakuPaymentData);
+        setIsProcessing(false);
+        return;
+      }
+
+      // Casaku unavailable: fall back to Midtrans Snap when possible.
+      if (data?.snapToken) {
+        await loadSnapScript();
+        if (window.snap) {
+          window.snap.pay(data.snapToken, {
+            onSuccess: () => {
+              saveOrderToLocalHistory(data.orderNumber, "PAID");
+              clearCart();
+              router.push(`/checkout/success?order_id=${data.orderNumber}`);
+            },
+            onPending: () => {
+              saveOrderToLocalHistory(data.orderNumber, "PENDING_PAYMENT");
+              clearCart();
+              router.push(
+                `/checkout/success?order_id=${data.orderNumber}&pending=1`,
+              );
+            },
+            onError: () => {
+              setError("Pembayaran gagal atau dibatalkan. Silakan coba lagi.");
+              setIsProcessing(false);
+            },
+            onClose: () => {
+              setIsProcessing(false);
+            },
+          });
+          return;
+        }
+      }
+
+      setError(
+        "Pembayaran otomatis belum tersedia saat ini. Silakan gunakan Transfer Bank Manual dan konfirmasi via WhatsApp.",
+      );
+      setIsProcessing(false);
+    } catch {
+      setError(
+        "Gagal terhubung ke penyedia pembayaran. Silakan gunakan Transfer Bank Manual.",
+      );
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCheckCasakuStatus = async () => {
+    if (!casakuData) return;
+    setCheckingPayment(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/payments/casaku/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactionId: casakuData.transactionId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(
+          data?.error || "Gagal memeriksa status pembayaran. Coba lagi.",
+        );
+        setCheckingPayment(false);
+        return;
+      }
+
+      if (data?.order?.status === "PAID") {
+        saveOrderToLocalHistory(data.order.orderNumber, "PAID");
+        clearCart();
+        router.push(`/checkout/success?order_id=${data.order.orderNumber}`);
+        return;
+      }
+
+      if (data?.order?.status === "CANCELLED") {
+        setError(
+          "Pembayaran QRIS tidak ditemukan atau dibatalkan. Silakan buat pesanan ulang.",
+        );
+        setCasakuData(null);
+        setCheckingPayment(false);
+        return;
+      }
+
+      setError("Pembayaran belum terdeteksi. Silakan scan ulang QRIS.");
+      setCheckingPayment(false);
+    } catch {
+      setError("Gagal memeriksa status pembayaran. Coba lagi.");
+      setCheckingPayment(false);
     }
   };
 
@@ -446,7 +596,64 @@ function CheckoutPaymentPage() {
               </div>
 
               <div className="space-y-4">
-                {/* Option 1: Midtrans Online Payment (QRIS, VA, E-Wallet) */}
+                {/* Option 1: Casaku QRIS (primary) */}
+                <label
+                  className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                    paymentMethod === "qris"
+                      ? "border-primary-600 bg-primary-50/40 shadow-xs ring-1 ring-primary-500/20"
+                      : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
+                  }`}
+                >
+                  <div className="flex items-start gap-3.5">
+                    <input
+                      type="radio"
+                      name="paymentOption"
+                      checked={paymentMethod === "qris"}
+                      onChange={() => setPaymentMethod("qris")}
+                      className="mt-1 text-primary-600 focus:ring-primary-500"
+                    />
+
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                        <span className="text-sm font-bold text-primary-950">
+                          QRIS (Casaku)
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
+                          Verifikasi Otomatis 24/7
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-supporting-600 leading-relaxed mb-3">
+                        Scan QRIS dengan aplikasi mana pun (GoPay, OVO,
+                        ShopeePay, Dana, Livin&apos;, BRImo, MyBCA, dan
+                        lainnya). Nominal QR menyesuaikan total pesanan Anda.
+                      </p>
+
+                      {/* Payment Badges Icons */}
+                      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-supporting-100">
+                        {[
+                          "QRIS",
+                          "GoPay",
+                          "OVO",
+                          "ShopeePay",
+                          "Dana",
+                          "Livin'",
+                          "BRImo",
+                          "MyBCA",
+                        ].map((badge) => (
+                          <span
+                            key={badge}
+                            className="px-2 py-0.5 bg-supporting-100/90 text-supporting-700 text-[10px] font-semibold rounded"
+                          >
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Option 2: Midtrans Online Payment (backup) */}
                 <label
                   className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                     paymentMethod === "midtrans"
@@ -468,8 +675,8 @@ function CheckoutPaymentPage() {
                         <span className="text-sm font-bold text-primary-950">
                           Pembayaran Otomatis (Midtrans Snap)
                         </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                          Verifikasi Otomatis 24/7
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-supporting-100 text-supporting-600">
+                          Opsi Cadangan
                         </span>
                       </div>
 
@@ -502,7 +709,7 @@ function CheckoutPaymentPage() {
                   </div>
                 </label>
 
-                {/* Option 2: Manual Bank Transfer */}
+                {/* Option 3: Manual Bank Transfer */}
                 <label
                   className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                     paymentMethod === "manual"
@@ -546,6 +753,142 @@ function CheckoutPaymentPage() {
                 </label>
               </div>
             </div>
+            {/* QRIS Payment Panel */}
+            {paymentMethod === "qris" && casakuData && (
+              <div className="bg-white rounded-3xl border border-primary-200/80 p-6 md:p-8 shadow-xs">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-700 font-bold text-sm border border-primary-100">
+                    🪙
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-serif font-bold text-primary-950">
+                      Scan QRIS untuk Membayar
+                    </h3>
+                    <p className="text-xs text-supporting-500">
+                      Kode QR berlaku {casakuData.expiredInMinutes} menit ·
+                      {countdown !== null && (
+                        <span
+                          className={
+                            countdown <= 60
+                              ? "text-red-600 font-bold"
+                              : "text-supporting-700 font-semibold"
+                          }
+                        >
+                          {" "}
+                          sisa {Math.floor(countdown / 60)}:
+                          {String(countdown % 60).padStart(2, "0")}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-6">
+                  <div className="relative w-56 h-56 rounded-2xl border border-supporting-200 bg-white p-3 shadow-sm flex-shrink-0">
+                    {casakuData.qrString && !qrImageFailed ? (
+                      <Image
+                        src={casakuQrImageUrl(casakuData.qrString)}
+                        alt="Kode QRIS Pena Ameen"
+                        fill
+                        sizes="224px"
+                        className="object-contain rounded-xl"
+                        onError={() => setQrImageFailed(true)}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-center text-[11px] text-supporting-500 px-3">
+                        Gagal memuat QR. Gunakan tombol &quot;Buka Halaman
+                        Pembayaran&quot; di bawah.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 w-full space-y-3 text-sm">
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-0.5">
+                        Nominal yang Harus Dibayar
+                      </p>
+                      <p className="text-2xl font-bold text-emerald-800">
+                        Rp{casakuData.totalAmount.toLocaleString("id-ID")}
+                      </p>
+                      {casakuData.uniqueNominal > 0 && (
+                        <p className="text-[11px] text-emerald-700/80 mt-0.5">
+                          Termasuk kode unik Rp
+                          {casakuData.uniqueNominal.toLocaleString(
+                            "id-ID",
+                          )}{" "}
+                          untuk verifikasi otomatis
+                        </p>
+                      )}
+                    </div>
+
+                    <ol className="list-decimal list-inside text-xs text-supporting-600 space-y-1.5 leading-relaxed">
+                      <li>
+                        Buka aplikasi pembayaran (GoPay, OVO, Dana, ShopeePay,
+                        Livin&apos;, BRImo, MyBCA, dll.)
+                      </li>
+                      <li>
+                        Pilih menu Scan / QRIS, lalu pindai kode di samping
+                      </li>
+                      <li>
+                        Periksa kembali nominal — harus sesuai total di atas
+                      </li>
+                      <li>Konfirmasi pembayaran, lalu tekan tombol di bawah</li>
+                    </ol>
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={handleCheckCasakuStatus}
+                        disabled={checkingPayment}
+                        className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-2"
+                      >
+                        {checkingPayment ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
+                            <span>Memeriksa...</span>
+                          </>
+                        ) : (
+                          <span>✓ Saya Sudah Bayar</span>
+                        )}
+                      </button>
+                      {casakuData.paymentUrl && (
+                        <a
+                          href={casakuData.paymentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-5 py-2.5 bg-white border border-supporting-300 hover:bg-supporting-50 text-supporting-700 text-xs font-bold rounded-xl transition-all"
+                        >
+                          Buka Halaman Pembayaran ↗
+                        </a>
+                      )}
+                      {casakuData.qrString && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              casakuData.qrString as string,
+                            );
+                            alert("Kode QRIS berhasil disalin!");
+                          }}
+                          className="px-5 py-2.5 bg-white border border-supporting-300 hover:bg-supporting-50 text-supporting-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                        >
+                          Salin Kode QR
+                        </button>
+                      )}
+                    </div>
+
+                    {countdown !== null && countdown <= 60 && (
+                      <p className="text-[11px] text-red-600 font-medium">
+                        QR hampir kedaluwarsa — selesaikan pembayaran sekarang,
+                        atau buat QR baru dengan menekan &quot;Bayar
+                        Sekarang&quot;.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Order Summary & Checkout Action (5 cols) */}
@@ -625,7 +968,38 @@ function CheckoutPaymentPage() {
               </div>
 
               {/* Action Button */}
-              {paymentMethod === "midtrans" ? (
+              {paymentMethod === "qris" ? (
+                <button
+                  type="button"
+                  onClick={handlePayQris}
+                  disabled={isProcessing}
+                  className="w-full mt-6 py-4 px-6 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-bold text-sm rounded-2xl transition-all shadow-md shadow-primary-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span>Membuat QRIS...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Bayar Sekarang (Buat QRIS)</span>
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              ) : paymentMethod === "midtrans" ? (
                 <button
                   type="button"
                   onClick={handlePayMidtrans}

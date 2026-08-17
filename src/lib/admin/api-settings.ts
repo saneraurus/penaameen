@@ -40,6 +40,16 @@ export interface ApiSettings {
     secretKey: string;
     adminEmails: string;
   };
+  casaku: {
+    enabled: boolean;
+    licenseKey: string;
+    webhookSecret: string;
+    qrId: string;
+    packageIds: string[];
+    expiryMinutes: number;
+    apiBaseUrl: string;
+    webhookUrl: string;
+  };
 }
 
 const SETTINGS_FILE = path.join(process.cwd(), "src/data/api_settings.json");
@@ -52,6 +62,7 @@ const SECRET_FIELDS: Record<keyof ApiSettings, readonly string[]> = {
   autoEmail: ["apiKey", "smtpPass"],
   emailForwarding: [],
   clerkAuth: ["secretKey", "publishableKey"],
+  casaku: ["licenseKey", "webhookSecret"],
 };
 
 export function isMaskedSecret(value: string): boolean {
@@ -154,6 +165,21 @@ function resolveEnvSecrets(): ApiSettings {
       secretKey: process.env.CLERK_SECRET_KEY || "",
       adminEmails,
     },
+    casaku: {
+      enabled: Boolean(process.env.CASAKU_LICENSE_KEY),
+      licenseKey: process.env.CASAKU_LICENSE_KEY || "",
+      webhookSecret: process.env.CASAKU_WEBHOOK_SECRET || "",
+      qrId: process.env.CASAKU_QR_ID || "",
+      packageIds: (process.env.CASAKU_PACKAGE_IDS || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean),
+      expiryMinutes: Number(process.env.CASAKU_EXPIRY_MINUTES) || 15,
+      apiBaseUrl: process.env.CASAKU_API_BASE_URL || "https://api.casaku.id",
+      webhookUrl: process.env.APP_BASE_URL
+        ? `${process.env.APP_BASE_URL}/api/webhooks/casaku`
+        : "",
+    },
   };
 }
 
@@ -215,6 +241,7 @@ function normalizeStoredSettings(
     autoEmail: mergeGroup("autoEmail"),
     emailForwarding: mergeGroup("emailForwarding"),
     clerkAuth: mergeGroup("clerkAuth"),
+    casaku: mergeGroup("casaku"),
   };
 }
 
