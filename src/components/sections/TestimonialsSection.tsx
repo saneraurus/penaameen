@@ -62,7 +62,8 @@ export function TestimonialsSection() {
             </h2>
 
             <p className="text-xs sm:text-sm text-supporting-600 leading-relaxed mb-5">
-              Pengalaman nyata mendampingi anak dan pemula lancar membaca dan mengaji dengan metode Al-Barqy dan ACM.
+              Pengalaman nyata mendampingi anak dan pemula lancar membaca dan
+              mengaji dengan metode Al-Barqy dan ACM.
             </p>
 
             {/* Overall Rating Stats Pill */}

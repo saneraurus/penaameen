@@ -8,8 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-const NVIDIA_ENDPOINT =
-  "https://integrate.api.nvidia.com/v1/chat/completions";
+const NVIDIA_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
 
 type AssistantProvider = {
   name: string;
@@ -103,7 +102,11 @@ async function callProvider(
 
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      return { ok: false, status: response.status, detail: detail.slice(0, 500) };
+      return {
+        ok: false,
+        status: response.status,
+        detail: detail.slice(0, 500),
+      };
     }
 
     const data = (await response.json()) as {
@@ -326,7 +329,11 @@ async function resolveChatSession(input: {
     const session = await prisma.chatSession.create({
       data: { sessionId: crypto.randomUUID() },
     });
-    return { sessionId: session.sessionId, dbSessionId: session.id, history: [] };
+    return {
+      sessionId: session.sessionId,
+      dbSessionId: session.id,
+      history: [],
+    };
   } catch {
     // DB unavailable - fall back to a stateless session.
     return {
@@ -377,7 +384,9 @@ function buildSystemPrompt(input: {
   const priorSection =
     input.priorConversation.length > 0
       ? input.priorConversation
-          .map((m) => `${m.role === "user" ? "Pelanggan" : "AMEEN"}: ${m.content}`)
+          .map(
+            (m) => `${m.role === "user" ? "Pelanggan" : "AMEEN"}: ${m.content}`,
+          )
           .join("\n")
       : "(tidak ada percakapan sebelumnya)";
 
@@ -497,7 +506,10 @@ export async function POST(request: Request) {
             { role: "assistant", content: result.reply },
           ]);
         }
-        return NextResponse.json({ reply: result.reply, sessionId: session.sessionId });
+        return NextResponse.json({
+          reply: result.reply,
+          sessionId: session.sessionId,
+        });
       }
       console.error(
         `Assistant provider "${provider.name}" failed (${result.status ?? "network"}): ${result.detail ?? "unknown"}`,

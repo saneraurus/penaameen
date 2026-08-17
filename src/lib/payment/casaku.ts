@@ -175,7 +175,20 @@ export class CasakuClient {
     expiredInMinutes?: number;
     prefix?: string;
   }): Promise<CasakuQrisData> {
-    return this.request<CasakuQrisData>("/api/generate/v2/qris", {
+    // The Casaku v2 API uses snake_case field names (qr_string, payment_url);
+    // normalize them to the camelCase contract used across this codebase.
+    const raw = await this.request<{
+      transactionId: string;
+      qr_string?: string;
+      originalAmount: number;
+      totalAmount: number;
+      uniqueNominal: number;
+      useUniqueCode: boolean;
+      packageIds: string[];
+      expiredInMinutes: number;
+      status: CasakuPaymentStatus;
+      payment_url?: string;
+    }>("/api/generate/v2/qris", {
       body: {
         qr_id: params.qrId ?? this.qrId,
         amount: params.amount,
@@ -190,6 +203,19 @@ export class CasakuClient {
         prefix: params.prefix ?? this.prefix,
       },
     });
+
+    return {
+      transactionId: raw.transactionId,
+      qrString: raw.qr_string,
+      originalAmount: raw.originalAmount,
+      totalAmount: raw.totalAmount,
+      uniqueNominal: raw.uniqueNominal,
+      useUniqueCode: raw.useUniqueCode,
+      packageIds: raw.packageIds ?? this.packageIds,
+      expiredInMinutes: raw.expiredInMinutes,
+      status: raw.status,
+      paymentUrl: raw.payment_url,
+    };
   }
 
   async checkStatus(transactionId: string): Promise<CasakuCheckStatusData> {

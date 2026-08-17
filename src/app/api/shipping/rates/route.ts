@@ -156,19 +156,21 @@ function calculateStandardIndonesianRates(
   let baseJneOke = 14000;
   let baseJntEz = 18000;
   let baseSicepatReg = 17000;
-  let baseSicepatBest = 27000;
   let basePosKilat = 16000;
   let etdReg = "2-3";
   let etdYes = "1";
   let etdPos = "2-4";
 
-  if (c.includes("surabaya") || c.includes("sidoarjo") || c.includes("gresik")) {
+  if (
+    c.includes("surabaya") ||
+    c.includes("sidoarjo") ||
+    c.includes("gresik")
+  ) {
     baseJneReg = 8000;
     baseJneYes = 15000;
     baseJneOke = 7000;
     baseJntEz = 9000;
     baseSicepatReg = 8000;
-    baseSicepatBest = 14000;
     basePosKilat = 8000;
     etdReg = "1-2";
     etdYes = "1";
@@ -179,7 +181,6 @@ function calculateStandardIndonesianRates(
     baseJneOke = 9000;
     baseJntEz = 12000;
     baseSicepatReg = 11000;
-    baseSicepatBest = 19000;
     basePosKilat = 10000;
     etdReg = "1-2";
     etdYes = "1";
@@ -200,7 +201,6 @@ function calculateStandardIndonesianRates(
     baseJneOke = 13000;
     baseJntEz = 18000;
     baseSicepatReg = 17000;
-    baseSicepatBest = 28000;
     basePosKilat = 16000;
     etdReg = "2-3";
     etdYes = "1";
@@ -211,18 +211,21 @@ function calculateStandardIndonesianRates(
     baseJneOke = 18000;
     baseJntEz = 23000;
     baseSicepatReg = 22000;
-    baseSicepatBest = 36000;
     basePosKilat = 20000;
     etdReg = "2-4";
     etdYes = "1-2";
     etdPos = "3-5";
-  } else if (p.includes("sumatera") || p.includes("sumatra") || p.includes("riau") || p.includes("lampung")) {
+  } else if (
+    p.includes("sumatera") ||
+    p.includes("sumatra") ||
+    p.includes("riau") ||
+    p.includes("lampung")
+  ) {
     baseJneReg = 29000;
     baseJneYes = 48000;
     baseJneOke = 24000;
     baseJntEz = 30000;
     baseSicepatReg = 29000;
-    baseSicepatBest = 46000;
     basePosKilat = 28000;
     etdReg = "3-4";
     etdYes = "1-2";
@@ -233,7 +236,6 @@ function calculateStandardIndonesianRates(
     baseJneOke = 30000;
     baseJntEz = 38000;
     baseSicepatReg = 36000;
-    baseSicepatBest = 55000;
     basePosKilat = 34000;
     etdReg = "3-5";
     etdYes = "2-3";
@@ -244,7 +246,6 @@ function calculateStandardIndonesianRates(
     baseJneOke = 52000;
     baseJntEz = 68000;
     baseSicepatReg = 65000;
-    baseSicepatBest = 90000;
     basePosKilat = 58000;
     etdReg = "4-7";
     etdYes = "3-4";
@@ -349,7 +350,8 @@ export async function POST(request: Request) {
 
     if (totalWeight <= 0 && parsed.items && parsed.items.length > 0) {
       totalWeight = parsed.items.reduce(
-        (sum, item) => sum + (item.quantity || 1) * ASSUMED_WEIGHT_GRAMS_PER_ITEM,
+        (sum, item) =>
+          sum + (item.quantity || 1) * ASSUMED_WEIGHT_GRAMS_PER_ITEM,
         0,
       );
     }
@@ -383,7 +385,10 @@ export async function POST(request: Request) {
       const settings = getApiSettings();
       apiKey = settings.rajaongkir?.apiKey || apiKey;
       originCityId = settings.rajaongkir?.originCityId || originCityId;
-      if (settings.rajaongkir?.enabledCouriers && settings.rajaongkir.enabledCouriers.length > 0) {
+      if (
+        settings.rajaongkir?.enabledCouriers &&
+        settings.rajaongkir.enabledCouriers.length > 0
+      ) {
         enabledCouriers = settings.rajaongkir.enabledCouriers.filter(Boolean);
       }
     } catch {
@@ -408,19 +413,23 @@ export async function POST(request: Request) {
             enabledCouriers,
           );
 
-          if (ratesResponse?.rajaongkir?.results && ratesResponse.rajaongkir.results.length > 0) {
-            const formattedRates = ratesResponse.rajaongkir.results.flatMap((courier) =>
-              courier.costs.flatMap((cost) =>
-                cost.cost.map((c) => ({
-                  courier: courier.code,
-                  courierName: courier.name,
-                  service: cost.service,
-                  description: cost.description,
-                  cost: c.value,
-                  etd: c.etd,
-                  note: c.note || "",
-                })),
-              ),
+          if (
+            ratesResponse?.rajaongkir?.results &&
+            ratesResponse.rajaongkir.results.length > 0
+          ) {
+            const formattedRates = ratesResponse.rajaongkir.results.flatMap(
+              (courier) =>
+                courier.costs.flatMap((cost) =>
+                  cost.cost.map((c) => ({
+                    courier: courier.code,
+                    courierName: courier.name,
+                    service: cost.service,
+                    description: cost.description,
+                    cost: c.value,
+                    etd: c.etd,
+                    note: c.note || "",
+                  })),
+                ),
             );
 
             if (formattedRates.length > 0) {
@@ -434,7 +443,10 @@ export async function POST(request: Request) {
           }
         }
       } catch (err) {
-        console.warn("[Shipping API] Live RajaOngkir query failed, using official tariff engine:", err);
+        console.warn(
+          "[Shipping API] Live RajaOngkir query failed, using official tariff engine:",
+          err,
+        );
       }
     }
 
@@ -456,7 +468,10 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
-    console.error("SHIPPING_RATE_ERROR:", error instanceof Error ? error.stack : error);
+    console.error(
+      "SHIPPING_RATE_ERROR:",
+      error instanceof Error ? error.stack : error,
+    );
 
     // Ultimate fallback so checkout never breaks
     const fallbackRates = calculateStandardIndonesianRates(

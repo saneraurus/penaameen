@@ -10,31 +10,40 @@ import { FeaturedProductSection } from "@/components/sections/FeaturedProductSec
 const LearningJourneySection = dynamic(
   () =>
     import("@/components/sections/LearningJourneySection").then(
-      (m) => m.LearningJourneySection
+      (m) => m.LearningJourneySection,
     ),
-  { ssr: true }
+  { ssr: true },
 );
 
 const TestimonialsSection = dynamic(
   () =>
     import("@/components/sections/TestimonialsSection").then(
-      (m) => m.TestimonialsSection
+      (m) => m.TestimonialsSection,
     ),
-  { ssr: true }
+  { ssr: true },
 );
 
 const EditorialStorySection = dynamic(
   () =>
     import("@/components/sections/EditorialStorySection").then(
-      (m) => m.EditorialStorySection
+      (m) => m.EditorialStorySection,
     ),
-  { ssr: true }
+  { ssr: true },
+);
+
+const GalleryPreviewSection = dynamic(
+  () =>
+    import("@/components/sections/GalleryPreviewSection").then(
+      (m) => m.GalleryPreviewSection,
+    ),
+  { ssr: true },
 );
 
 const articles = [
   {
     slug: "belajar-cepat-mengaji-untuk-anak",
-    title: "Belajar Cepat Mengaji untuk Anak: Kunci Konsistensi 15 Menit Sehari",
+    title:
+      "Belajar Cepat Mengaji untuk Anak: Kunci Konsistensi 15 Menit Sehari",
     category: "Tips Belajar",
     image: "/images/penaameen/editorial/anak-belajar-mengaji.jpg",
     date: "12 Januari 2026",
@@ -104,7 +113,12 @@ export default function HomePage() {
                   </h2>
 
                   <p className="text-sm sm:text-base text-supporting-600 leading-relaxed mb-6">
-                    PENA AMEEN menerbitkan metode legendaris <strong>AL-BARQY</strong> (Cepat Baca Al-Qur&apos;an 200 Menit Anti-Lupa) dan <strong>ACM</strong> (Aku Cepat Membaca Tanpa Mengeja). Kami telah mendampingi lebih dari 8.000+ keluarga dan 500+ TPQ/sekolah di Indonesia dan Asia Tenggara.
+                    PENA AMEEN menerbitkan metode legendaris{" "}
+                    <strong>AL-BARQY</strong> (Cepat Baca Al-Qur&apos;an 200
+                    Menit Anti-Lupa) dan <strong>ACM</strong> (Aku Cepat Membaca
+                    Tanpa Mengeja). Kami telah mendampingi lebih dari 8.000+
+                    keluarga dan 500+ TPQ/sekolah di Indonesia dan Asia
+                    Tenggara.
                   </p>
 
                   {/* 3 Pillars */}
@@ -123,13 +137,20 @@ export default function HomePage() {
                         desc: "Standar kurikulum resmi ratusan lembaga TPQ, sekolah dasar, dan program literasi.",
                       },
                     ].map((pillar, idx) => (
-                      <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl bg-supporting-50/70 border border-supporting-200/80">
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 p-3 rounded-2xl bg-supporting-50/70 border border-supporting-200/80"
+                      >
                         <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                           ✓
                         </span>
                         <div>
-                          <h4 className="text-xs sm:text-sm font-bold text-primary-950">{pillar.title}</h4>
-                          <p className="text-[11px] sm:text-xs text-supporting-600 leading-snug">{pillar.desc}</p>
+                          <h4 className="text-xs sm:text-sm font-bold text-primary-950">
+                            {pillar.title}
+                          </h4>
+                          <p className="text-[11px] sm:text-xs text-supporting-600 leading-snug">
+                            {pillar.desc}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -224,25 +245,29 @@ export default function HomePage() {
             {[
               {
                 title: "Anak Usia Dini (PAUD/TK)",
-                description: "Lancar membaca huruf Latin tanpa mengeja dan bebas stres.",
+                description:
+                  "Lancar membaca huruf Latin tanpa mengeja dan bebas stres.",
                 image: "/images/penaameen/products/aktivitas.jpg",
                 badge: "Metode ACM",
               },
               {
                 title: "Orang Tua di Rumah",
-                description: "Modul pendampingan mandiri praktis 15 menit per hari.",
+                description:
+                  "Modul pendampingan mandiri praktis 15 menit per hari.",
                 image: "/images/penaameen/products/home-learning.jpg",
                 badge: "Home Learning",
               },
               {
                 title: "Guru & Pengajar TPQ",
-                description: "Perangkat peraga klasikal dinding dan panduan kurikulum kelas.",
+                description:
+                  "Perangkat peraga klasikal dinding dan panduan kurikulum kelas.",
                 image: "/images/penaameen/products/flashcard.jpg",
                 badge: "Alat Peraga Guru",
               },
               {
                 title: "Remaja, Dewasa & Mualaf",
-                description: "Kuasai membaca Al-Qur'an tartil dalam 200 menit tuntas.",
+                description:
+                  "Kuasai membaca Al-Qur'an tartil dalam 200 menit tuntas.",
                 image: "/images/penaameen/products/poster.jpg",
                 badge: "Al-Barqy 200 Menit",
               },
@@ -265,7 +290,9 @@ export default function HomePage() {
                     <h3 className="text-base font-serif font-bold text-primary-950 mb-1 leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-supporting-600 leading-relaxed">{item.description}</p>
+                    <p className="text-xs text-supporting-600 leading-relaxed">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               </Reveal>
@@ -321,21 +348,38 @@ export default function HomePage() {
                       ACM (Aku Cepat Membaca)
                     </h3>
                     <p className="text-xs sm:text-sm text-supporting-600 leading-relaxed mb-6">
-                      Metode membaca aktif tanpa mengeja B-A = BA. Menggunakan pendekatan kata lembaga bermakna dan lagu edukatif ceria yang menjaga rasa gembira anak.
+                      Metode membaca aktif tanpa mengeja B-A = BA. Menggunakan
+                      pendekatan kata lembaga bermakna dan lagu edukatif ceria
+                      yang menjaga rasa gembira anak.
                     </p>
 
                     <div className="space-y-2.5 mb-6">
                       {[
-                        { title: "100% Tanpa Mengeja", desc: "Anak langsung membaca suku kata utuh secara spontan." },
-                        { title: "Tuntas 16–24 Sesi", desc: "Terukur dan cepat tanpa membebani daya ingat anak." },
-                        { title: "Ramah Anak ABK", desc: "Sangat efektif untuk terapi disleksia dan speech delay." },
+                        {
+                          title: "100% Tanpa Mengeja",
+                          desc: "Anak langsung membaca suku kata utuh secara spontan.",
+                        },
+                        {
+                          title: "Tuntas 16–24 Sesi",
+                          desc: "Terukur dan cepat tanpa membebani daya ingat anak.",
+                        },
+                        {
+                          title: "Ramah Anak ABK",
+                          desc: "Sangat efektif untuk terapi disleksia dan speech delay.",
+                        },
                       ].map((b, i) => (
-                        <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm">
+                        <div
+                          key={i}
+                          className="flex items-start gap-2.5 text-xs sm:text-sm"
+                        >
                           <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                             ✓
                           </span>
                           <p className="text-supporting-700">
-                            <strong className="text-primary-950">{b.title}:</strong> {b.desc}
+                            <strong className="text-primary-950">
+                              {b.title}:
+                            </strong>{" "}
+                            {b.desc}
                           </p>
                         </div>
                       ))}
@@ -390,21 +434,38 @@ export default function HomePage() {
                       AL-BARQY (Metode Anti-Lupa)
                     </h3>
                     <p className="text-xs sm:text-sm text-supporting-600 leading-relaxed mb-6">
-                      Metode cepat membaca Al-Qur&apos;an karya KH. Nursyamsu Muhadi sejak 1965. Membagi materi ke dalam 8 bab terstruktur yang tuntas dalam total durasi 200 menit.
+                      Metode cepat membaca Al-Qur&apos;an karya KH. Nursyamsu
+                      Muhadi sejak 1965. Membagi materi ke dalam 8 bab
+                      terstruktur yang tuntas dalam total durasi 200 menit.
                     </p>
 
                     <div className="space-y-2.5 mb-6">
                       {[
-                        { title: "Formula Kata Anti-Lupa", desc: "Rumus kata kunci fonetik A-DA-RA-JA, MA-HA-KA-YA." },
-                        { title: "Tuntas 200 Menit", desc: "8 sesi @ 25 menit efektif dari nol sampai tartil." },
-                        { title: "Tajwid Terapan", desc: "Langsung lancar membaca ayat Al-Qur'an tanpa rumus rumit." },
+                        {
+                          title: "Formula Kata Anti-Lupa",
+                          desc: "Rumus kata kunci fonetik A-DA-RA-JA, MA-HA-KA-YA.",
+                        },
+                        {
+                          title: "Tuntas 200 Menit",
+                          desc: "8 sesi @ 25 menit efektif dari nol sampai tartil.",
+                        },
+                        {
+                          title: "Tajwid Terapan",
+                          desc: "Langsung lancar membaca ayat Al-Qur'an tanpa rumus rumit.",
+                        },
                       ].map((b, i) => (
-                        <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm">
+                        <div
+                          key={i}
+                          className="flex items-start gap-2.5 text-xs sm:text-sm"
+                        >
                           <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                             ✓
                           </span>
                           <p className="text-supporting-700">
-                            <strong className="text-primary-950">{b.title}:</strong> {b.desc}
+                            <strong className="text-primary-950">
+                              {b.title}:
+                            </strong>{" "}
+                            {b.desc}
                           </p>
                         </div>
                       ))}
@@ -516,6 +577,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 10.5. Gallery Preview Section */}
+      <GalleryPreviewSection />
+
       {/* 11. Final CTA Section */}
       <section className="py-16 md:py-24 bg-primary-950 text-white relative overflow-hidden border-t border-primary-800">
         <div className="absolute inset-0 opacity-15 pointer-events-none">
@@ -536,7 +600,8 @@ export default function HomePage() {
               Mulai Perjalanan Belajar Membaca Sekarang.
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed max-w-xl mx-auto mb-8 drop-shadow-xs">
-              Pesan paket modul belajar orisinal bergaransi resmi dari Penerbit Pena Ameen atau konsultasikan kebutuhan kurikulum lembaga Anda.
+              Pesan paket modul belajar orisinal bergaransi resmi dari Penerbit
+              Pena Ameen atau konsultasikan kebutuhan kurikulum lembaga Anda.
             </p>
             <div className="flex flex-wrap gap-3.5 justify-center">
               <Link

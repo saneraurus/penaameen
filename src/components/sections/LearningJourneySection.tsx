@@ -27,13 +27,15 @@ export const journeyStages: JourneyStage[] = [
     number: "01",
     stepName: "Kenali Kebutuhan",
     title: "Identifikasi Gaya & Kesiapan Belajar",
-    subtitle: "Menemukan titik awal yang paling ramah dan nyaman bagi pembelajar.",
+    subtitle:
+      "Menemukan titik awal yang paling ramah dan nyaman bagi pembelajar.",
     description:
       "Setiap anak memiliki kesiapan dan kecepatan belajar yang berbeda. Evaluasi awal dilakukan secara informal tanpa tes yang membebani, memastikan anak merasa nyaman sejak hari pertama.",
     badge: "Langkah Awal",
     tagline: "Pondasi Belajar",
     image: "/images/penaameen/journey/step-1-kenali.jpg",
-    imageAlt: "Ibu dan anak berdiskusi hangat memeriksa kartu kesiapan belajar membaca",
+    imageAlt:
+      "Ibu dan anak berdiskusi hangat memeriksa kartu kesiapan belajar membaca",
     highlights: [
       {
         label: "Evaluasi Informal",
@@ -56,7 +58,8 @@ export const journeyStages: JourneyStage[] = [
     number: "02",
     stepName: "Pilih Metode",
     title: "Pilih Jalur Belajar yang Teruji",
-    subtitle: "ACM untuk membaca huruf Latin, atau AL-BARQY untuk mengaji Al-Qur'an.",
+    subtitle:
+      "ACM untuk membaca huruf Latin, atau AL-BARQY untuk mengaji Al-Qur'an.",
     description:
       "PENA AMEEN menghadirkan dua metode rujukan: ACM (Aku Cepat Membaca) tanpa mengeja untuk anak usia dini, dan AL-BARQY dengan formula kata anti-lupa 200 menit untuk membaca Al-Qur'an.",
     badge: "Kurikulum Teruji",
@@ -85,13 +88,15 @@ export const journeyStages: JourneyStage[] = [
     number: "03",
     stepName: "Gunakan Perangkat",
     title: "Lengkapi Media Pembelajaran Praktis",
-    subtitle: "Buku panduan, poster klasikal, flashcard interaktif & modul aktivitas.",
+    subtitle:
+      "Buku panduan, poster klasikal, flashcard interaktif & modul aktivitas.",
     description:
       "Perangkat fisik PENA AMEEN dirancang ergonomis dengan kertas tebal ramah anak. Media bantu ini memudahkan anak memahami materi secara visual dan kinestetik.",
     badge: "Media Lengkap",
     tagline: "Alat Peraga Edukatif",
     image: "/images/penaameen/journey/step-3-perangkat.jpg",
-    imageAlt: "Koleksi buku, kartu belajar hijaiyah, dan perangkat edukasi PENA AMEEN",
+    imageAlt:
+      "Koleksi buku, kartu belajar hijaiyah, dan perangkat edukasi PENA AMEEN",
     highlights: [
       {
         label: "Buku Panduan Step-by-Step",
@@ -120,7 +125,8 @@ export const journeyStages: JourneyStage[] = [
     badge: "Rutinitas Harian",
     tagline: "15–20 Menit/Hari",
     image: "/images/penaameen/journey/step-4-latihan.jpg",
-    imageAlt: "Ayah dan anak berlatih menulis dan membaca bersama di meja rumah",
+    imageAlt:
+      "Ayah dan anak berlatih menulis dan membaca bersama di meja rumah",
     highlights: [
       {
         label: "Durasi Efektif",
@@ -143,13 +149,15 @@ export const journeyStages: JourneyStage[] = [
     number: "05",
     stepName: "Tumbuh & Mandiri",
     title: "Kemandirian Literasi & Karakter Mulia",
-    subtitle: "Mampu membaca lancar, gemar belajar, dan memiliki kesiapan sekolah.",
+    subtitle:
+      "Mampu membaca lancar, gemar belajar, dan memiliki kesiapan sekolah.",
     description:
       "Hasil akhir dari proses belajar adalah tumbuhnya kemandirian membaca, kepercayaan diri menghadapi kurikulum sekolah dasar, serta kecintaan pada Al-Qur'an.",
     badge: "Hasil Nyata",
     tagline: "Mandiri & Berkarakter",
     image: "/images/penaameen/journey/step-5-tumbuh.jpg",
-    imageAlt: "Siswi Indonesia berprestasi tersenyum bangga membaca buku dengan percaya diri",
+    imageAlt:
+      "Siswi Indonesia berprestasi tersenyum bangga membaca buku dengan percaya diri",
     highlights: [
       {
         label: "Kemandirian Belajar",
@@ -185,7 +193,8 @@ export function LearningJourneySection() {
               Perjalanan Belajar Bersama PENA AMEEN
             </h2>
             <p className="text-xs sm:text-sm text-supporting-600">
-              Panduan terstruktur 5 langkah dari pengenalan awal hingga kemandirian membaca anak.
+              Panduan terstruktur 5 langkah dari pengenalan awal hingga
+              kemandirian membaca anak.
             </p>
           </div>
         </Reveal>
@@ -268,12 +277,18 @@ export function LearningJourneySection() {
                       Poin Kunci Pendampingan:
                     </h4>
                     {activeStage.highlights.map((h, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs sm:text-sm">
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 text-xs sm:text-sm"
+                      >
                         <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
                           ✓
                         </span>
                         <p className="text-supporting-700 leading-snug">
-                          <strong className="text-primary-950 font-semibold">{h.label}:</strong> {h.desc}
+                          <strong className="text-primary-950 font-semibold">
+                            {h.label}:
+                          </strong>{" "}
+                          {h.desc}
                         </p>
                       </div>
                     ))}
@@ -293,7 +308,9 @@ export function LearningJourneySection() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setActiveStepIndex((prev) => Math.max(0, prev - 1))}
+                      onClick={() =>
+                        setActiveStepIndex((prev) => Math.max(0, prev - 1))
+                      }
                       disabled={activeStepIndex === 0}
                       aria-label="Tahap Sebelumnya"
                       className="px-3 py-2 text-xs font-bold rounded-xl border border-supporting-200 text-supporting-700 hover:bg-supporting-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
@@ -304,7 +321,7 @@ export function LearningJourneySection() {
                       type="button"
                       onClick={() =>
                         setActiveStepIndex((prev) =>
-                          Math.min(journeyStages.length - 1, prev + 1)
+                          Math.min(journeyStages.length - 1, prev + 1),
                         )
                       }
                       disabled={activeStepIndex === journeyStages.length - 1}

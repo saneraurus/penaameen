@@ -38,7 +38,7 @@ export async function getBranches(): Promise<Branch[]> {
 
 export async function getBranchBySlug(slug: string): Promise<Branch | null> {
   const r = await prisma.branch.findUnique({ where: { slug } });
-  return r ? (({ ...r } as unknown as Branch)) : null;
+  return r ? ({ ...r } as unknown as Branch) : null;
 }
 
 export async function getMethods(): Promise<Method[]> {
@@ -51,7 +51,7 @@ export async function getMethods(): Promise<Method[]> {
 
 export async function getMethodBySlug(slug: string): Promise<Method | null> {
   const r = await prisma.method.findUnique({ where: { slug } });
-  return r ? (({ ...r } as unknown as Method)) : null;
+  return r ? ({ ...r } as unknown as Method) : null;
 }
 
 export async function getHistoryMilestones(): Promise<HistoryMilestone[]> {

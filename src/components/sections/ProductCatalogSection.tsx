@@ -64,7 +64,8 @@ export function ProductCatalogSection() {
                 Perangkat Belajar yang Dirancang untuk Digunakan.
               </h2>
               <p className="text-xs sm:text-sm text-supporting-600 mt-1.5 leading-relaxed">
-                Koleksi buku panduan, flashcard hijaiyah, poster peraga dinding, dan modul belajar resmi dari Penerbit Pena Ameen.
+                Koleksi buku panduan, flashcard hijaiyah, poster peraga dinding,
+                dan modul belajar resmi dari Penerbit Pena Ameen.
               </p>
             </div>
 
@@ -222,7 +223,11 @@ export function ProductCatalogSection() {
                             </span>
                             {rich.savings && (
                               <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/80 px-1 py-0.2 rounded">
-                                -{Math.round((rich.savings / rich.originalPrice) * 100)}%
+                                -
+                                {Math.round(
+                                  (rich.savings / rich.originalPrice) * 100,
+                                )}
+                                %
                               </span>
                             )}
                           </div>
@@ -273,13 +278,16 @@ export function ProductCatalogSection() {
           <div className="mt-6 pt-5 border-t border-supporting-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs font-semibold text-supporting-600">
               <span className="flex items-center gap-1">
-                <span className="text-emerald-600 font-bold">✓</span> 100% Produk Orisinal
+                <span className="text-emerald-600 font-bold">✓</span> 100%
+                Produk Orisinal
               </span>
               <span className="flex items-center gap-1">
-                <span className="text-emerald-600 font-bold">✓</span> Garansi Penggantian Cacat Kirim
+                <span className="text-emerald-600 font-bold">✓</span> Garansi
+                Penggantian Cacat Kirim
               </span>
               <span className="flex items-center gap-1">
-                <span className="text-emerald-600 font-bold">✓</span> Kirim Cepat Seluruh Indonesia
+                <span className="text-emerald-600 font-bold">✓</span> Kirim
+                Cepat Seluruh Indonesia
               </span>
             </div>
 

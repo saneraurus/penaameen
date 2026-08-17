@@ -54,7 +54,8 @@ export function EditorialStorySection() {
                   {/* Inner caption at the bottom */}
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <p className="text-xs sm:text-sm font-serif italic text-white/95 leading-snug">
-                      &ldquo;Kemampuan membaca yang kuat berawal dari pendampingan konsisten di rumah.&rdquo;
+                      &ldquo;Kemampuan membaca yang kuat berawal dari
+                      pendampingan konsisten di rumah.&rdquo;
                     </p>
                   </div>
                 </div>
@@ -62,9 +63,12 @@ export function EditorialStorySection() {
                 {/* Floating Note Card */}
                 <div className="hidden sm:block absolute -bottom-5 -right-5 max-w-xs bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-supporting-200/90 shadow-xl">
                   <div className="flex items-start gap-2.5">
-                    <span className="text-xl text-primary-600 font-serif">“</span>
+                    <span className="text-xl text-primary-600 font-serif">
+                      “
+                    </span>
                     <p className="text-xs text-supporting-700 leading-relaxed font-medium">
-                      Buku yang tepat dan pendampingan 15 menit sehari membentuk kebiasaan literasi anak seumur hidup.
+                      Buku yang tepat dan pendampingan 15 menit sehari membentuk
+                      kebiasaan literasi anak seumur hidup.
                     </p>
                   </div>
                 </div>
@@ -93,7 +97,10 @@ export function EditorialStorySection() {
                 </h2>
 
                 <p className="text-xs sm:text-sm md:text-base text-supporting-600 leading-relaxed mb-6">
-                  PENA AMEEN berkomitmen menyajikan perangkat belajar yang terstruktur secara ilmiah dan ramah anak. Kami percaya proses belajar membaca harus menjadi pengalaman positif yang menumbuhkan rasa percaya diri anak tanpa paksaan.
+                  PENA AMEEN berkomitmen menyajikan perangkat belajar yang
+                  terstruktur secara ilmiah dan ramah anak. Kami percaya proses
+                  belajar membaca harus menjadi pengalaman positif yang
+                  menumbuhkan rasa percaya diri anak tanpa paksaan.
                 </p>
 
                 {/* 3 Value Pillars */}

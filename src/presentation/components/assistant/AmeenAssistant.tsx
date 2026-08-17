@@ -207,46 +207,46 @@ export function AmeenAssistant() {
                   </p>
                 </div>
               </div>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={resetChat}
-                aria-label="Mulai ulang percakapan"
-                className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
-              >
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={resetChat}
+                  aria-label="Mulai ulang percakapan"
+                  className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0114.9-2M20 14a8 8 0 01-14.9 2"
-                  />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                aria-label="Tutup TANYA AMEEN"
-                className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
-              >
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0114.9-2M20 14a8 8 0 01-14.9 2"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Tutup TANYA AMEEN"
+                  className="rounded-full p-1.5 text-primary-100 transition-colors hover:bg-white/15 hover:text-white cursor-pointer"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-</svg>
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -384,36 +384,36 @@ export function AmeenAssistant() {
             isOpen ? "rotate-90" : ""
           }`}
         >
-        {isOpen ? (
-          <svg
-            className="h-6 w-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        ) : (
-          <svg
-            className="h-6 w-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8-1.036 0-2.039-.132-2.968-.38L3 21l1.286-3.67C3.47 16.103 3 14.107 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-        )}
-      </button>
+          {isOpen ? (
+            <svg
+              className="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8-1.036 0-2.039-.132-2.968-.38L3 21l1.286-3.67C3.47 16.103 3 14.107 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+          )}
+        </button>
       </div>
     </div>
   );

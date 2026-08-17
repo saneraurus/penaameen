@@ -158,8 +158,8 @@ export async function POST(request: Request) {
 
     // 2. Determine Address
     let addressSnapshot:
-      | z.infer<typeof createOrderSchema.shape.shippingAddress>
-      | undefined = clientAddress ?? undefined;
+      z.infer<typeof createOrderSchema.shape.shippingAddress> | undefined =
+      clientAddress ?? undefined;
 
     if (addressId && userId) {
       try {
@@ -213,8 +213,10 @@ export async function POST(request: Request) {
               data: {
                 clerkId: userId,
                 email: customerEmail || `${userId}@user.penaameen.com`,
-                name: customerName || addressSnapshot?.recipientName || "Pelanggan Pena Ameen",
-                role: "CUSTOMER",
+                name:
+                  customerName ||
+                  addressSnapshot?.recipientName ||
+                  "Pelanggan Pena Ameen",
               },
             });
           } catch {
@@ -304,6 +306,9 @@ export async function POST(request: Request) {
         expiresAt: expires.toISOString(),
         paymentUrl: `https://penaameen.com/pay/${orderNumber}`,
         qrString: `00020101021226600016ID.CO.QRIS.WWW01189360099900000123450215${orderNumber}520459995303360540${total}5802ID5919PENA AMEEN OFFICIAL6008SURABAYA62070703A0163046294`,
+        status: "pending",
+        useUniqueCode: false,
+        packageIds: [],
       };
     }
 
@@ -404,13 +409,13 @@ export async function GET() {
       return {
         id: order.id,
         orderNumber: order.orderNumber,
+        trackingNumber: (order as Record<string, unknown>).trackingNumber as string | null ?? null,
         status: order.status,
         subtotal: order.subtotal.toString(),
         shippingCost: order.shippingCost.toString(),
         total: order.total.toString(),
         shippingMethod: order.shippingMethod,
         shippingRate: order.shippingRate,
-        trackingNumber: order.trackingNumber,
         createdAt: order.createdAt.toISOString(),
         items: order.items.map((item) => ({
           id: item.id,

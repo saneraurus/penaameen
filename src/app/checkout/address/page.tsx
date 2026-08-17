@@ -299,7 +299,10 @@ export default function CheckoutAddressPage() {
       case "pos":
         return { bg: "bg-orange-600 text-white", label: "POS" };
       default:
-        return { bg: "bg-primary-100 text-primary-800", label: courier.toUpperCase() };
+        return {
+          bg: "bg-primary-100 text-primary-800",
+          label: courier.toUpperCase(),
+        };
     }
   };
 
@@ -393,7 +396,8 @@ export default function CheckoutAddressPage() {
               Keranjang Anda Masih Kosong
             </h2>
             <p className="text-supporting-600 text-sm mb-6 leading-relaxed">
-              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari katalog kami terlebih dahulu.
+              Silakan pilih buku atau paket metode belajar Al-Barqy / ACM dari
+              katalog kami terlebih dahulu.
             </p>
             <Link
               href="/produk"
@@ -512,7 +516,10 @@ export default function CheckoutAddressPage() {
                   </div>
                 ) : rates.length === 0 ? (
                   <div className="p-6 bg-supporting-50 rounded-2xl text-center text-xs text-supporting-600 space-y-2">
-                    <p>Silakan pilih alamat di atas untuk melihat tarif kurir yang tersedia.</p>
+                    <p>
+                      Silakan pilih alamat di atas untuk melihat tarif kurir
+                      yang tersedia.
+                    </p>
                   </div>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -543,7 +550,9 @@ export default function CheckoutAddressPage() {
                                   onChange={() => setSelectedRate(rate)}
                                   className="text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                                 />
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.bg}`}>
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.bg}`}
+                                >
                                   {badge.label}
                                 </span>
                                 <span className="text-xs font-bold text-primary-950 uppercase tracking-wide">
@@ -622,7 +631,8 @@ export default function CheckoutAddressPage() {
                         </h4>
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] text-supporting-500 font-medium">
-                            Rp{item.product.price.toLocaleString("id-ID")} x {item.quantity}
+                            Rp{Number(item.product.price).toLocaleString("id-ID")} x{" "}
+                            {item.quantity}
                           </span>
                         </div>
 
@@ -732,7 +742,9 @@ export default function CheckoutAddressPage() {
                 <div className="mt-4 pt-4 border-t border-supporting-100/80 space-y-1.5 text-[11px] text-supporting-500">
                   <div className="flex items-center gap-2">
                     <span>🔒</span>
-                    <span>Transaksi aman &amp; terverifikasi oleh Midtrans / QRIS</span>
+                    <span>
+                      Transaksi aman &amp; terverifikasi oleh Midtrans / QRIS
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span>🛡️</span>
@@ -800,7 +812,9 @@ export default function CheckoutAddressPage() {
                     type="tel"
                     required
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
                     placeholder="08123456789"
                     className="w-full p-2.5 rounded-xl border border-supporting-300 focus:ring-2 focus:ring-emerald-500 outline-none"
                   />

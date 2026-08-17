@@ -253,19 +253,18 @@ export default function GaleriKegiatanPage() {
   const prevImage = useCallback(() => {
     if (lightboxIndex === null) return;
     setLightboxIndex((prev) =>
-      prev === null ? null : (prev - 1 + filtered.length) % filtered.length
+      prev === null ? null : (prev - 1 + filtered.length) % filtered.length,
     );
   }, [lightboxIndex, filtered.length]);
 
   const nextImage = useCallback(() => {
     if (lightboxIndex === null) return;
     setLightboxIndex((prev) =>
-      prev === null ? null : (prev + 1) % filtered.length
+      prev === null ? null : (prev + 1) % filtered.length,
     );
   }, [lightboxIndex, filtered.length]);
 
-  const currentItem =
-    lightboxIndex !== null ? filtered[lightboxIndex] : null;
+  const currentItem = lightboxIndex !== null ? filtered[lightboxIndex] : null;
 
   return (
     <>
@@ -298,8 +297,8 @@ export default function GaleriKegiatanPage() {
             </h1>
             <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
               Dokumentasi perjalanan kami dalam menyebarkan metode belajar
-              Al-Qur&#x27;an — pelatihan guru, workshop nasional, dan
-              kegiatan komunitas di seluruh Indonesia.
+              Al-Qur&#x27;an — pelatihan guru, workshop nasional, dan kegiatan
+              komunitas di seluruh Indonesia.
             </p>
 
             {/* Stats strip */}
@@ -477,7 +476,10 @@ export default function GaleriKegiatanPage() {
           {/* Prev */}
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              prevImage();
+            }}
             className="absolute left-3 md:left-6 z-10 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Foto sebelumnya"
           >
@@ -503,7 +505,9 @@ export default function GaleriKegiatanPage() {
               <p className="text-white font-semibold text-sm md:text-base">
                 {currentItem.caption}
               </p>
-              <p className="text-emerald-400 text-xs mt-1">{currentItem.year}</p>
+              <p className="text-emerald-400 text-xs mt-1">
+                {currentItem.year}
+              </p>
               <p className="text-white/40 text-xs mt-2">
                 {lightboxIndex + 1} / {filtered.length}
               </p>
@@ -513,7 +517,10 @@ export default function GaleriKegiatanPage() {
           {/* Next */}
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              nextImage();
+            }}
             className="absolute right-3 md:right-6 z-10 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Foto berikutnya"
           >

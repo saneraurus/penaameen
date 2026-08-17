@@ -59,7 +59,11 @@ const showcaseTabs: ShowcaseTab[] = [
     ctaHref: "/produk/paket-albarqy-200-menit",
     secondaryCtaText: "Metode Al-Barqy",
     secondaryCtaHref: "/metode/al-barqy",
-    highlights: ["Sistem 200 Menit Tuntas", "Formula Kata Anti-Lupa", "Untuk Anak & Dewasa"],
+    highlights: [
+      "Sistem 200 Menit Tuntas",
+      "Formula Kata Anti-Lupa",
+      "Untuk Anak & Dewasa",
+    ],
   },
   {
     id: "acm",
@@ -154,7 +158,16 @@ export function HeroSection() {
           </h1>
 
           <p className="text-[11px] sm:text-xs text-white/80 leading-relaxed max-w-xl mx-auto font-normal">
-            Metode resmi <strong className="text-amber-300 font-semibold">AL-BARQY (200 Menit)</strong> dan <strong className="text-amber-300 font-semibold">ACM (Tanpa Mengeja)</strong> dari Penerbit Pena Ameen. Teruji membimbing jutaan santri &amp; keluarga.
+            Metode resmi{" "}
+            <strong className="text-amber-300 font-semibold">
+              AL-BARQY (200 Menit)
+            </strong>{" "}
+            dan{" "}
+            <strong className="text-amber-300 font-semibold">
+              ACM (Tanpa Mengeja)
+            </strong>{" "}
+            dari Penerbit Pena Ameen. Teruji membimbing jutaan santri &amp;
+            keluarga.
           </p>
         </div>
 
@@ -179,10 +192,7 @@ export function HeroSection() {
           </div>
 
           {/* Search Input Bar */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="relative w-full"
-          >
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
             <label htmlFor="hero-search-input" className="sr-only">
               Cari produk atau metode
             </label>
@@ -244,7 +254,9 @@ export function HeroSection() {
                         }}
                       />
                     )}
-                    <span className="relative z-10 text-xs sm:text-sm">{tab.icon}</span>
+                    <span className="relative z-10 text-xs sm:text-sm">
+                      {tab.icon}
+                    </span>
                     <span className="relative z-10">{tab.label}</span>
                   </button>
                 );
@@ -259,7 +271,10 @@ export function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0.01 : 0.25, ease: "easeOut" }}
+              transition={{
+                duration: shouldReduceMotion ? 0.01 : 0.25,
+                ease: "easeOut",
+              }}
               className="bg-primary-900/90 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 sm:p-4 md:p-5 shadow-xl overflow-hidden"
             >
               <div className="grid gap-3 sm:gap-5 lg:grid-cols-12 items-center">

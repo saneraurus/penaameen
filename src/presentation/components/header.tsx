@@ -20,6 +20,7 @@ import {
   NotebookPen,
   Info,
   Building2,
+  Images,
   type LucideIcon,
 } from "lucide-react";
 import { Show } from "@clerk/nextjs";
@@ -98,6 +99,13 @@ const aboutItems: NavItem[] = [
     href: "/cabang",
     description: "Daftar alamat dan kontak cabang resmi di seluruh Indonesia.",
     icon: Building2,
+  },
+  {
+    title: "Galeri Kegiatan",
+    href: "/galeri-kegiatan",
+    description:
+      "Foto dokumentasi pelatihan, workshop, dan kegiatan komunitas PENA AMEEN.",
+    icon: Images,
   },
 ];
 
@@ -475,6 +483,11 @@ export function Header() {
               <MobileLink
                 href="/artikel"
                 label="Artikel"
+                onClose={() => setIsMobileOpen(false)}
+              />
+              <MobileLink
+                href="/galeri-kegiatan"
+                label="Galeri Kegiatan"
                 onClose={() => setIsMobileOpen(false)}
               />
 

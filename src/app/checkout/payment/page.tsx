@@ -194,8 +194,7 @@ function CheckoutPaymentPage() {
       addressData?.recipientName ||
       "Ihsan Abdil Haq";
 
-    const currentShippingMethod =
-      shippingMethod || "JNE Express — REG";
+    const currentShippingMethod = shippingMethod || "JNE Express — REG";
 
     const finalAddress = addressData || {
       id: addressId || "addr-default-1",
