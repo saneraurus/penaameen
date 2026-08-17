@@ -1,0 +1,23 @@
+[dev-db] initialising embedded PostgreSQL...
+The files belonging to this database system will be owned by user "HP VICTUS".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  locale provider:   libc
+  LC_COLLATE:  English_Indonesia.1252
+  LC_CTYPE:    English_Indonesia.1252
+  LC_MESSAGES: C
+  LC_MONETARY: English_Indonesia.1252
+  LC_NUMERIC:  English_Indonesia.1252
+  LC_TIME:     English_Indonesia.1252
+The default database encoding has accordingly been set to "WIN1252".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+
+
+[STDERR] initdb: error: directory ".pgdata" exists but is not empty
+initdb: hint: If you want to create a new database system, either remove or empty the directory ".pgdata" or run initdb with an argument other than ".pgdata".
+

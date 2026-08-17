@@ -245,7 +245,7 @@ export async function POST(request: Request) {
       content: m.content,
     }));
 
-    const model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+    const model = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
 
     const groqResponse = await fetch(GROQ_ENDPOINT, {
       method: "POST",
