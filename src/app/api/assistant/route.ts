@@ -135,6 +135,7 @@ const requestSchema = z.object({
   pagePath: z.string().max(500).optional().default(""),
   searchQuery: z.string().max(300).optional().default(""),
   cartItemCount: z.number().int().nonnegative().max(999).optional().default(0),
+  sessionId: z.string().max(100).optional(),
 });
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -261,12 +262,105 @@ async function fetchUserOrders(userId: string): Promise<
   return [];
 }
 
+const SESSION_HISTORY_LIMIT = 12;
+
+async function loadSessionHistory(dbSessionId: string): Promise<ChatMessage[]> {
+  const rows = await prisma.chatMessage.findMany({
+    where: { sessionId: dbSessionId },
+    orderBy: { createdAt: "desc" },
+    take: SESSION_HISTORY_LIMIT,
+  });
+  return rows
+    .reverse()
+    .map((r) => ({ role: r.role as ChatMessage["role"], content: r.content }));
+}
+
+async function resolveChatSession(input: {
+  clerkUserId?: string;
+  clientSessionId?: string;
+}): Promise<{
+  sessionId: string;
+  dbSessionId: string | null;
+  history: ChatMessage[];
+}> {
+  const clerkUserId = input.clerkUserId;
+  const clientSessionId = input.clientSessionId?.trim();
+
+  try {
+    // Logged-in users always get their own stable session, recorded in the DB.
+    if (clerkUserId) {
+      const dbUser = await prisma.user.findFirst({
+        where: { clerkId: clerkUserId },
+      });
+      if (dbUser) {
+        const session = await prisma.chatSession.upsert({
+          where: { userId: dbUser.id },
+          update: {},
+          create: { userId: dbUser.id, sessionId: crypto.randomUUID() },
+        });
+        const history = await loadSessionHistory(session.id);
+        return {
+          sessionId: session.sessionId,
+          dbSessionId: session.id,
+          history,
+        };
+      }
+    }
+
+    // Guests resume their session via the client-provided sessionId.
+    if (clientSessionId) {
+      const session = await prisma.chatSession.findUnique({
+        where: { sessionId: clientSessionId },
+      });
+      if (session && !session.userId) {
+        const history = await loadSessionHistory(session.id);
+        return {
+          sessionId: session.sessionId,
+          dbSessionId: session.id,
+          history,
+        };
+      }
+      // A session owned by someone else must never be reused.
+    }
+
+    const session = await prisma.chatSession.create({
+      data: { sessionId: crypto.randomUUID() },
+    });
+    return { sessionId: session.sessionId, dbSessionId: session.id, history: [] };
+  } catch {
+    // DB unavailable - fall back to a stateless session.
+    return {
+      sessionId: clientSessionId || crypto.randomUUID(),
+      dbSessionId: null,
+      history: [],
+    };
+  }
+}
+
+async function persistChatMessages(
+  dbSessionId: string,
+  messagesToSave: ChatMessage[],
+): Promise<void> {
+  try {
+    await prisma.chatMessage.createMany({
+      data: messagesToSave.map((m) => ({
+        sessionId: dbSessionId,
+        role: m.role,
+        content: m.content,
+      })),
+    });
+  } catch (error) {
+    console.error("Failed to persist chat session message:", error);
+  }
+}
+
 function buildSystemPrompt(input: {
   pagePath: string;
   searchQuery: string;
   cartItemCount: number;
   isSignedIn: boolean;
   orders: Awaited<ReturnType<typeof fetchUserOrders>>;
+  priorConversation: ChatMessage[];
 }): string {
   const ordersSection =
     input.orders.length > 0
@@ -280,6 +374,13 @@ function buildSystemPrompt(input: {
           .join("\n")
       : "(tidak ada pesanan yang terhubung)";
 
+  const priorSection =
+    input.priorConversation.length > 0
+      ? input.priorConversation
+          .map((m) => `${m.role === "user" ? "Pelanggan" : "AMEEN"}: ${m.content}`)
+          .join("\n")
+      : "(tidak ada percakapan sebelumnya)";
+
   return `Kamu adalah AMEEN, asisten customer service resmi dari website Pena Ameen (penaameen.com) - penerbit dan lembaga edukasi Islam yang dikenal dengan metode belajar membaca Al-Qur'an AL-BARQY (200 Menit Anti Lupa) dan metode belajar membaca anak ACM (Aku Cepat Membaca). Pengguna melihatmu sebagai "TANYA AMEEN". Seluruh jawabanmu dalam Bahasa Indonesia yang ramah, hangat, santun, dan ringkas (maksimal 3-5 kalimat per topik, gunakan poin bila membantu).
 
 KONTEKS PELANGGAN SAAT INI:
@@ -287,6 +388,8 @@ KONTEKS PELANGGAN SAAT INI:
 - Jumlah item di keranjang: ${input.cartItemCount}
 - Status login: ${input.isSignedIn ? "sudah login" : "belum login"}
 - Pesanan pelanggan ini (jika login): ${ordersSection}
+- Riwayat percakapan sebelumnya dengan pelanggan ini (dari sesi yang tercatat):
+${priorSection}
 
 PENGETAHUAN WEBSITE (hanya gunakan informasi ini, jangan mengarang fakta, harga, atau janji):
 ${buildWebsiteKnowledge()}
@@ -300,7 +403,8 @@ ATURAN WAJIB (guardrails):
 6. Jangan pernah menjanjikan diskon, promo, atau penawaran yang tidak tercantum di pengetahuan di atas. Tanpa ragu katakan tidak tahu dan arahkan ke kontak resmi.
 7. Jangan berjanji tanggal pengiriman pasti; jelaskan estimasi ditentukan saat checkout oleh kurir dan bisa dipantau lewat nomor resi di /orders.
 8. Jika tidak tahu jawabannya, jangan mengarang. Arahkan pelanggan ke: email cs.penaameen@yahoo.com, WhatsApp/telepon +62822 3123 9158, atau halaman /kontak.
-9. Jawab dengan teks biasa (boleh gunakan bullet list sederhana). Jangan gunakan format markdown header atau tabel.`;
+9. Jawab dengan teks biasa (boleh gunakan bullet list sederhana). Jangan gunakan format markdown header atau tabel.
+10. Riwayat percakapan di atas adalah milik pelanggan ini dan hanya untuk konteks lanjutan percakapan yang sama. Jangan pernah mengarang isi percakapan sebelumnya atau menyebut percakapan milik pelanggan lain.`;
 }
 
 export async function POST(request: Request) {
@@ -337,7 +441,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { messages, pagePath, searchQuery, cartItemCount } = parsed.data;
+    const {
+      messages,
+      pagePath,
+      searchQuery,
+      cartItemCount,
+      sessionId: clientSessionId,
+    } = parsed.data;
 
     const clerkAuth = await auth();
     const isSignedIn = Boolean(clerkAuth.userId);
@@ -345,23 +455,49 @@ export async function POST(request: Request) {
       ? await fetchUserOrders(clerkAuth.userId as string)
       : [];
 
+    const session = await resolveChatSession({
+      ...(isSignedIn ? { clerkUserId: clerkAuth.userId as string } : {}),
+      ...(clientSessionId ? { clientSessionId } : {}),
+    });
+
+    const currentUserMessage = [...messages]
+      .reverse()
+      .find((m) => m.role === "user");
+
+    // DB history is the source of truth for recorded sessions; client history
+    // is only used as fallback for stateless/guest first messages.
+    const history: ChatMessage[] =
+      session.history.length > 0
+        ? [
+            ...session.history,
+            ...(currentUserMessage
+              ? [{ role: "user" as const, content: currentUserMessage.content }]
+              : []),
+          ].slice(-SESSION_HISTORY_LIMIT)
+        : messages.slice(-12).map((m) => ({
+            role: m.role,
+            content: m.content,
+          }));
+
     const systemPrompt = buildSystemPrompt({
       pagePath,
       searchQuery,
       cartItemCount,
       isSignedIn,
       orders,
+      priorConversation: session.history,
     });
-
-    const history: ChatMessage[] = messages.slice(-12).map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
 
     for (const provider of providers) {
       const result = await callProvider(provider, systemPrompt, history);
       if (result.ok && result.reply) {
-        return NextResponse.json({ reply: result.reply });
+        if (session.dbSessionId && currentUserMessage) {
+          await persistChatMessages(session.dbSessionId, [
+            { role: "user", content: currentUserMessage.content },
+            { role: "assistant", content: result.reply },
+          ]);
+        }
+        return NextResponse.json({ reply: result.reply, sessionId: session.sessionId });
       }
       console.error(
         `Assistant provider "${provider.name}" failed (${result.status ?? "network"}): ${result.detail ?? "unknown"}`,

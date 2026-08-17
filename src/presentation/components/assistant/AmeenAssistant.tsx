@@ -16,6 +16,7 @@ interface ChatMessage {
 }
 
 const STORAGE_KEY = "penaameen_ameen_chat";
+const SESSION_KEY = "penaameen_ameen_session";
 
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
@@ -41,6 +42,29 @@ function loadHistory(): ChatMessage[] {
     return parsed;
   } catch {
     return [WELCOME_MESSAGE];
+  }
+}
+
+function getSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let sessionId = localStorage.getItem(SESSION_KEY);
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem(SESSION_KEY, sessionId);
+    }
+    return sessionId;
+  } catch {
+    return "";
+  }
+}
+
+function storeSessionId(sessionId: string): void {
+  if (!sessionId) return;
+  try {
+    localStorage.setItem(SESSION_KEY, sessionId);
+  } catch {
+    // storage unavailable - ignore
   }
 }
 
@@ -112,10 +136,19 @@ export function AmeenAssistant() {
             pagePath: pathname,
             searchQuery,
             cartItemCount: itemCount,
+            sessionId: getSessionId(),
           }),
         });
 
-        const data = (await res.json()) as { reply?: string; error?: string };
+        const data = (await res.json()) as {
+          reply?: string;
+          error?: string;
+          sessionId?: string;
+        };
+
+        if (data.sessionId) {
+          storeSessionId(data.sessionId);
+        }
 
         if (!res.ok || !data.reply) {
           setError(data.error ?? "Maaf, terjadi kendala. Silakan coba lagi.");
