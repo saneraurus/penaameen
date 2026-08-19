@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -94,6 +94,7 @@ function CheckoutPaymentPage() {
   const [qrImageFailed, setQrImageFailed] = useState(false);
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const qrPanelRef = useRef<HTMLDivElement | null>(null);
 
   // Countdown timer for the active QRIS payment.
   useEffect(() => {
@@ -313,6 +314,12 @@ function CheckoutPaymentPage() {
       if (data?.casaku?.transactionId) {
         setCasakuData(data.casaku as CasakuPaymentData);
         setIsProcessing(false);
+        requestAnimationFrame(() => {
+          qrPanelRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
         return;
       }
 
@@ -346,7 +353,9 @@ function CheckoutPaymentPage() {
       }
 
       setError(
-        "Pembayaran otomatis belum tersedia saat ini. Silakan gunakan Transfer Bank Manual dan konfirmasi via WhatsApp.",
+        data?.casakuError
+          ? `Pembayaran otomatis belum tersedia: ${data.casakuError}. Silakan gunakan Transfer Bank Manual dan konfirmasi via WhatsApp.`
+          : "Pembayaran otomatis belum tersedia saat ini. Silakan gunakan Transfer Bank Manual dan konfirmasi via WhatsApp.",
       );
       setIsProcessing(false);
     } catch {
@@ -803,7 +812,10 @@ function CheckoutPaymentPage() {
             </div>
             {/* QRIS Payment Panel */}
             {paymentMethod === "qris" && casakuData && (
-              <div className="bg-white rounded-3xl border border-primary-200/80 p-6 md:p-8 shadow-xs">
+              <div
+                ref={qrPanelRef}
+                className="bg-white rounded-3xl border border-primary-200/80 p-6 md:p-8 shadow-xs"
+              >
                 <div className="flex items-center gap-3 mb-4">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-700 font-bold text-sm border border-primary-100">
                     🪙

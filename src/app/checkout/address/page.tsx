@@ -632,7 +632,9 @@ export default function CheckoutAddressPage() {
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] text-supporting-500 font-medium">
                             Rp
-                            {Number(item.product.price).toLocaleString("id-ID")}{" "}
+                            {Number(item.product.price).toLocaleString(
+                              "id-ID",
+                            )}{" "}
                             x {item.quantity}
                           </span>
                         </div>

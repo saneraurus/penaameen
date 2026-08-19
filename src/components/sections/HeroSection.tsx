@@ -1,4 +1,4 @@
-"use client";
+\"use client\";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
+/* ------------------------------------------------------------------ */
+/*  Showcase data — konten tidak diubah dari versi sebelumnya        */
+/* ------------------------------------------------------------------ */
 interface ShowcaseTab {
   id: string;
   label: string;
@@ -26,11 +29,11 @@ const showcaseTabs: ShowcaseTab[] = [
   {
     id: "home-learning",
     label: "Home Learning",
-    icon: "👨‍👩‍👧",
+    icon: "\uD83C\uDFE0",
     badge: "Solusi Belajar di Rumah",
     title: "Dampingi Anak Membaca & Mengaji Mandiri di Rumah",
     description:
-      "Perangkat 5-in-1 lengkap: buku utama Al-Barqy, flashcard hijaiyah interaktif, 12 poster edukasi dinding, modul pendamping orang tua, dan tas kanvas. Cukup 15–20 menit sehari.",
+      "Perangkat 5-in-1 lengkap: buku utama Al-Barqy, flashcard hijaiyah interaktif, 12 poster edukasi dinding, modul pendamping orang tua, dan tas kanvas. Cukup 15\u201320 menit sehari.",
     image: "/images/penaameen/hero/hero-centered-showcase.jpg",
     imageAlt:
       "Ibu dan anak belajar membaca huruf dan kata dengan buku edukatif dan kartu flashcard PENA AMEEN",
@@ -47,14 +50,13 @@ const showcaseTabs: ShowcaseTab[] = [
   {
     id: "albarqy",
     label: "Metode Al-Barqy",
-    icon: "⚡",
+    icon: "\u26A1",
     badge: "Metode Anti Lupa Revolusioner",
-    title: "Lancar Membaca Al-Qur'an dalam 200 Menit",
+    title: "Lancar Membaca Al-Qur\u0027an dalam 200 Menit",
     description:
-      "Formula fonetik kata kunci (A-DA-RA-JA, MA-HA-KA-YA) karya KH. Nursyamsu Muhadi. Tuntas membaca Al-Qur'an secara tartil tanpa mengeja huruf satu per satu.",
+      "Formula fonetik kata kunci (A-DA-RA-JA, MA-HA-KA-YA) karya KH. Nursyamsu Muhadi. Tuntas membaca Al-Qur\u0027an secara tartil tanpa mengeja huruf satu per satu.",
     image: "/images/penaameen/methods/method-albarqy.jpg",
-    imageAlt:
-      "Santri dan murid belajar membaca Al-Qur'an dengan metode Al-Barqy anti lupa",
+    imageAlt: "Santri dan murid belajar membaca Al-Qur\u0027an dengan metode Al-Barqy anti lupa",
     ctaText: "Lihat Paket Al-Barqy",
     ctaHref: "/produk/paket-albarqy-200-menit",
     secondaryCtaText: "Metode Al-Barqy",
@@ -68,35 +70,33 @@ const showcaseTabs: ShowcaseTab[] = [
   {
     id: "acm",
     label: "Metode ACM",
-    icon: "👶",
-    badge: "Aku Cepat Membaca (3–8 Tahun)",
+    icon: "\uD83E\uDD82",
+    badge: "Aku Cepat Membaca (3\u20138 Tahun)",
     title: "Lancar Membaca Huruf Latin Tanpa Mengeja",
     description:
-      "Metode membaca aktif berbasis kata lembaga dan lagu edukatif ceria. Anak langsung membaca kata utuh tanpa mengeja B-A = BA. Tuntas rata-rata dalam 16–24 pertemuan.",
+      "Metode membaca aktif berbasis kata lembaga dan lagu edukatif ceria. Anak langsung membaca kata utuh tanpa mengeja B-A = BA. Tuntas rata-rata dalam 16\u201324 pertemuan.",
     image: "/images/penaameen/methods/method-acm.jpg",
-    imageAlt:
-      "Anak-anak antusias belajar membaca dengan buku dan materi metode ACM",
+    imageAlt: "Anak-anak antusias belajar membaca dengan buku dan materi metode ACM",
     ctaText: "Lihat Produk ACM",
     ctaHref: "/produk",
     secondaryCtaText: "Metode ACM",
     secondaryCtaHref: "/metode/acm",
     highlights: [
       "100% Tanpa Mengeja",
-      "16–24 Sesi Pembelajaran",
+      "16\u201324 Sesi Pembelajaran",
       "Ramah PAUD/TK & ABK",
     ],
   },
   {
     id: "perangkat",
     label: "Kit & Alat Peraga",
-    icon: "📦",
+    icon: "\uD83D\uDCC2",
     badge: "Untuk Sekolah & TPQ",
     title: "Standar Kurikulum Pengajaran Guru & Lembaga",
     description:
       "Perangkat ajar kelas: flipchart peraga dinding besar, tongkat penunjuk, buku kurikulum guru, dan sertifikasi pengajar Al-Barqy & ACM di seluruh Indonesia.",
     image: "/images/penaameen/hero/hero-kit-showcase.jpg",
-    imageAlt:
-      "Kit perangkat fisik lengkap buku, kartu flashcard, dan alat peraga PENA AMEEN",
+    imageAlt: "Kit perangkat fisik lengkap buku, kartu flashcard, dan alat peraga PENA AMEEN",
     ctaText: "Lihat Alat Peraga Guru",
     ctaHref: "/produk",
     secondaryCtaText: "Konsultasi Lembaga",
@@ -109,6 +109,9 @@ const showcaseTabs: ShowcaseTab[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 export function HeroSection() {
   const router = useRouter();
   const [activeTabId, setActiveTabId] = useState<string>("home-learning");
@@ -121,238 +124,245 @@ export function HeroSection() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    if (q) {
-      router.push(`/produk?q=${encodeURIComponent(q)}`);
-    } else {
-      router.push("/produk");
-    }
+    router.push(q ? `/produk?q=${encodeURIComponent(q)}` : "/produk");
   };
 
   return (
-    <section className="relative overflow-hidden pt-4 pb-6 sm:pt-6 sm:pb-8 md:pt-8 md:pb-10 bg-primary-950 text-white border-b border-supporting-200/40">
-      {/* Background Image with Dark Gradient Overlay */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <Image
-          src="/images/penaameen/hero/hero-bg-islamic-learning.jpg"
-          alt="Latar Belajar Islami Pena Ameen"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center brightness-[0.40] contrast-[1.10]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary-950/95 via-primary-950/90 to-primary-950/98" />
-      </div>
+    <section className="relative overflow-hidden bg-background-50 text-supporting-900">
+      {/* ── Orbs dekoratif (hangat, tidak berat) ───────────────── */}
+      <div
+        className="absolute -top-20 -right-20 w-80 h-80 bg-primary-100/40 rounded-full blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent-200/30 rounded-full blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
 
-      <div className="container relative z-10 px-4 sm:px-6 mx-auto max-w-4xl">
-        {/* Main Headline & Subtitle */}
-        <div className="text-center max-w-2xl mx-auto mb-3 sm:mb-4">
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-1.5 border border-white/15 backdrop-blur-md">
-            Penerbit Resmi • Sejak 1995
-          </span>
+      <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20 relative z-10">
+        {/* ═══════════════════════════════════════════════════════════
+            SPLIT HERO — KIRI: pesan; KANAN: visual + tab showcase
+        ════════════════════════════════════════════════════════════ */}
+        <div className="grid gap-10 lg:gap-16 items-center lg:grid-cols-2">
+          {/* ── LEFT COLUMN — Message & Actions ──────────────────── */}
+          <div className="flex flex-col gap-5 lg:max-w-xl justify-center">
+            {/* Trust ribbon */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-100 text-primary-800 text-[10px] font-semibold uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary-600" />
+                Penerbit Resmi
+              </span>
+              <span className="text-[10px] text-supporting-600 font-medium">
+                \u2022 Sejak 1995
+              </span>
+            </div>
 
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white tracking-tight leading-tight mb-1.5 drop-shadow-md">
-            Kuasai Membaca &amp; Mengaji.{" "}
-            <span className="block sm:inline bg-gradient-to-r from-emerald-300 via-amber-200 to-emerald-200 bg-clip-text text-transparent">
-              Lebih Cepat, Tepat &amp; Anti-Lupa.
-            </span>
-          </h1>
+            {/* Headline — serif, besar tapi tidak berisik */}
+            <h1 className="font-serif font-bold text-primary-950 leading-[1.1] tracking-tight text-balance">
+              <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+                Kuasai Membaca &amp; Mengaji.
+              </span>
+              <span className="block sm:inline text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary-600">
+                Lebih Cepat, Tepat &amp;{" "}
+                <span className="bg-gradient-to-r from-accent-300 via-accent-400 to-accent-300 bg-clip-text text-transparent">
+                  Anti-Lupa.
+                </span>
+              </span>
+            </h1>
 
-          <p className="text-[11px] sm:text-xs text-white/80 leading-relaxed max-w-xl mx-auto font-normal">
-            Metode resmi{" "}
-            <strong className="text-amber-300 font-semibold">
-              AL-BARQY (200 Menit)
-            </strong>{" "}
-            dan{" "}
-            <strong className="text-amber-300 font-semibold">
-              ACM (Tanpa Mengeja)
-            </strong>{" "}
-            dari Penerbit Pena Ameen. Teruji membimbing jutaan santri &amp;
-            keluarga.
-          </p>
-        </div>
+            {/* Subheadline */}
+            <p className="text-sm sm:text-base text-supporting-600 leading-relaxed max-w-lg">
+              Metode resmi{" "}
+              <strong className="text-primary-800 font-semibold">
+                AL-BARQY (200 Menit)
+              </strong>{" "}
+              dan{" "}
+              <strong className="text-primary-800 font-semibold">
+                ACM (Tanpa Mengeja)
+              </strong>{" "}
+              dari Penerbit Pena Ameen. Teruji membimbing jutaan santri &amp;
+              keluarga.
+            </p>
 
-        {/* Action Buttons & Search */}
-        <div className="flex flex-col items-center gap-2 max-w-md mx-auto mb-3.5 sm:mb-4">
-          {/* Primary Action Buttons */}
-          <div className="flex items-center justify-center gap-2 w-full">
-            <Link
-              href="/produk"
-              className="flex-1 py-1.5 sm:py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1 cursor-pointer text-center"
-            >
-              <span>Jelajahi Paket &amp; Produk</span>
-              <span>→</span>
-            </Link>
+            {/* Action row: CTA + search, terpisah secara visual */}
+            <div className="flex flex-col gap-4">
+              {/* CTA pair */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+                <Link
+                  href="/produk"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-primary-600/20 transition-all active:scale-[0.98]"
+                >
+                  Jelajahi Paket &amp; Produk
+                  <span aria-hidden="true">\u2192</span>
+                </Link>
+                <Link
+                  href="/metode"
+                  className="inline-flex items-center justify-center px-5 py-3 rounded-xl border border-supporting-300 text-primary-800 font-medium text-sm sm:text-base hover:bg-supporting-50 transition-all"
+                >
+                  Pelajari 2 Metode
+                </Link>
+              </div>
 
-            <Link
-              href="/metode"
-              className="py-1.5 sm:py-2 px-3 bg-white/15 hover:bg-white/25 text-white text-xs font-bold rounded-xl border border-white/25 backdrop-blur-md transition-all flex items-center justify-center text-center"
-            >
-              Pelajari 2 Metode
-            </Link>
+              {/* Search — secondary, tidak bersaing dengan CTA */}
+              <form
+                onSubmit={handleSearchSubmit}
+                className="relative w-full max-w-sm group"
+              >
+                <label htmlFor="hero-search-input" className="sr-only">
+                  Cari produk atau metode
+                </label>
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 text-supporting-500 group-focus-within:text-primary-600 transition-colors shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    id="hero-search-input"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari paket Al-Barqy, ACM..."
+                    className="w-full px-4 py-2.5 bg-white border border-supporting-200 rounded-xl text-sm text-supporting-900 placeholder-supporting-400 outline-none transition-all focus:ring-2 focus:ring-primary-500"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 px-3 py-2 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold transition-colors"
+                  >
+                    Cari
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
 
-          {/* Search Input Bar */}
-          <form onSubmit={handleSearchSubmit} className="relative w-full">
-            <label htmlFor="hero-search-input" className="sr-only">
-              Cari produk atau metode
-            </label>
-            <input
-              id="hero-search-input"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari paket Al-Barqy, ACM, Flashcard..."
-              className="w-full pl-8 pr-16 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder-white/60 border border-white/20 rounded-xl text-xs backdrop-blur-md outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
-            />
-            <svg
-              className="absolute left-2.5 top-2 sm:top-2.5 h-3.5 w-3.5 text-emerald-300 pointer-events-none"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <button
-              type="submit"
-              className="absolute right-1 top-1 bottom-1 px-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-lg transition-colors flex items-center cursor-pointer"
-            >
-              Cari
-            </button>
-          </form>
-        </div>
-
-        {/* Interactive Showcase Tabs Component */}
-        <div className="max-w-3xl mx-auto">
-          {/* Centered Hugging Tab Navigation */}
-          <div className="flex justify-center mb-3">
-            <div className="inline-flex items-center gap-1 p-1 bg-primary-900/90 backdrop-blur-md border border-white/15 rounded-2xl shadow-md max-w-full overflow-x-auto scrollbar-none">
+          {/* ────────────────────────────────────────────────────────────
+              RIGHT COLUMN — Visual + Tab Showcase
+          ──────────────────────────────────────────────────────────── */}
+          <div className="flex flex-col gap-4 lg:order-2">
+            {/* Tab navigation — lebih tenang, wrap */}
+            <div className="flex flex-wrap gap-2">
               {showcaseTabs.map((tab) => {
                 const isActive = tab.id === activeTabId;
                 return (
                   <button
                     key={tab.id}
+                    type="button"
                     onClick={() => setActiveTabId(tab.id)}
-                    className={`relative px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 cursor-pointer flex-shrink-0 ${
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
                       isActive
-                        ? "text-primary-950 font-bold shadow-xs"
-                        : "text-white/80 hover:text-white hover:bg-white/10"
+                        ? "bg-primary-950 text-white shadow-md"
+                        : "bg-white text-primary-700 border border-supporting-200 hover:bg-primary-50 hover:border-primary-200"
                     }`}
+                    aria-pressed={isActive}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTabBadge"
-                        className="absolute inset-0 bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 rounded-xl z-0"
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-                    <span className="relative z-10 text-xs sm:text-sm">
-                      {tab.icon}
-                    </span>
-                    <span className="relative z-10">{tab.label}</span>
+                    <span aria-hidden="true">{tab.icon}</span>
+                    {tab.label}
                   </button>
                 );
               })}
             </div>
-          </div>
 
-          {/* Active Tab Showcase Card */}
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={activeTab.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                duration: shouldReduceMotion ? 0.01 : 0.25,
-                ease: "easeOut",
-              }}
-              className="bg-primary-900/90 backdrop-blur-xl border border-white/20 rounded-2xl p-3.5 sm:p-4 md:p-5 shadow-xl overflow-hidden"
-            >
-              <div className="grid gap-3 sm:gap-5 lg:grid-cols-12 items-center">
-                {/* Left Showcase Copy & Highlights */}
-                <div className="lg:col-span-7 flex flex-col justify-between">
-                  <div>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold mb-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      {activeTab.badge}
-                    </span>
+            {/* Showcase visual — image-first, bukan card dense */}
+            <div className="relative inline-flex w-full max-w-md">
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl bg-supporting-100">
+                <Image
+                  src={activeTab.image}
+                  alt={activeTab.imageAlt}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover transition-opacity duration-300"
+                  key={activeTab.image}
+                />
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-primary-950/25 via-transparent to-transparent pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
 
-                    <h2 className="text-sm sm:text-base md:text-lg font-serif font-bold text-white mb-1 leading-snug">
-                      {activeTab.title}
-                    </h2>
-
-                    <p className="text-[11px] sm:text-xs text-white/80 leading-relaxed mb-2.5 line-clamp-2">
-                      {activeTab.description}
-                    </p>
-
-                    {/* Feature Highlights Pills */}
-                    <div className="flex flex-wrap gap-1 mb-2.5">
-                      {activeTab.highlights.map((highlight, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 border border-white/15 text-[10px] sm:text-[11px] text-white/90 font-medium"
-                        >
-                          <span className="text-emerald-400 font-bold">✓</span>
-                          <span>{highlight}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tab Action CTAs */}
-                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
-                    <Link
-                      href={activeTab.ctaHref}
-                      className="px-3 py-1.5 bg-amber-400 hover:bg-amber-300 text-primary-950 text-xs font-bold rounded-lg shadow-xs transition-all inline-flex items-center gap-1"
-                    >
-                      <span>{activeTab.ctaText}</span>
-                      <span>→</span>
-                    </Link>
-
-                    <Link
-                      href={activeTab.secondaryCtaHref}
-                      className="px-2.5 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg border border-white/20 transition-colors"
-                    >
-                      {activeTab.secondaryCtaText}
-                    </Link>
-                  </div>
+              {/* Floating info card — mobile: di bawah gambar; desktop: floating */}
+              <div
+                className="mt-3 bg-white rounded-xl p-4 shadow-lg border border-supporting-200 lg:mt-0 lg:absolute lg:right-0 lg:bottom-0 lg:bg-background-50/95 lg:backdrop-blur-sm lg:shadow-md lg:border-primary-200/40"
+              >
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-800 text-[10px] font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-600" />
+                    {activeTab.badge}
+                  </span>
+                  <span className="text-[10px] text-supporting-500 font-medium whitespace-nowrap">
+                    {activeTab.id === "home-learning" ? "Lifestyle" : "Metode"}
+                  </span>
                 </div>
 
-                {/* Right Showcase Visual Image */}
-                <div className="lg:col-span-5">
-                  <div className="relative aspect-[16/10] sm:aspect-[16/10] max-h-[160px] sm:max-h-[190px] rounded-xl overflow-hidden border border-white/25 shadow-md bg-primary-800/80">
-                    <Image
-                      src={activeTab.image}
-                      alt={activeTab.imageAlt}
-                      fill
-                      priority
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
-                      className="object-cover"
-                    />
-                    <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-primary-950/90 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/20 flex items-center justify-between text-[11px] text-white">
-                      <span className="font-semibold text-emerald-300 text-[10px] truncate">
-                        {activeTab.label}
-                      </span>
-                      <span className="text-[9px] bg-white/20 px-1.5 py-0.2 rounded text-white font-bold">
-                        Orisinal
-                      </span>
-                    </div>
-                  </div>
+                <h2 className="font-serif font-bold text-primary-950 text-base md:text-lg leading-snug mb-1">
+                  {activeTab.title}
+                </h2>
+
+                <p className="text-xs text-supporting-600 leading-relaxed line-clamp-2 mb-3">
+                  {activeTab.description}
+                </p>
+
+                {/* Highlights pills */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {activeTab.highlights.map((h) => (
+                    <span
+                      key={h}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary-50 text-primary-800 text-[10px] font-medium border border-primary-200"
+                    >
+                      <svg
+                        className="w-3 h-3 text-primary-600 shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {h}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTAs dalam card */}
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-supporting-200">
+                  <Link
+                    href={activeTab.ctaHref}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold transition-colors"
+                  >
+                    {activeTab.ctaText}
+                    <span aria-hidden="true">\u2192</span>
+                  </Link>
+                  <Link
+                    href={activeTab.secondaryCtaHref}
+                    className="inline-flex items-center px-3 py-2 rounded-lg border border-supporting-300 text-primary-800 text-xs font-medium hover:bg-supporting-50 transition-colors"
+                  >
+                    {activeTab.secondaryCtaText}
+                  </Link>
                 </div>
               </div>
-            </motion.div>
-          </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* ── Bottom edge — transisi halus ke section berikutnya ───── */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-supporting-200 to-transparent pointer-events-none"
+        aria-hidden="true"
+      />
     </section>
   );
 }

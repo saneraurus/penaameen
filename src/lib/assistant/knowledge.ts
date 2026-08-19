@@ -39,7 +39,20 @@ function buildMethodsSection(): string {
 }
 
 function buildBranchesSection(): string {
-  return branches.map((b) => `- ${b.region} (${b.city})`).join("\n");
+  return branches
+    .map((b) => {
+      if (b.outlets && b.outlets.length > 0) {
+        const outletList = b.outlets
+          .map(
+            (o) =>
+              `  * ${o.name} (PIC: ${o.pic}): ${o.address} | Telp: ${o.contact}`,
+          )
+          .join("\n");
+        return `- ${b.region} (${b.city}):\n${outletList}`;
+      }
+      return `- ${b.region} (${b.city}): ${b.address} | Kontak: ${b.contact}`;
+    })
+    .join("\n");
 }
 
 function buildArticlesSection(): string {
@@ -84,8 +97,8 @@ export function buildWebsiteKnowledge(): string {
     "=== ARTIKEL / EDUKASI ===",
     buildArticlesSection(),
     "",
-    "=== CABANG ===",
-    "Alamat detail cabang belum tersedia di sistem; arahkan pelanggan ke halaman /kontak atau /cabang.",
+    "=== CABANG & MITRA RESMI ===",
+    "Daftar cabang, perwakilan, dan mitra resmi Pena Ameen tersedia di bawah ini. Arahkan pelanggan ke halaman /cabang atau /kontak untuk informasi lebih lanjut.",
     buildBranchesSection(),
     "",
     "=== STATUS PESANAN ===",

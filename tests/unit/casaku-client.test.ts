@@ -54,6 +54,8 @@ describe("CasakuClient.generateQris", () => {
     expect(result.transactionId).toBe("CSK-123");
     expect(result.totalAmount).toBe(150333);
     expect(result.uniqueNominal).toBe(333);
+    expect(result.qrString).toBe("00020101021126630012COM.CASAKU");
+    expect(result.paymentUrl).toBe("https://go.casaku.id/pay?trx=CSK-123");
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe(`${CASAKU_DEFAULT_BASE_URL}/api/generate/v2/qris`);

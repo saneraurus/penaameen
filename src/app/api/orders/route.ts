@@ -9,6 +9,7 @@ import {
   buildCasakuConfig,
   generateQrisForOrder,
 } from "@/lib/payment/casaku-service";
+import { CasakuError } from "@/lib/payment/casaku";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -268,6 +269,7 @@ export async function POST(request: Request) {
           expiresAt: string;
         })
       | null = null;
+    let casakuError: string | null = null;
     let snapToken: string | undefined = undefined;
     let redirectUrl: string | undefined = undefined;
 
@@ -286,31 +288,24 @@ export async function POST(request: Request) {
               expiresAt: result.expiresAt.toISOString(),
             };
           }
-        } catch (casakuError) {
-          console.warn("Casaku QRIS generation failed:", casakuError);
+        } catch (casakuErr) {
+          console.warn("Casaku QRIS generation failed:", casakuErr);
+          casakuError =
+            casakuErr instanceof CasakuError && casakuErr.status === 403
+              ? "Pembayaran QRIS belum diaktifkan oleh admin toko"
+              : casakuErr instanceof CasakuError
+                ? casakuErr.message
+                : "Penyedia QRIS tidak tersedia saat ini";
         }
       }
     } catch {
       // Ignore settings read error
     }
 
-    // If Casaku is not active, generate standard QRIS payload for instant display
-    if (!casaku) {
-      const expires = new Date(Date.now() + 15 * 60 * 1000);
-      casaku = {
-        transactionId: `CSK-${orderNumber}`,
-        originalAmount: total,
-        totalAmount: total,
-        uniqueNominal: 0,
-        expiredInMinutes: 15,
-        expiresAt: expires.toISOString(),
-        paymentUrl: `https://penaameen.com/pay/${orderNumber}`,
-        qrString: `00020101021226600016ID.CO.QRIS.WWW01189360099900000123450215${orderNumber}520459995303360540${total}5802ID5919PENA AMEEN OFFICIAL6008SURABAYA62070703A0163046294`,
-        status: "pending",
-        useUniqueCode: false,
-        packageIds: [],
-      };
-    }
+    // NOTE: no fabricated/mock QRIS fallback here. A fake QR string would
+    // render a scannable image that never triggers a real payment — the
+    // order would stay PENDING forever. If Casaku is unavailable, the
+    // client falls back to Midtrans Snap or shows a truthful error.
 
     if (!snapToken) {
       try {
@@ -352,6 +347,7 @@ export async function POST(request: Request) {
       orderNumber,
       total,
       casaku,
+      casakuError,
       snapToken,
       redirectUrl,
       items: orderItemsToSave,
