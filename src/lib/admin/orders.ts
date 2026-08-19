@@ -190,16 +190,22 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
         createdAt: db.createdAt.toISOString(),
       },
     ],
-    fulfillmentHistory: [
-      {
-        id: `ful-${db.id}`,
-        type: "shipped",
-        status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
-        carrier: db.shippingMethod || "JNE",
-        trackingNumber: `JP${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-        createdAt: db.createdAt.toISOString(),
-      },
-    ],
+    // H-1 FIX: do NOT fabricate a tracking number. A fake "JPxxxx" resi shown
+    // to staff/customers is invented data (AGENTS.md #4/#18). Only surface a
+    // tracking number when one has actually been recorded against the order.
+    fulfillmentHistory: db.trackingNumber
+      ? [
+          {
+            id: `ful-${db.id}`,
+            type: "shipped",
+            status:
+              fulfillmentStat === "unfulfilled" ? "pending" : "completed",
+            carrier: db.shippingMethod || "JNE",
+            trackingNumber: db.trackingNumber,
+            createdAt: db.createdAt.toISOString(),
+          },
+        ]
+      : [],
   };
 }
 

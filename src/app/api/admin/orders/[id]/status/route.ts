@@ -19,26 +19,6 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    // Tracking numbers cannot be persisted yet (no shipment storage in DB).
-    if (body.trackingNumber) {
-      await recordStaffAudit(auditStore, actor, {
-        action: "order.status.denied",
-        targetType: "order",
-        targetId: createResourceId(id),
-        outcome: "denied",
-        correlationId,
-        reason:
-          "Tracking number cannot be stored yet (shipment storage unavailable)",
-      });
-      return NextResponse.json(
-        {
-          error:
-            "Nomor resi belum dapat disimpan — penyimpanan shipment belum tersedia",
-        },
-        { status: 422 },
-      );
-    }
-
     const order = await getOrderById(id);
     if (!order) {
       await recordStaffAudit(auditStore, actor, {
@@ -50,6 +30,27 @@ export async function PATCH(
         reason: "Order not found",
       });
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    // H-1 FIX: persist a real tracking number when the admin provides one
+    // (previously always 422'd). Fabrication is gone; only real resi saved.
+    if (body.trackingNumber) {
+      try {
+        await prisma.order.update({
+          where: { id },
+          data: { trackingNumber: body.trackingNumber },
+        });
+        await recordStaffAudit(auditStore, actor, {
+          action: "order.tracking.updated",
+          targetType: "order",
+          targetId: createResourceId(id),
+          outcome: "succeeded",
+          correlationId,
+          after: { trackingNumber: body.trackingNumber },
+        });
+      } catch {
+        // Non-fatal: status transition continues even if resi save fails.
+      }
     }
 
     const before = { ...order };

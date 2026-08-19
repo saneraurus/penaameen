@@ -164,16 +164,16 @@ function CheckoutPaymentPage() {
       user?.fullName ||
       (user?.firstName
         ? `${user.firstName} ${user.lastName || ""}`.trim()
-        : "Ihsan Abdil Haq");
+        : "");
 
     setAddressData({
       id: addressId || "addr-default-1",
       recipientName: dynamicName,
-      phone: "081234567890",
-      addressLine1: "Jl. Margorejo Indah No. 12, Kec. Wonocolo",
-      city: "Surabaya",
-      province: "Jawa Timur",
-      postalCode: "60238",
+      phone: "",
+      addressLine1: "",
+      city: "",
+      province: "",
+      postalCode: "",
       country: "Indonesia",
     });
   }, [addressId, user]);
@@ -193,18 +193,18 @@ function CheckoutPaymentPage() {
         ? `${user.firstName} ${user.lastName || ""}`.trim()
         : null) ||
       addressData?.recipientName ||
-      "Ihsan Abdil Haq";
+      "";
 
     const currentShippingMethod = shippingMethod || "JNE Express — REG";
 
     const finalAddress = addressData || {
       id: addressId || "addr-default-1",
       recipientName: realName,
-      phone: "081234567890",
-      addressLine1: "Jl. Margorejo Indah No. 12, Kec. Wonocolo",
-      city: "Surabaya",
-      province: "Jawa Timur",
-      postalCode: "60238",
+      phone: "",
+      addressLine1: "",
+      city: "",
+      province: "",
+      postalCode: "",
       country: "Indonesia",
     };
 
@@ -220,6 +220,7 @@ function CheckoutPaymentPage() {
           customerName: realName,
           items: cartItems.map((item) => ({
             productId: item.product.id,
+            slug: item.product.slug,
             quantity: item.quantity,
             name: item.product.name,
             price: Number(item.product?.price || 378000),

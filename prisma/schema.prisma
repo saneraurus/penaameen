@@ -125,6 +125,7 @@ model Order {
   casakuTotalAmount BigInt?    // QR total incl. unique code (amount to verify)
   casakuQrString   String?     // QRIS payload string (server-rendered only)
   casakuExpiresAt  DateTime?   // QR expiry
+  trackingNumber  String?      // carrier tracking/resi (set on shipment)
   paidAt           DateTime?
   shippedAt       DateTime?
   deliveredAt     DateTime?

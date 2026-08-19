@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getOrderById } from "@/lib/admin/orders";
 import Midtrans from "midtrans-client";
 
@@ -24,12 +25,15 @@ export async function POST(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
+    // C-2: stable correlation id so the webhook can resolve this order.
+    const midtransOrderId = `${order.orderNumber}`;
+
     try {
       const midtrans = getMidtransClient();
       const parameter = {
         transaction_details: {
-          order_id: `${order.orderNumber}-${Date.now().toString().slice(-4)}`,
-          gross_amount: order.totalAmount,
+          order_id: midtransOrderId,
+          gross_amount: Number(order.totalAmount),
         },
         customer_details: {
           first_name: order.customerName,
@@ -45,23 +49,39 @@ export async function POST(
         },
         item_details: order.items.map((item) => ({
           id: item.productId || item.id,
-          price: item.unitPrice,
+          price: Number(item.unitPrice),
           quantity: item.quantity,
           name: item.productName.slice(0, 50),
         })),
       };
 
       const midtransResponse = await midtrans.createTransaction(parameter);
+
+      // C-2: persist correlation id + token idempotently.
+      await prisma.order
+        .update({
+          where: { id: order.id },
+          data: {
+            midtransOrderId,
+            midtransToken: midtransResponse.token,
+          },
+        })
+        .catch(() => {
+          /* non-fatal: token still returned to client */
+        });
+
       return NextResponse.json({
         snapToken: midtransResponse.token,
         redirectUrl: midtransResponse.redirect_url,
       });
     } catch {
-      // Mock Snap token for sandbox / test environment
-      return NextResponse.json({
-        snapToken: `MOCK_SNAP_${order.orderNumber}_${Date.now()}`,
-        redirectUrl: `https://app.sandbox.midtrans.com/snap/v2/vtweb/mock`,
-      });
+      // C-3 FIX: fail closed. Never return a fabricated MOCK_SNAP_ token —
+      // that made the webhook correlation impossible and let orders appear
+      // paid without a real transaction.
+      return NextResponse.json(
+        { error: "Failed to generate snap token" },
+        { status: 500 },
+      );
     }
   } catch (error) {
     console.error("Error creating snap token:", error);

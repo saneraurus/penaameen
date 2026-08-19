@@ -80,18 +80,18 @@ export default function CheckoutAddressPage() {
       user?.fullName ||
       (user?.firstName
         ? `${user.firstName} ${user.lastName || ""}`.trim()
-        : "Ihsan Abdil Haq");
+        : "");
 
     const dynamicDefaultAddress: Address = {
       id: "addr-default-1",
       label: "Rumah",
       recipientName: dynamicName,
-      phone: "081234567890",
-      addressLine1: "Jl. Margorejo Indah No. 12",
-      addressLine2: "Kec. Wonocolo",
-      city: "Surabaya",
-      province: "Jawa Timur",
-      postalCode: "60238",
+      phone: "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      province: "",
+      postalCode: "",
       country: "Indonesia",
       isDefault: true,
     };

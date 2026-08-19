@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   CasakuClient,
+  CasakuError,
   type CasakuConfig,
   type CasakuPaymentStatus,
   type CasakuQrisData,
@@ -43,11 +44,15 @@ export type GeneratedQrisResult =
       data: CasakuQrisData;
       expiresAt: Date;
     }
-  | { ok: false; error: string };
+  | { ok: false; error: string; detail?: string };
 
 /**
  * Generates a dynamic QRIS for an order and persists the transaction
  * reference. Idempotent: existing casakuTransactionId is reused.
+ *
+ * Casaku API failures and database persistence failures are kept distinct so
+ * the caller can show an accurate message instead of a misleading
+ * "Penyedia QRIS tidak tersedia" fallback.
  */
 export async function generateQrisForOrder(
   orderId: string,
@@ -57,10 +62,23 @@ export async function generateQrisForOrder(
   const config = buildCasakuConfig(settings);
   if (!config) return { ok: false, error: "not_configured" };
 
-  const existing = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: { casakuTransactionId: true, casakuExpiresAt: true },
-  });
+  let existing: { casakuTransactionId: string | null; casakuExpiresAt: Date | null } | null =
+    null;
+  try {
+    existing = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { casakuTransactionId: true, casakuExpiresAt: true },
+    });
+  } catch (dbErr) {
+    return {
+      ok: false,
+      error: "db_read_failed",
+      detail:
+        dbErr instanceof Error
+          ? dbErr.message
+          : "Gagal membaca data pesanan dari database",
+    };
+  }
 
   if (existing?.casakuTransactionId) {
     if (existing.casakuExpiresAt && existing.casakuExpiresAt > new Date()) {
@@ -71,22 +89,48 @@ export async function generateQrisForOrder(
     }
   }
 
+  // Generate the QR from Casaku first — this is independent of our DB.
   const client = new CasakuClient(config);
-  const data = await client.generateQris({ amount });
+  let data: CasakuQrisData;
+  try {
+    data = await client.generateQris({ amount });
+  } catch (err) {
+    if (err instanceof CasakuError) {
+      return { ok: false, error: "casaku_api", detail: err.message };
+    }
+    return {
+      ok: false,
+      error: "casaku_unknown",
+      detail: err instanceof Error ? err.message : "Unknown Casaku error",
+    };
+  }
 
   const expiresAt = new Date(
     Date.now() + (data.expiredInMinutes || config.expiryMinutes || 15) * 60_000,
   );
 
-  await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      casakuTransactionId: data.transactionId,
-      casakuTotalAmount: BigInt(data.totalAmount),
-      casakuQrString: data.qrString ?? null,
-      casakuExpiresAt: expiresAt,
-    },
-  });
+  // Persist the transaction reference. A failure here is a database problem,
+  // NOT a Casaku/QRIS-provider problem.
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        casakuTransactionId: data.transactionId,
+        casakuTotalAmount: BigInt(data.totalAmount),
+        casakuQrString: data.qrString ?? null,
+        casakuExpiresAt: expiresAt,
+      },
+    });
+  } catch (dbErr) {
+    return {
+      ok: false,
+      error: "db_persist_failed",
+      detail:
+        dbErr instanceof Error
+          ? dbErr.message
+          : "Gagal menyimpan referensi pembayaran ke database",
+    };
+  }
 
   return { ok: true, data, expiresAt };
 }

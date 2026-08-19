@@ -14,6 +14,10 @@ const pg = new EmbeddedPostgres({
   password: DB_PASSWORD,
   port: DB_PORT,
   persistent: true,
+  // Root-cause fix for seed "22P05" (WIN1252 rejects emoji/UTF-8 chars):
+  // force the embedded cluster itself to UTF-8 at initdb time so every
+  // created database inherits UTF8 instead of the Windows OS locale.
+  initdbFlags: ["--encoding=UTF8", "--locale=C"],
 });
 
 async function main() {
