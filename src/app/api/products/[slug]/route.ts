@@ -1,12 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getProductBySlug } from "@/lib/admin/products";
+import {
+  getSheetCatalogProducts,
+  mapSheetProductToPublic,
+} from "@/lib/inventory/sheets-catalog";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+
+  try {
+    const sheetProducts = await getSheetCatalogProducts();
+    const sheetProduct = (sheetProducts ?? [])
+      .filter((p) => p.status === "published")
+      .map(mapSheetProductToPublic)
+      .find((p) => p.slug === slug || p.id === slug.toUpperCase());
+    if (sheetProduct) {
+      return NextResponse.json({ product: sheetProduct });
+    }
+  } catch (error) {
+    console.warn(
+      `Stock sheet read failed for product slug ${slug}, checking database:`,
+      error,
+    );
+  }
 
   try {
     const product = await prisma.product.findUnique({

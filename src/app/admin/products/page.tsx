@@ -4,6 +4,7 @@ import {
   Pagination,
 } from "@/presentation/components/admin/DataTable";
 import { ProductStatusButton } from "@/presentation/components/admin/ProductStatusButton";
+import { ProductsTabs } from "@/presentation/components/admin/ProductsTabs";
 import Link from "next/link";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
 import {
@@ -154,6 +155,8 @@ export default async function AdminProductsPage({
           Add Product
         </Link>
       </div>
+
+      <ProductsTabs />
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex flex-wrap gap-4">

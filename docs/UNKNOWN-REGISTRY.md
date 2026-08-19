@@ -109,6 +109,17 @@ These entries record missing brand/design evidence exposed by Phase 5. They pres
 | DES-001 | DESIGN / BRAND | Approved brand asset package: logo variants/usage, color palette, typography, and brand guide | Required to finalize visual expression, token values, logo rules, and implementation-ready design system | No visual assets, logo files, fonts, colors, or brand guide are present in repository; request remains outstanding | Client brand asset package and approval owner | CRITICAL | Client brand/marketing + leadership | CLIENT DECISION REQUIRED |
 | DES-002 | DESIGN / BRAND | Approved imagery, illustration, iconography, tone, cultural positioning, and visual-content direction | Required to govern product/editorial/education/branch/gallery visual treatment without unsupported cultural or brand assumptions | Education/community/commerce positioning is known; visual direction is not | Client brand/content/legal direction | HIGH | Client brand/marketing + content/legal | CLIENT DECISION REQUIRED |
 
+## Resolution additions — 2026-08-20
+
+These entries record resolutions from the Stock Sheets integration (D019, T019). The original rows above remain as historical evidence; resolution status is authoritative.
+
+| ID | Resolution |
+|---|---|
+| INV-001 | RESOLVED — Stock quantity source is the STOCK PENAAMEEN spreadsheet (tab `Sheet1`, column `STOK`) managed via the admin MANAGE STOCKS tab; storefront reads it first (60s cache) with PostgreSQL/static fallback. |
+| INV-002 | PARTIAL — Movement/audit trail implemented as append-only `MUTASI STOCK` ledger tab (CREATED/ADJUSTED/STATUS/DELETED). Reservation/backorder rules still need the warehouse SOP (see `docs/DATA-DECISION-REGISTER.md` DD-004). |
+| PROD-003 | PARTIAL — SKU format decided by implementation (uppercase alphanumeric, auto-generated from name if absent); SKU uniqueness enforced in the sheet adapter. Remaining product data decisions tracked in `docs/CLIENT-DECISION-REGISTER.md` CDR-002/CDR-012. |
+| DATA-005 | UNCHANGED — Package/bundle component allocation remains open; the sheet stores package-level stock only. |
+
 ## Summary Counts
 
 - Total unknown registry items: 65

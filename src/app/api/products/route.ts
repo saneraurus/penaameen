@@ -1,10 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { products as catalogProducts } from "@/data/products";
+import {
+  getSheetCatalogProducts,
+  mapSheetProductToPublic,
+} from "@/lib/inventory/sheets-catalog";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  try {
+    const sheetProducts = await getSheetCatalogProducts();
+    const published = (sheetProducts ?? [])
+      .filter((p) => p.status === "published")
+      .map(mapSheetProductToPublic);
+    if (published.length > 0) {
+      return NextResponse.json({ products: published });
+    }
+  } catch (error) {
+    console.warn("Stock sheet read failed, falling back to database:", error);
+  }
+
   try {
     const dbProducts = await prisma.product.findMany({
       where: { isActive: true },
