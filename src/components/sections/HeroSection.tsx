@@ -139,9 +139,9 @@ export function HeroSection() {
             SPLIT HERO PROFESSIONAL
             KIRI  : teks (headline, deskripsi, CTA, search) — bg gelap
                    , kontras tinggi, mudah dibaca.
-            KANAN : gambar hero besar + tab selector di bawahnya.
+            KANAN : gambar hero + content card + tab selector
         ════════════════════════════════════════════════════════════ */}
-        <div className="grid gap-10 lg:gap-14 items-center lg:grid-cols-2">
+        <div className="grid gap-10 lg:gap-14 items-start lg:grid-cols-2">
 
           {/* ── LEFT — Text content: gelap, kontras, profesional ──── */}
           <div className="flex flex-col gap-5 lg:max-w-xl justify-center lg:col-span-1">
@@ -241,7 +241,7 @@ export function HeroSection() {
             </form>
           </div>
 
-          {/* ── RIGHT — Hero image + tab selector ─────────────────── */}
+          {/* ── RIGHT — Hero image + Content Card + Tab Selector ──── */}
           <div className="flex flex-col gap-5 lg:col-span-1 lg:order-2">
             {/* Hero image — besar, prominent */}
             <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
@@ -272,7 +272,74 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* Tab selector — di bawah gambar */}
+            {/* ═══════════════════════════════════════════════════════
+                CONTENT CARD — menampilkan info active tab dengan rapi
+            ════════════════════════════════════════════════════════ */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
+              {/* Badge + tag */}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-500/20 text-accent-300 text-[10px] font-semibold border border-accent-400/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-400" />
+                  {activeTab.badge}
+                </span>
+                <span className="text-white/40 text-[10px] font-medium">
+                  {activeTab.id === "home-learning" ? "Lifestyle" : "Metode"}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3 className="font-serif font-bold text-white text-base md:text-lg leading-snug mb-2">
+                {activeTab.title}
+              </h3>
+
+              {/* Description — line clamp 2 */}
+              <p className="text-xs text-white/70 leading-relaxed line-clamp-2 mb-4">
+                {activeTab.description}
+              </p>
+
+              {/* Highlights pills */}
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {activeTab.highlights.map((h) => (
+                  <span
+                    key={h}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 text-white/90 text-[10px] font-medium border border-white/10"
+                  >
+                    <svg
+                      className="w-3 h-3 text-accent-400 shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {h}
+                  </span>
+                ))}
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/10">
+                <Link
+                  href={activeTab.ctaHref}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold transition-colors"
+                >
+                  {activeTab.ctaText}
+                  <span aria-hidden="true">→</span>
+                </Link>
+                <Link
+                  href={activeTab.secondaryCtaHref}
+                  className="inline-flex items-center px-3 py-2 rounded-lg border border-white/20 text-white/80 text-xs font-medium hover:bg-white/10 transition-colors"
+                >
+                  {activeTab.secondaryCtaText}
+                </Link>
+              </div>
+            </div>
+
+            {/* Tab selector — di bawah content card */}
             <div className="flex flex-wrap gap-2">
               {showcaseTabs.map((tab) => {
                 const isActive = tab.id === activeTabId;
@@ -281,11 +348,10 @@ export function HeroSection() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTabId(tab.id)}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-white text-primary-950 shadow-md"
-                        : "bg-white/10 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white hover:border-white/20"
-                    }`}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${isActive
+                      ? "bg-white text-primary-950 shadow-md"
+                      : "bg-white/10 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white hover:border-white/20"
+                      }`}
                     aria-pressed={isActive}
                   >
                     <span aria-hidden="true">{tab.icon}</span>
