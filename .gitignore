@@ -13,10 +13,17 @@ test-results/
 .env.test.local
 .env.production.local
 
+# runtime secrets / live config (payment keys + business identifiers)
+src/data/api_settings.json
+
 # TypeScript incremental state
 *.tsbuildinfo
 
 # local editor/system files
 .DS_Store
+
+# local embedded PostgreSQL data directory (runtime, machine-specific)
+.pgdata/
+.pgdata-*/
 
 /generated/prisma
