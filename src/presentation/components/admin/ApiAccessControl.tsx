@@ -318,7 +318,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   </div>
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Diperoleh dari Casaku Dashboard → API Keys (awalan
-                    cashify_[REDACTED]/casaku_)
+                    cashify_…/casaku_…
                   </span>
                 </div>
 

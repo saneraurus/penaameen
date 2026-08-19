@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       fraud_status,
       gross_amount,
       status_code,
-      signature_[REDACTED],
+      signature_key,
     } = body;
 
     console.log("Midtrans webhook received:", {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       status_code,
       gross_amount,
       serverKey,
-      signature_[REDACTED],
+      signature_key,
     );
 
     if (!isValidSignature) {

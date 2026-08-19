@@ -36,6 +36,26 @@ async function main() {
   } catch {
     console.log(`[dev-db] database "${DB_NAME}" already exists`);
   }
+  // Force UTF-8 on the database itself. Fresh clusters inherit the platform
+  // locale encoding (e.g. WIN1252 on Windows), which rejects UTF-8 characters
+  // (emoji, some punctuation) used by the seed data with "22P05".
+  const client = pg.getPgClient();
+  await client.connect();
+  const encoding = await client.query(
+    "SELECT pg_encoding_to_char(encoding) AS enc FROM pg_database WHERE datname = $1",
+    [DB_NAME],
+  );
+  const enc = encoding.rows[0]?.enc;
+  if (enc !== "UTF8") {
+    console.log(`[dev-db] database "${DB_NAME}" uses ${enc}; recreating as UTF8...`);
+    await client.query(`DROP DATABASE ${client.escapeIdentifier(DB_NAME)}`);
+    await client.query(
+      `CREATE DATABASE ${client.escapeIdentifier(DB_NAME)} ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C' TEMPLATE template0`,
+    );
+  } else {
+    console.log(`[dev-db] database "${DB_NAME}" encoding: ${enc}`);
+  }
+  await client.end();
   const url = `postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}`;
   console.log(`[dev-db] PostgreSQL is READY at ${url}`);
   console.log("[dev-db] keeping process alive. Press Ctrl+C to stop.");
