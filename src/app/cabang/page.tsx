@@ -2,12 +2,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
-import { branches } from "@/data/branches";
+import { useState, useMemo, useEffect } from "react";
+import { branches as fallbackBranches, type Branch } from "@/data/branches";
 
 export default function BranchListPage() {
+  const [branches, setBranches] = useState<Branch[]>(fallbackBranches);
   const [search, setSearch] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
+
+  useEffect(() => {
+    fetch("/api/branches")
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: { branches: Branch[] }) => setBranches(data.branches))
+      .catch(() => setBranches(fallbackBranches));
+  }, []);
 
   const filteredBranches = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -38,15 +46,15 @@ export default function BranchListPage() {
 
       return inMain || inOutlets;
     });
-  }, [search, selectedRegion]);
+  }, [branches, search, selectedRegion]);
 
   const regions = useMemo(() => {
     return [...new Set(branches.map((branch) => branch.region))];
-  }, []);
+  }, [branches]);
 
   const totalOutletsCount = useMemo(() => {
     return branches.reduce((acc, b) => acc + (b.outlets?.length || 1), 0);
-  }, []);
+  }, [branches]);
 
   return (
     <div className="min-h-screen bg-[#FBF9F5]">

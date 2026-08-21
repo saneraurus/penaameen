@@ -1,8 +1,10 @@
 import { AdminHeader } from "@/presentation/components/admin/AdminHeader";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { getContentSeoHealth } from "@/lib/seo/content-health";
 
 export default async function AdminSeoPage() {
   void (await requireStaffActor("seo:read"));
+  const health = await getContentSeoHealth();
 
   return (
     <div className="space-y-6">
@@ -17,10 +19,10 @@ export default async function AdminSeoPage() {
             Indexed Pages
           </span>
           <p className="text-2xl font-bold text-emerald-600 mt-1 font-mono">
-            UNKNOWN
+            {health.indexedPages.count}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Belum ada inventaris URL dan redirect tervalidasi
+            URL aktif dari product/content source
           </p>
         </div>
 
@@ -29,7 +31,7 @@ export default async function AdminSeoPage() {
             Schema.org Structured Data
           </span>
           <p className="text-2xl font-bold text-blue-600 mt-1 font-mono">
-            UNKNOWN
+            {health.structuredData.state.toUpperCase()}
           </p>
           <p className="text-xs text-gray-500 mt-1">
             Validasi structured data belum terhubung ke health check
@@ -41,10 +43,10 @@ export default async function AdminSeoPage() {
             Sitemap Status
           </span>
           <p className="text-2xl font-bold text-purple-600 mt-1 font-mono">
-            UNKNOWN
+            {health.sitemap.state.toUpperCase()}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Status sitemap perlu diverifikasi di environment target
+            {health.sitemap.url} tersedia dari metadata runtime
           </p>
         </div>
       </div>
@@ -60,7 +62,8 @@ export default async function AdminSeoPage() {
                 Ensure all product images include descriptive alt text
               </p>
               <p className="text-gray-500">
-                Audit alt text belum memiliki sumber data tervalidasi
+                {health.products.imagesComplete}/{health.products.total} produk
+                memiliki image source
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
@@ -72,9 +75,7 @@ export default async function AdminSeoPage() {
               <p className="font-semibold text-gray-900">
                 Verify 301 redirects for legacy WordPress URLs
               </p>
-              <p className="text-gray-500">
-                Redirect inventory belum tersedia untuk diverifikasi
-              </p>
+              <p className="text-gray-500">{health.redirects.detail}</p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
               Blocked

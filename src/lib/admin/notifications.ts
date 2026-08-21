@@ -1,6 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import fs from "fs";
-import path from "path";
 
 export type NotificationSeverity = "info" | "warning" | "critical";
 
@@ -25,41 +23,17 @@ export interface NotificationInput {
   targetId?: string;
 }
 
-const NOTIFICATIONS_FILE = path.join(
-  process.cwd(),
-  "src/data/notifications.json",
-);
-
-function loadFileNotifications(): AdminNotification[] {
-  try {
-    if (fs.existsSync(NOTIFICATIONS_FILE)) {
-      const raw = fs.readFileSync(NOTIFICATIONS_FILE, "utf-8");
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed as AdminNotification[];
-    }
-  } catch (e) {
-    console.warn("Could not read notifications.json:", e);
-  }
-  return [];
-}
-
-function saveFileNotifications(list: AdminNotification[]): void {
-  try {
-    const dir = path.dirname(NOTIFICATIONS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(
-      NOTIFICATIONS_FILE,
-      JSON.stringify(list, null, 2),
-      "utf-8",
-    );
-  } catch (e) {
-    console.warn("Could not write notifications.json:", e);
-  }
-}
-
 let prismaUnavailable = false;
+
+export function getNotificationStoreHealth() {
+  return {
+    state: prismaUnavailable ? ("degraded" as const) : ("database" as const),
+    writable: !prismaUnavailable,
+    detail: prismaUnavailable
+      ? "Notification database unavailable; new notifications are rejected instead of written to local files."
+      : "Notifications are persisted in PostgreSQL.",
+  };
+}
 
 export async function createNotification(
   input: NotificationInput,
@@ -92,21 +66,7 @@ export async function createNotification(
     }
   }
 
-  const notification: AdminNotification = {
-    id: `notif-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    type: input.type,
-    severity: input.severity,
-    title: input.title,
-    message: input.message,
-    targetType: input.targetType,
-    targetId: input.targetId,
-    readAt: null,
-    createdAt: new Date().toISOString(),
-  };
-  const list = loadFileNotifications();
-  list.unshift(notification);
-  saveFileNotifications(list);
-  return notification;
+  throw new Error("NOTIFICATION_STORE_UNAVAILABLE");
 }
 
 export async function getNotifications(options: {
@@ -147,12 +107,7 @@ export async function getNotifications(options: {
     }
   }
 
-  let list = loadFileNotifications();
-  if (unreadOnly) list = list.filter((n) => n.readAt === null);
-  list.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  const total = list.length;
-  const start = (page - 1) * perPage;
-  return { notifications: list.slice(start, start + perPage), total };
+  return { notifications: [], total: 0 };
 }
 
 export async function getUnreadNotificationCount(): Promise<number> {
@@ -163,7 +118,7 @@ export async function getUnreadNotificationCount(): Promise<number> {
       prismaUnavailable = true;
     }
   }
-  return loadFileNotifications().filter((n) => n.readAt === null).length;
+  return 0;
 }
 
 export async function markNotificationRead(
@@ -191,12 +146,7 @@ export async function markNotificationRead(
     }
   }
 
-  const list = loadFileNotifications();
-  const found = list.find((n) => n.id === id);
-  if (!found) return null;
-  found.readAt = new Date().toISOString();
-  saveFileNotifications(list);
-  return found;
+  return null;
 }
 
 export async function markAllNotificationsRead(): Promise<number> {
@@ -212,14 +162,5 @@ export async function markAllNotificationsRead(): Promise<number> {
     }
   }
 
-  const list = loadFileNotifications();
-  let count = 0;
-  for (const n of list) {
-    if (n.readAt === null) {
-      n.readAt = new Date().toISOString();
-      count += 1;
-    }
-  }
-  saveFileNotifications(list);
-  return count;
+  return 0;
 }

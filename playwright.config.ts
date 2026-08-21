@@ -15,6 +15,18 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    ...(process.env.PLAYWRIGHT_AUTH_STATE
+      ? [
+          {
+            name: "chromium-authenticated",
+            testMatch: /authenticated-admin\.spec\.ts/,
+            use: {
+              ...devices["Desktop Chrome"],
+              storageState: process.env.PLAYWRIGHT_AUTH_STATE,
+            },
+          },
+        ]
+      : []),
   ],
   webServer: {
     command: "npm run dev",

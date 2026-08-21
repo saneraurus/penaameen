@@ -4,12 +4,17 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: "📊" },
   { name: "Products", href: "/admin/products", icon: "📦" },
-  { name: "Orders", href: "/admin/orders", icon: "🧾", hasBadge: true },
+  { name: "Orders", href: "/admin/orders", icon: "🧾" },
+  { name: "Customers", href: "/admin/customers", icon: "👥" },
+  { name: "Payments", href: "/admin/payments", icon: "💳" },
+  { name: "Fulfillment", href: "/admin/fulfillment", icon: "🚚" },
+  { name: "Media", href: "/admin/media", icon: "🖼️" },
+  { name: "Redirects", href: "/admin/seo/redirects", icon: "🔁" },
+  { name: "Analytics", href: "/admin/analytics", icon: "📈" },
   { name: "Notifications", href: "/admin/notifications", icon: "🔔" },
   { name: "Audit Log", href: "/admin/audit", icon: "📜" },
   { name: "Emergency Controls", href: "/admin/system-controls", icon: "🛑" },
@@ -19,24 +24,6 @@ const navigation = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const [orderCount, setOrderCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    async function fetchCount() {
-      try {
-        const res = await fetch("/api/orders");
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data.orders)) {
-            setOrderCount(data.orders.length);
-          }
-        }
-      } catch {
-        // ignore
-      }
-    }
-    fetchCount();
-  }, [pathname]);
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
@@ -75,11 +62,6 @@ export function AdminSidebar() {
                 <span aria-hidden="true">{item.icon}</span>
                 <span>{item.name}</span>
               </div>
-              {"hasBadge" in item && orderCount !== null && orderCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary-600 text-white shadow-xs">
-                  {orderCount}
-                </span>
-              )}
             </Link>
           );
         })}

@@ -1,5 +1,6 @@
 import { createCorrelationId } from "@/domain/common/identifiers";
 import { fail, succeed, type Result } from "@/domain/common/result";
+import { getApiSettings } from "@/lib/admin/api-settings";
 
 export type ApplicationEnvironment = "development" | "test" | "production";
 
@@ -130,7 +131,9 @@ function hasValue(
   values: Readonly<Record<string, string | undefined>>,
   key: string,
 ) {
-  return Boolean(values[key]?.trim());
+  const value = values[key]?.trim();
+  if (!value) return false;
+  return !/^(?:\.\.\.|.*REDACTED.*|.*your_.*|.*placeholder.*)$/i.test(value);
 }
 
 function readinessCheck(
@@ -155,63 +158,90 @@ export function getEnvironmentReadiness(
 ): EnvironmentReadiness {
   const environment = readEnvironment(values.APP_ENV);
   const production = environment === "production";
+  let effective = values;
+  try {
+    const settings = getApiSettings();
+    effective = {
+      ...values,
+      CASAKU_LICENSE_KEY: settings.casaku.licenseKey,
+      CASAKU_WEBHOOK_SECRET: settings.casaku.webhookSecret,
+      CASAKU_QR_ID: settings.casaku.qrId,
+      MIDTRANS_SERVER_KEY: settings.midtrans.serverKey,
+      NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: settings.midtrans.clientKey,
+      RAJAONGKIR_API_KEY: settings.rajaongkir.apiKey,
+      RESEND_API_KEY: settings.autoEmail.apiKey,
+      CLERK_PUBLISHABLE_KEY: settings.clerkAuth.publishableKey,
+      CLERK_SECRET_KEY: settings.clerkAuth.secretKey,
+    };
+  } catch {
+    // Keep raw environment values if the optional settings file is unavailable.
+  }
   const checks = [
     readinessCheck(
       "app.base_url",
-      values,
+      effective,
       ["APP_BASE_URL"],
       production,
       "APP_BASE_URL is not configured",
     ),
     readinessCheck(
       "database.url",
-      values,
+      effective,
       ["DATABASE_URL"],
       production,
       "DATABASE_URL is not configured",
     ),
     readinessCheck(
       "auth.clerk",
-      values,
+      effective,
       ["CLERK_PUBLISHABLE_KEY", "CLERK_SECRET_KEY"],
       production,
       "Clerk credentials are not configured",
     ),
     readinessCheck(
       "payment.casaku",
-      values,
+      effective,
       ["CASAKU_LICENSE_KEY", "CASAKU_WEBHOOK_SECRET", "CASAKU_QR_ID"],
       false,
       "Casaku credentials are not configured",
     ),
     readinessCheck(
       "payment.midtrans",
-      values,
+      effective,
       ["MIDTRANS_SERVER_KEY", "NEXT_PUBLIC_MIDTRANS_CLIENT_KEY"],
       false,
       "Midtrans credentials are not configured",
     ),
     readinessCheck(
       "shipping.rajaongkir",
-      values,
+      effective,
       ["RAJAONGKIR_API_KEY"],
       false,
       "RajaOngkir credentials are not configured",
     ),
     readinessCheck(
       "email.resend",
-      values,
+      effective,
       ["RESEND_API_KEY"],
       false,
       "Resend credentials are not configured",
     ),
-    readinessCheck(
-      "catalog.google_sheets",
-      values,
-      ["GOOGLE_SHEETS_SPREADSHEET_ID"],
-      false,
-      "Google Sheets catalog is not configured",
-    ),
+    {
+      id: "catalog.google_sheets",
+      state:
+        hasValue(effective, "GOOGLE_SHEETS_SPREADSHEET_ID") &&
+        (hasValue(effective, "GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON") ||
+          hasValue(effective, "GOOGLE_SHEETS_SERVICE_ACCOUNT_FILE"))
+          ? "ready"
+          : "unknown",
+      required: false,
+      detail:
+        hasValue(effective, "GOOGLE_SHEETS_SPREADSHEET_ID") &&
+        (hasValue(effective, "GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON") ||
+          hasValue(effective, "GOOGLE_SHEETS_SERVICE_ACCOUNT_FILE"))
+          ? "configured"
+          : "Google Sheets spreadsheet and service-account access are not configured",
+    } satisfies EnvironmentReadinessCheck,
   ] as const;
   const state: ReadinessState = checks.some((item) => item.state === "blocked")
     ? "blocked"

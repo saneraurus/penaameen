@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { buildWebsiteKnowledge } from "@/lib/assistant/knowledge";
+import { buildLiveWebsiteKnowledge } from "@/lib/assistant/knowledge";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -361,14 +361,14 @@ async function persistChatMessages(
   }
 }
 
-function buildSystemPrompt(input: {
+async function buildSystemPrompt(input: {
   pagePath: string;
   searchQuery: string;
   cartItemCount: number;
   isSignedIn: boolean;
   orders: Awaited<ReturnType<typeof fetchUserOrders>>;
   priorConversation: ChatMessage[];
-}): string {
+}): Promise<string> {
   const ordersSection =
     input.orders.length > 0
       ? input.orders
@@ -390,6 +390,7 @@ function buildSystemPrompt(input: {
           .join("\n")
       : "(tidak ada percakapan sebelumnya)";
 
+  const websiteKnowledge = await buildLiveWebsiteKnowledge();
   return `Kamu adalah AMEEN, asisten customer service resmi dari website Pena Ameen (penaameen.com) - penerbit dan lembaga edukasi Islam yang dikenal dengan metode belajar membaca Al-Qur'an AL-BARQY (200 Menit Anti Lupa) dan metode belajar membaca anak ACM (Aku Cepat Membaca). Pengguna melihatmu sebagai "TANYA AMEEN". Seluruh jawabanmu dalam Bahasa Indonesia yang ramah, hangat, santun, dan ringkas (maksimal 3-5 kalimat per topik, gunakan poin bila membantu).
 
 KONTEKS PELANGGAN SAAT INI:
@@ -401,7 +402,7 @@ KONTEKS PELANGGAN SAAT INI:
 ${priorSection}
 
 PENGETAHUAN WEBSITE (hanya gunakan informasi ini, jangan mengarang fakta, harga, atau janji):
-${buildWebsiteKnowledge()}
+${websiteKnowledge}
 
 ATURAN WAJIB (guardrails):
 1. Kamu HANYA customer service. Boleh membantu: informasi produk dan harga, metode belajar (AL-BARQY & ACM), status pesanan, pengiriman/resi, pembayaran, cabang, artikel, dan cara memakai website (mencari produk, keranjang, checkout, login).
@@ -488,7 +489,7 @@ export async function POST(request: Request) {
             content: m.content,
           }));
 
-    const systemPrompt = buildSystemPrompt({
+    const systemPrompt = await buildSystemPrompt({
       pagePath,
       searchQuery,
       cartItemCount,

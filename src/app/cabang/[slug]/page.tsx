@@ -3,7 +3,11 @@
 
 import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
-import { getBranchBySlug, branches } from "@/data/branches";
+import {
+  branches as fallbackBranches,
+  getBranchBySlug,
+  type Branch,
+} from "@/data/branches";
 import { useParams, notFound } from "next/navigation";
 
 interface PageProps {
@@ -21,6 +25,18 @@ export default function BranchDetailPage(props?: PageProps) {
   const [resolvedSlug, setResolvedSlug] = useState<string | null>(
     initialSlug || null,
   );
+  const [branch, setBranch] = useState<Branch | null>(
+    initialSlug ? (getBranchBySlug(initialSlug) ?? null) : null,
+  );
+  const [branches, setBranches] = useState<Branch[]>(fallbackBranches);
+  const effectiveSlug = resolvedSlug || initialSlug;
+
+  useEffect(() => {
+    fetch("/api/branches")
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: { branches: Branch[] }) => setBranches(data.branches))
+      .catch(() => setBranches(fallbackBranches));
+  }, []);
 
   useEffect(() => {
     if (props?.params && "then" in props.params) {
@@ -32,11 +48,17 @@ export default function BranchDetailPage(props?: PageProps) {
     }
   }, [props?.params, routerParams?.slug]);
 
-  const effectiveSlug = resolvedSlug || initialSlug;
-  const branch = useMemo(
-    () => (effectiveSlug ? getBranchBySlug(effectiveSlug) : null),
-    [effectiveSlug],
-  );
+  useEffect(() => {
+    if (!effectiveSlug) return;
+    fetch(`/api/branches?slug=${encodeURIComponent(effectiveSlug)}`)
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: { branch: Branch | null }) => setBranch(data.branch))
+      .catch(() =>
+        setBranch(
+          effectiveSlug ? (getBranchBySlug(effectiveSlug) ?? null) : null,
+        ),
+      );
+  }, [effectiveSlug]);
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedSubCity, setSelectedSubCity] = useState<string>("");

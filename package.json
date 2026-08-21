@@ -35,6 +35,8 @@
     "test:migration": "vitest run tests/migration",
     "test:regression": "vitest run tests/regression",
     "test:e2e": "playwright test",
+    "staging:readiness": "node scripts/staging-readiness.mjs",
+    "db:migration:status": "prisma migrate status",
     "check": "npm run format && npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {

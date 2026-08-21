@@ -2,6 +2,7 @@ import { products } from "@/data/products";
 import { methods } from "@/data/methods";
 import { branches } from "@/data/branches";
 import { articles } from "@/data/articles";
+import { getArticles, getBranches, getMethods } from "@/lib/content";
 
 const formatIdr = (value: number): string =>
   new Intl.NumberFormat("id-ID", {
@@ -112,4 +113,41 @@ export function buildWebsiteKnowledge(): string {
     "=== PETA HALAMAN WEBSITE ===",
     buildSiteMapSection(),
   ].join("\n");
+}
+
+export async function buildLiveWebsiteKnowledge(): Promise<string> {
+  const [liveArticles, liveBranches, liveMethods] = await Promise.all([
+    getArticles(),
+    getBranches(),
+    getMethods(),
+  ]);
+
+  return buildWebsiteKnowledge()
+    .replace(
+      buildArticlesSection(),
+      liveArticles
+        .map(
+          (a) =>
+            `- ${a.title} (Kategori: ${a.category}, ${a.readTime} menit baca) - ${a.excerpt.slice(0, 200)}`,
+        )
+        .join("\n"),
+    )
+    .replace(
+      buildBranchesSection(),
+      liveBranches
+        .map(
+          (b) =>
+            `- ${b.region} (${b.city}): ${b.address} | Kontak: ${b.contact}`,
+        )
+        .join("\n"),
+    )
+    .replace(
+      buildMethodsSection(),
+      liveMethods
+        .map(
+          (m) =>
+            `Nama: ${m.name}\nTagline: ${m.tagline}\nDeskripsi: ${m.description}`,
+        )
+        .join("\n\n"),
+    );
 }

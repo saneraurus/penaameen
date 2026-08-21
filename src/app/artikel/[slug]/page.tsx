@@ -1,7 +1,7 @@
 // src/app/artikel/[slug]/page.tsx
 import Link from "next/link";
 import Image from "next/image";
-import { getArticleBySlug, articles, Article } from "@/data/articles";
+import { getArticleBySlug, getArticles } from "@/lib/content";
 import { notFound } from "next/navigation";
 
 export default async function ArticleDetailPage({
@@ -10,7 +10,7 @@ export default async function ArticleDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();
@@ -78,10 +78,10 @@ export default async function ArticleDetailPage({
               </h2>
               <div className="grid gap-6 md:grid-cols-2">
                 {/* We'll show two related articles for now */}
-                {articles
-                  .filter((a: Article) => a.id !== article.id)
+                {(await getArticles())
+                  .filter((a) => a.id !== article.id)
                   .slice(0, 2)
-                  .map((related: Article) => (
+                  .map((related) => (
                     <Link
                       key={related.id}
                       href={`/artikel/${related.slug}`}

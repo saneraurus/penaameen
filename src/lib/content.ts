@@ -20,7 +20,7 @@ export async function getArticles(): Promise<Article[]> {
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  const r = await prisma.article.findUnique({ where: { slug } });
+  const r = await prisma.article.findFirst({ where: { slug, isActive: true } });
   if (!r) return null;
   return {
     ...r,
@@ -37,7 +37,7 @@ export async function getBranches(): Promise<Branch[]> {
 }
 
 export async function getBranchBySlug(slug: string): Promise<Branch | null> {
-  const r = await prisma.branch.findUnique({ where: { slug } });
+  const r = await prisma.branch.findFirst({ where: { slug, isActive: true } });
   return r ? ({ ...r } as unknown as Branch) : null;
 }
 

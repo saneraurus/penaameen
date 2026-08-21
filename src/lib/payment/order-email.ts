@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { createNotification } from "@/lib/admin/notifications";
 
 /**
  * Sends the order confirmation email to the customer after payment is
@@ -6,6 +7,20 @@ import { prisma } from "@/lib/prisma";
  */
 export async function sendOrderConfirmationEmail(orderId: string) {
   try {
+    if (
+      !process.env.RESEND_API_KEY ||
+      /REDACTED|\.\.\./i.test(process.env.RESEND_API_KEY)
+    ) {
+      await createNotification({
+        type: "email_delivery_blocked",
+        severity: "warning",
+        title: "Email order confirmation blocked",
+        message: "Resend is not configured with a verified API key.",
+        targetType: "order",
+        targetId: orderId,
+      }).catch(() => undefined);
+      return { ok: false as const, reason: "provider_not_configured" as const };
+    }
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,7 +32,8 @@ export async function sendOrderConfirmationEmail(orderId: string) {
       },
     });
 
-    if (!order || !order.user.email) return;
+    if (!order || !order.user.email)
+      return { ok: false as const, reason: "recipient_missing" as const };
 
     const shippingAddress = (order.shippingAddress ?? {}) as {
       recipientName?: string;
@@ -100,7 +116,20 @@ Telp: ${shippingAddress.phone ?? ""}</p>
       subject: `Pesanan ${order.orderNumber} Dikonfirmasi - PENA AMEEN`,
       html,
     });
+    return { ok: true as const };
   } catch (error) {
     console.error("Error sending confirmation email:", error);
+    await createNotification({
+      type: "email_delivery_failed",
+      severity: "critical",
+      title: "Order confirmation email failed",
+      message:
+        error instanceof Error
+          ? error.message.slice(0, 500)
+          : "Unknown email delivery failure",
+      targetType: "order",
+      targetId: orderId,
+    }).catch(() => undefined);
+    return { ok: false as const, reason: "delivery_failed" as const };
   }
 }
