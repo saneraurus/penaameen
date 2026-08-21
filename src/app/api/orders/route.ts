@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import Midtrans from "midtrans-client";
 import { Prisma } from "@/generated/prisma";
 import { getApiSettings } from "@/lib/admin/api-settings";
 import {
@@ -11,6 +10,7 @@ import {
   generateQrisForOrder,
 } from "@/lib/payment/casaku-service";
 import { CasakuError } from "@/lib/payment/casaku";
+import { createMidtransSnapClient } from "@/lib/payment/midtrans-client";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -68,16 +68,6 @@ function mapCasakuFailure(error: string, detail?: string): string {
     default:
       return detail || "Terjadi gangguan pada layanan pembayaran QRIS.";
   }
-}
-
-function getMidtransClient() {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY || "";
-  const clientKey = process.env.MIDTRANS_CLIENT_KEY || "";
-  return new Midtrans.Snap({
-    isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
-    serverKey,
-    clientKey,
-  });
 }
 
 // C-4 FIX: order numbers must be unique. The previous random suffix had a
@@ -514,7 +504,7 @@ export async function POST(request: Request) {
 
     if (!snapToken) {
       try {
-        const midtrans = getMidtransClient();
+        const midtrans = createMidtransSnapClient();
         const parameter = {
           transaction_details: {
             order_id: orderNumber,

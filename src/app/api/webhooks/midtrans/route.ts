@@ -8,6 +8,7 @@ import { auditStore } from "@/infrastructure/audit";
 import { recordSystemAudit } from "@/application/audit/audit-store";
 import { createResourceId } from "@/domain/common/identifiers";
 import { sendOrderConfirmationEmail } from "@/lib/payment/order-email";
+import { getMidtransServerKey } from "@/lib/payment/midtrans-client";
 
 function verifyMidtransSignature(
   orderId: string,
@@ -43,9 +44,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing order_id" }, { status: 400 });
     }
 
-    const serverKey = process.env.MIDTRANS_SERVER_KEY;
+    const serverKey = getMidtransServerKey();
     if (!serverKey) {
-      console.error("MIDTRANS_SERVER_KEY not configured");
+      console.error("Midtrans server key not configured");
       return NextResponse.json(
         { error: "Server not configured" },
         { status: 500 },

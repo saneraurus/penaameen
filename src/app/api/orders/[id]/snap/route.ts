@@ -1,17 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrderById } from "@/lib/admin/orders";
-import Midtrans from "midtrans-client";
-
-function getMidtransClient() {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY || "";
-  const clientKey = process.env.MIDTRANS_CLIENT_KEY || "";
-  return new Midtrans.Snap({
-    isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
-    serverKey,
-    clientKey,
-  });
-}
+import { createMidtransSnapClient } from "@/lib/payment/midtrans-client";
 
 export async function POST(
   request: Request,
@@ -29,7 +19,7 @@ export async function POST(
     const midtransOrderId = `${order.orderNumber}`;
 
     try {
-      const midtrans = getMidtransClient();
+      const midtrans = createMidtransSnapClient();
       const parameter = {
         transaction_details: {
           order_id: midtransOrderId,
