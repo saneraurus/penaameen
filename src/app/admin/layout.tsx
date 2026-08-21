@@ -1,6 +1,11 @@
 import { AdminSidebar } from "@/presentation/components/admin/AdminSidebar";
+import { requireStaffActor } from "@/application/auth/clerk-auth";
 
-export default function AdminLayout(props: { children: React.ReactNode }) {
+export default async function AdminLayout(props: {
+  children: React.ReactNode;
+}) {
+  await requireStaffActor();
+
   return (
     <div className="min-h-screen flex bg-gray-50">
       <AdminSidebar />

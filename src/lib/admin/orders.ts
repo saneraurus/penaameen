@@ -237,8 +237,22 @@ export async function getOrders(
     ];
   }
   if (status) where.status = status;
-  if (paymentStatus) where.paymentStatus = paymentStatus;
-  if (fulfillmentStatus) where.fulfillmentStatus = fulfillmentStatus;
+  // Payment and fulfillment are projections of the persisted order state.
+  // Keep filtering aligned with the Prisma schema instead of querying fields
+  // that do not exist on Order.
+  if (paymentStatus === "paid") {
+    where.status = { in: ["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] };
+  } else if (paymentStatus === "failed") {
+    where.status = { in: ["CANCELLED", "REFUNDED"] };
+  } else if (paymentStatus === "pending") {
+    where.status = "PENDING_PAYMENT";
+  }
+  if (fulfillmentStatus === "shipped") where.status = "SHIPPED";
+  if (fulfillmentStatus === "delivered") where.status = "DELIVERED";
+  if (fulfillmentStatus === "fulfilled") where.status = "PROCESSING";
+  if (fulfillmentStatus === "unfulfilled") {
+    where.status = { in: ["PENDING_PAYMENT", "PAID"] };
+  }
   if (dateFrom || dateTo) {
     where.createdAt = {};
     if (dateFrom)

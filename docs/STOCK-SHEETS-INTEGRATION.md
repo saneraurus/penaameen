@@ -30,6 +30,11 @@ spreadsheet must be shared with its `client_email` (Editor). No other
 credential is required; the JWT flow uses Node `crypto` only (no new
 dependencies).
 
+The workbook `PRODUK/BERAT PRODUK ACM ABQ.xlsx` is imported to a separate
+`BERAT PRODUK` tab with `npm run import:weights:sheets`. The tab stores 38
+verified component rows in grams. These rows are reference data only; sellable
+package weights remain unresolved until package contents are confirmed.
+
 ## 3. Spreadsheet schema (tab `Sheet1`)
 
 | Column | Header | Example |

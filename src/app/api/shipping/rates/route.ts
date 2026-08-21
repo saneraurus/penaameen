@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { getApiSettings } from "@/lib/admin/api-settings";
+import { getSheetCatalogProducts } from "@/lib/inventory/sheets-catalog";
+import { productWeights } from "@/data/product-weights";
 
 const shippingRateSchema = z.object({
   addressId: z.string().optional(),
@@ -157,8 +159,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Compute total weight from cart or items
-    const totalWeight = parsed.weight || 0;
+    // 2. Reconcile package weight from server-known product names. A client
+    // supplied weight is never trusted as the sole source for a provider call.
+    let totalWeight = parsed.weight || 0;
+    if (parsed.items?.length) {
+      const identifiers = parsed.items
+        .map((item) => item.productId)
+        .filter((value): value is string => Boolean(value));
+      const dbProducts = await prisma.product.findMany({
+        where: {
+          OR: identifiers.flatMap((value) => [
+            { id: value },
+            { sku: value },
+            { slug: value },
+          ]),
+        },
+        select: { id: true, sku: true, slug: true, name: true },
+      });
+      const sheets = (await getSheetCatalogProducts()) ?? [];
+      const weightByName = new Map(
+        productWeights.map((item) => [
+          item.name.trim().toLowerCase(),
+          item.weightGrams,
+        ]),
+      );
+      const resolvedWeight = parsed.items.reduce((sum, item) => {
+        const product = dbProducts.find(
+          (candidate) =>
+            candidate.id === item.productId ||
+            candidate.sku === item.productId ||
+            candidate.slug === item.productId,
+        );
+        const sheet = sheets.find(
+          (candidate) =>
+            candidate.sku === item.productId ||
+            candidate.slug === item.productId,
+        );
+        const name = (product?.name || sheet?.name || "").trim().toLowerCase();
+        const grams = weightByName.get(name);
+        return grams ? sum + grams * (item.quantity || 0) : sum;
+      }, 0);
+      if (resolvedWeight > 0) totalWeight = resolvedWeight;
+    }
 
     if (totalWeight <= 0) {
       return NextResponse.json(

@@ -54,8 +54,8 @@ export default function CartPage() {
             Keranjang Anda kosong
           </h1>
           <p className="mb-8 max-w-md text-supporting-600">
-            Belum ada produk yang ditambahkan. Jelajahi produk ALBARQY &amp;
-            ACM untuk memulai belanja.
+            Belum ada produk yang ditambahkan. Jelajahi produk ALBARQY &amp; ACM
+            untuk memulai belanja.
           </p>
           <Link
             href="/produk"

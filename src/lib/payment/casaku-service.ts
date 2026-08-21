@@ -62,8 +62,10 @@ export async function generateQrisForOrder(
   const config = buildCasakuConfig(settings);
   if (!config) return { ok: false, error: "not_configured" };
 
-  let existing: { casakuTransactionId: string | null; casakuExpiresAt: Date | null } | null =
-    null;
+  let existing: {
+    casakuTransactionId: string | null;
+    casakuExpiresAt: Date | null;
+  } | null = null;
   try {
     existing = await prisma.order.findUnique({
       where: { id: orderId },

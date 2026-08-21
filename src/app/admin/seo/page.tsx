@@ -17,10 +17,10 @@ export default async function AdminSeoPage() {
             Indexed Pages
           </span>
           <p className="text-2xl font-bold text-emerald-600 mt-1 font-mono">
-            19 / 19
+            UNKNOWN
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            All catalog products have valid canonical URLs
+            Belum ada inventaris URL dan redirect tervalidasi
           </p>
         </div>
 
@@ -29,10 +29,10 @@ export default async function AdminSeoPage() {
             Schema.org Structured Data
           </span>
           <p className="text-2xl font-bold text-blue-600 mt-1 font-mono">
-            Product & Org
+            UNKNOWN
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Active on catalog & home layouts
+            Validasi structured data belum terhubung ke health check
           </p>
         </div>
 
@@ -41,10 +41,10 @@ export default async function AdminSeoPage() {
             Sitemap Status
           </span>
           <p className="text-2xl font-bold text-purple-600 mt-1 font-mono">
-            Generated
+            UNKNOWN
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Dynamic sitemap endpoint active
+            Status sitemap perlu diverifikasi di environment target
           </p>
         </div>
       </div>
@@ -60,11 +60,11 @@ export default async function AdminSeoPage() {
                 Ensure all product images include descriptive alt text
               </p>
               <p className="text-gray-500">
-                Currently 100% compliant across WooCommerce imports
+                Audit alt text belum memiliki sumber data tervalidasi
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
-              Good
+              Review
             </span>
           </li>
           <li className="py-3 flex items-center justify-between">
@@ -73,11 +73,11 @@ export default async function AdminSeoPage() {
                 Verify 301 redirects for legacy WordPress URLs
               </p>
               <p className="text-gray-500">
-                All /shop/ and product permalinks preserved
+                Redirect inventory belum tersedia untuk diverifikasi
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
-              Good
+              Blocked
             </span>
           </li>
         </ul>

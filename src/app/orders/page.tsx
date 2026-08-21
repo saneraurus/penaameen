@@ -100,24 +100,7 @@ export default function OrdersPage() {
     if (!isSignedIn) return;
 
     async function loadOrders() {
-      // 1. Sync any local orders from localStorage to backend first
-      try {
-        const localHistory = localStorage.getItem("penaameen_orders_history");
-        if (localHistory) {
-          const parsed = JSON.parse(localHistory);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            await fetch("/api/orders/sync", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ orders: parsed }),
-            });
-          }
-        }
-      } catch (e) {
-        console.warn("Could not sync local orders:", e);
-      }
-
-      // 2. Fetch fresh real-time orders from backend
+      // Only the server is authoritative for order history.
       try {
         const res = await fetch("/api/orders");
         if (res.ok) {
@@ -135,21 +118,6 @@ export default function OrdersPage() {
         }
       } catch {
         // Fallback below
-      }
-
-      // 3. Fallback from localStorage history
-      try {
-        const localHistory = localStorage.getItem("penaameen_orders_history");
-        if (localHistory) {
-          const parsed = JSON.parse(localHistory);
-          if (parsed.length > 0) {
-            setOrders(parsed);
-            setIsLoading(false);
-            return;
-          }
-        }
-      } catch {
-        // No orders
       }
 
       setOrders([]);

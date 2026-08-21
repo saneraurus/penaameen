@@ -22,6 +22,7 @@
     "db:push": "prisma db push",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
     "import:products:sheets": "tsx scripts/import-products-to-sheets.ts",
+    "import:weights:sheets": "tsx scripts/import-product-weights-to-sheets.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",

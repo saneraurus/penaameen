@@ -19,6 +19,23 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    if (body.paymentStatus !== undefined) {
+      return NextResponse.json(
+        {
+          error:
+            "Payment status hanya dapat diubah melalui payment verification",
+        },
+        { status: 403 },
+      );
+    }
+
+    if (body.status !== undefined || body.fulfillmentStatus !== undefined) {
+      return NextResponse.json(
+        { error: "Gunakan endpoint transition untuk perubahan status pesanan" },
+        { status: 409 },
+      );
+    }
+
     const order = await getOrderById(id);
     if (!order) {
       await recordStaffAudit(auditStore, actor, {
@@ -68,23 +85,7 @@ export async function PATCH(
       );
     }
 
-    if (body.status && body.status !== order.status) {
-      order.status = body.status;
-      changed.push("status");
-    }
-    if (body.paymentStatus && body.paymentStatus !== order.paymentStatus) {
-      order.paymentStatus = body.paymentStatus;
-      changed.push("paymentStatus");
-    }
-    if (
-      body.fulfillmentStatus &&
-      body.fulfillmentStatus !== order.fulfillmentStatus
-    ) {
-      order.fulfillmentStatus = body.fulfillmentStatus;
-      changed.push("fulfillmentStatus");
-    }
-
-    if (changed.length === 0) {
+    if (changed.length === 0 && !body.trackingNumber) {
       return NextResponse.json({ success: true, order });
     }
 

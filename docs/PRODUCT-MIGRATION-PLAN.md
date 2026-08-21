@@ -17,7 +17,7 @@ This plan maps existing WooCommerce-style product data into the future commerce 
 | Category | Browsing and SEO | PARTIAL | WooCommerce export |
 | Tags | Discovery/filtering/SEO | PARTIAL | WooCommerce export |
 | Images | Product trust/conversion | UNKNOWN | Media export |
-| Weight | Shipping rates | UNKNOWN | WooCommerce export/operations sheet |
+| Weight | Shipping rates | PARTIAL — component weights imported from `PRODUK/BERAT PRODUK ACM ABQ.xlsx`; package composition remains unresolved | Operations sheet + confirmed package contents |
 | Dimensions | Shipping/package rules | UNKNOWN | WooCommerce export/operations sheet |
 | Stock | Inventory control | UNKNOWN | WooCommerce export/warehouse sheet |
 | Variants | Options and pricing | UNKNOWN | WooCommerce export |
@@ -51,6 +51,7 @@ This plan maps existing WooCommerce-style product data into the future commerce 
 7. Preserve product images and alt text; do not reuse unlicensed media.
 8. Map package/bundle contents explicitly before launch.
 9. Preserve product SEO metadata and structured data if present.
+10. Keep component weights separate from sellable-package weights until package contents are confirmed; never sum or infer package weight.
 
 ## Validation checklist
 

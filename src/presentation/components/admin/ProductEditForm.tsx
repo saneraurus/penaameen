@@ -19,7 +19,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
     category: product.category,
     price: product.price,
     salePrice: product.salePrice || "",
-    stockQuantity: product.stockQuantity ?? 50,
+    stockQuantity: product.stockQuantity ?? 0,
     sku: product.sku || "",
     image: product.image || "/images/penaameen/products/home-learning.jpg",
     status: product.status,

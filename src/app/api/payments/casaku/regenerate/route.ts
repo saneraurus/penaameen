@@ -24,7 +24,10 @@ export async function POST(request: Request) {
     const { orderId } = body as { orderId: string };
 
     if (!orderId) {
-      return NextResponse.json({ error: "orderId is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "orderId is required" },
+        { status: 400 },
+      );
     }
 
     const order = await prisma.order.findUnique({
@@ -80,10 +83,9 @@ export async function POST(request: Request) {
       const message =
         err instanceof CasakuError ? err.message : "Gagal menghubungi Casaku";
       const status = err instanceof CasakuError ? err.status : 502;
-      return NextResponse.json(
-        { error: message },
-        { status: status ?? 502 } as Parameters<typeof NextResponse.json>[1],
-      );
+      return NextResponse.json({ error: message }, {
+        status: status ?? 502,
+      } as Parameters<typeof NextResponse.json>[1]);
     }
   } catch (error) {
     console.error("Error regenerating Casaku QRIS:", error);

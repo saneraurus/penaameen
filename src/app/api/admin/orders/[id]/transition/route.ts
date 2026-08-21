@@ -26,14 +26,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const actor = await requireStaffActor("orders:transition");
+    const body = await request.json();
+    const transition = body.transition as OrderTransition;
+    const actor = await requireStaffActor(
+      transition === "mark_paid" ? "payments:verify" : "orders:transition",
+    );
     const correlationId = createRequestCorrelationId(
       request.headers.get("x-request-id"),
     );
     const { id } = await params;
-    const body = await request.json();
-    const transition = body.transition as OrderTransition;
-
     if (!VALID_TRANSITIONS.includes(transition)) {
       await recordStaffAudit(auditStore, actor, {
         action: "order.transition.denied",
@@ -46,6 +47,13 @@ export async function PATCH(
       return NextResponse.json(
         { error: "Invalid transition" },
         { status: 400 },
+      );
+    }
+
+    if (transition === "mark_paid" && !String(body.evidence || "").trim()) {
+      return NextResponse.json(
+        { error: "Bukti pembayaran wajib disertakan untuk verifikasi manual" },
+        { status: 422 },
       );
     }
 
@@ -64,6 +72,17 @@ export async function PATCH(
         { error: "Order not found or transition not allowed" },
         { status: 404 },
       );
+    }
+
+    if (transition === "mark_paid" && body.evidence) {
+      await recordStaffAudit(auditStore, actor, {
+        action: "payment.manual_verification.evidence",
+        targetType: "order",
+        targetId: createResourceId(id),
+        outcome: "succeeded",
+        correlationId,
+        reason: String(body.evidence).slice(0, 500),
+      });
     }
 
     await recordStaffAudit(auditStore, actor, {

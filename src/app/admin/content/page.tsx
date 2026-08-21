@@ -1,8 +1,15 @@
 import { AdminHeader } from "@/presentation/components/admin/AdminHeader";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { prisma } from "@/lib/prisma";
 
 export default async function AdminContentPage() {
   void (await requireStaffActor("content:read"));
+  const articles = await prisma.article.findMany({
+    where: { isActive: true },
+    orderBy: { date: "desc" },
+    take: 50,
+    select: { id: true, title: true, date: true },
+  });
 
   return (
     <div className="space-y-6">
@@ -16,59 +23,40 @@ export default async function AdminContentPage() {
           <h3 className="text-base font-semibold text-gray-900">
             Articles & Guides
           </h3>
-          <button
-            type="button"
-            className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl transition-colors"
-          >
-            + Write Article
-          </button>
+          <span className="px-4 py-2 bg-amber-50 text-amber-800 text-xs font-semibold rounded-xl border border-amber-200">
+            CMS belum aktif
+          </span>
         </div>
 
-        <div className="divide-y divide-gray-100 text-xs">
-          {[
-            {
-              title:
-                "Cara Efektif Mengajarkan Anak Membaca Tanpa Mengeja (Metode ACM)",
-              status: "published",
-              date: "14 Agu 2026",
-              views: "1.4k",
-            },
-            {
-              title:
-                "Panduan Lengkap Mengenalkan Huruf Hijaiyah dengan Metode Al-Barqy",
-              status: "published",
-              date: "08 Agu 2026",
-              views: "980",
-            },
-            {
-              title:
-                "5 Aktivitas Menyenangkan Melatih Motorik Halus Anak Usia Dini",
-              status: "draft",
-              date: "17 Agu 2026",
-              views: "-",
-            },
-          ].map((item, idx) => (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
+          Data artikel saat ini masih berasal dari sumber statis/migrasi. Tidak
+          ada aksi publikasi yang tersedia sampai model konten, workflow
+          editorial, dan data sumber disetujui.
+        </div>
+        <div className="divide-y divide-gray-100 text-xs opacity-75">
+          {articles.map((item) => (
             <div
-              key={idx}
+              key={item.id}
               className="py-3 flex items-center justify-between gap-4"
             >
               <div>
                 <p className="font-semibold text-gray-900">{item.title}</p>
                 <p className="text-gray-500 mt-0.5">
-                  {item.date} • {item.views} pembaca
+                  {item.date.toLocaleDateString("id-ID")} • status aktif
                 </p>
               </div>
               <span
-                className={`px-2.5 py-1 rounded-full font-semibold uppercase text-[10px] ${
-                  item.status === "published"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-amber-50 text-amber-700"
-                }`}
+                className={`px-2.5 py-1 rounded-full font-semibold uppercase text-[10px] ${"bg-emerald-50 text-emerald-700"}`}
               >
-                {item.status}
+                published
               </span>
             </div>
           ))}
+          {articles.length === 0 && (
+            <p className="py-6 text-gray-500">
+              Belum ada artikel aktif di database.
+            </p>
+          )}
         </div>
       </div>
     </div>

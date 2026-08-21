@@ -29,6 +29,7 @@ export const ROLE_CAPABILITY_MAP: Readonly<
     "orders:write",
     "orders:transition",
     "payments:read",
+    "payments:verify",
     "payments:refund",
     "fulfillment:read",
     "fulfillment:write",
@@ -199,35 +200,9 @@ export async function getStaffActor(): Promise<StaffActor | null> {
         }
       }
 
-      // Check active organization invitations in Clerk
-      if (!resolvedRole) {
-        const orgList = await client.organizations.getOrganizationList();
-        for (const org of orgList.data || []) {
-          try {
-            const invitations =
-              await client.organizations.getOrganizationInvitationList({
-                organizationId: org.id,
-              });
-
-            const matchedInvite = invitations.data?.find((inv) =>
-              userEmails.includes(inv.emailAddress.toLowerCase()),
-            );
-
-            if (matchedInvite) {
-              const rawRole = (matchedInvite.role || "admin").replace(
-                /^org:/,
-                "",
-              );
-              resolvedRole = (
-                rawRole in ROLE_CAPABILITY_MAP ? rawRole : "admin"
-              ) as ClerkOrgRole;
-              break;
-            }
-          } catch {
-            // ignore
-          }
-        }
-      }
+      // Pending invitations are not staff authorization. Only an active
+      // organization membership or explicitly configured metadata may grant
+      // capabilities.
     } catch (e) {
       console.warn(
         "[Clerk Auth] Error during staff resolution for user:",

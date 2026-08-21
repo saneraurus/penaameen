@@ -165,7 +165,7 @@ export default function CheckoutAddressPage() {
                 }
               : undefined,
             items: cartItems.map((item) => ({
-              productId: item.product.id,
+              productId: item.product.slug || item.product.id,
               quantity: item.quantity,
             })),
           }),

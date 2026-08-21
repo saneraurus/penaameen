@@ -23,7 +23,8 @@ export async function GET(
       where: { clerkId: authObj.userId },
       select: { id: true },
     });
-    if (!user) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    if (!user)
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     const { id } = await params;
     const order = await prisma.order.findFirst({
@@ -33,7 +34,8 @@ export async function GET(
       },
       select: { trackingNumber: true, shippingMethod: true, status: true },
     });
-    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    if (!order)
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     if (!order.trackingNumber) {
       return NextResponse.json({

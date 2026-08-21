@@ -72,6 +72,11 @@ export async function POST(request: Request) {
       "status_poll",
     );
 
+    const updatedOrder = await prisma.order.findUnique({
+      where: { id: order.id },
+      select: { id: true, orderNumber: true, status: true },
+    });
+
     return NextResponse.json({
       transactionId,
       status: status.status,
@@ -80,7 +85,7 @@ export async function POST(request: Request) {
       order: {
         id: order.id,
         orderNumber: order.orderNumber,
-        status: order.status,
+        status: updatedOrder?.status ?? order.status,
       },
     });
   } catch (error) {

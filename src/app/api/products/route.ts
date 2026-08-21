@@ -59,7 +59,7 @@ export async function GET() {
       description: p.description,
       price: p.price,
       image: p.image,
-      stock: 50,
+      stock: 0,
     })),
   });
 }

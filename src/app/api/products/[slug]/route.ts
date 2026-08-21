@@ -66,7 +66,7 @@ export async function GET(
         description: liveProduct.description,
         price: liveProduct.price,
         image: liveProduct.image,
-        stock: liveProduct.stockQuantity ?? 50,
+        stock: liveProduct.stockQuantity ?? 0,
       },
     });
   }

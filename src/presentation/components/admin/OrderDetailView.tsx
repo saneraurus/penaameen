@@ -16,22 +16,18 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleUpdateStatus = async (
-    status: string,
-    fulfillmentStatus: string,
-    note?: string,
-  ) => {
+  const handleUpdateStatus = async (transition: string) => {
     setIsUpdating(true);
     try {
-      const res = await fetch(`/api/admin/orders/${order.id}/status`, {
+      const res = await fetch(`/api/admin/orders/${order.id}/transition`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, fulfillmentStatus, note }),
+        body: JSON.stringify({ transition }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        setOrder(data.order || { ...order, status, fulfillmentStatus });
+        setOrder(data.order || order);
         router.refresh();
       }
     } catch {
@@ -72,13 +68,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
             order.fulfillmentStatus !== "shipped" && (
               <button
                 type="button"
-                onClick={() =>
-                  handleUpdateStatus(
-                    "processing",
-                    "fulfilled",
-                    "Pesanan sedang dikemas di gudang.",
-                  )
-                }
+                onClick={() => handleUpdateStatus("mark_fulfilled")}
                 disabled={isUpdating}
                 className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
@@ -89,13 +79,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
           {order.fulfillmentStatus !== "shipped" && (
             <button
               type="button"
-              onClick={() =>
-                handleUpdateStatus(
-                  "processing",
-                  "shipped",
-                  "Paket telah diserahkan ke kurir ekspedisi.",
-                )
-              }
+              onClick={() => handleUpdateStatus("mark_shipped")}
               disabled={isUpdating}
               className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
             >

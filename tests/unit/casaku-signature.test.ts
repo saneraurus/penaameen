@@ -6,8 +6,7 @@ import {
   verifyCasakuWebhookSignature,
 } from "@/lib/payment/casaku";
 
-const SECRET =
-  "cashify_[REDACTED]";
+const SECRET = "cashify_[REDACTED]";
 
 const SAMPLE_PAYLOAD = JSON.stringify({
   transactionId: "CSK-123",

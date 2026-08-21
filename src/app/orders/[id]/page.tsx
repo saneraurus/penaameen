@@ -320,45 +320,21 @@ function OrderDetailInner() {
     setIsProcessingPayment(true);
 
     try {
-      // Update backend status to PAID & PROCESSING
-      await fetch(`/api/admin/orders/${order.id}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: "processing",
-          paymentStatus: "paid",
-          fulfillmentStatus: "unfulfilled",
-          note: "Pembayaran berhasil diverifikasi via Midtrans Snap Gateway.",
-        }),
-      });
-
-      // Update local storage history
-      try {
-        const localSaved = JSON.parse(
-          localStorage.getItem("penaameen_orders_history") || "[]",
-        );
-        const updated = localSaved.map(
-          (o: { id: string; orderNumber?: string }) =>
-            o.id === order.id || o.orderNumber === order.orderNumber
-              ? { ...o, status: "PROCESSING", paymentStatus: "paid" }
-              : o,
-        );
-        localStorage.setItem(
-          "penaameen_orders_history",
-          JSON.stringify(updated),
-        );
-      } catch {
-        // ignore
+      // Payment state is written only by the verified Midtrans webhook. The
+      // browser callback is not trusted to mutate the order directly.
+      const statusResponse = await fetch(`/api/orders/${order.id}`);
+      if (!statusResponse.ok) {
+        throw new Error("Status pembayaran belum dapat diverifikasi");
       }
 
-      setOrder((prev) =>
-        prev
-          ? {
-              ...prev,
-              status: "PROCESSING",
-            }
-          : prev,
-      );
+      const data = await statusResponse.json();
+      if (
+        data.order?.status !== "PAID" &&
+        data.order?.status !== "PROCESSING"
+      ) {
+        throw new Error("Pembayaran belum terverifikasi oleh server");
+      }
+      setOrder(data.order);
 
       setShowSnapSimulationModal(false);
       router.refresh();

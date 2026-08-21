@@ -216,8 +216,7 @@ export const branches: Branch[] = [
         id: "jbr-13",
         name: "PONPES DAR EL QOMAR",
         pic: "MUBAROK",
-        address:
-          "Jln. Mayabon Polda Banten Cipocok Jaya Kota Serang - Banten",
+        address: "Jln. Mayabon Polda Banten Cipocok Jaya Kota Serang - Banten",
         contact: "081911135011",
         city: "Banten",
         type: "Pondok Pesantren",

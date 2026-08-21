@@ -45,29 +45,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
     setProcessingOrderId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const res = await fetch(`/api/admin/orders/${orderId}/transition`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          status: "processing",
-          paymentStatus: "paid",
-          fulfillmentStatus: "unfulfilled",
-          note: "Pembayaran dikonfirmasi manual oleh Admin. Pesanan siap dikemas di gudang.",
+          transition: "mark_paid",
+          evidence: "Konfirmasi pembayaran manual dari staf finance",
         }),
       });
 
       if (res.ok) {
+        const data = await res.json();
         setOrders((prev) =>
-          prev.map((o) =>
-            o.id === orderId
-              ? {
-                  ...o,
-                  status: "processing",
-                  paymentStatus: "paid",
-                  fulfillmentStatus: "unfulfilled",
-                }
-              : o,
-          ),
+          prev.map((o) => (o.id === orderId ? data.order || o : o)),
         );
         setToastMessage(
           `✓ Pembayaran #${orderId} berhasil dikonfirmasi! Pesanan kini siap diproses & dicetak resinya.`,
@@ -86,26 +76,18 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
   const handleMarkShipped = async (orderId: string) => {
     setProcessingOrderId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const res = await fetch(`/api/admin/orders/${orderId}/transition`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          status: "processing",
-          fulfillmentStatus: "shipped",
-          note: "Paket telah diserahkan kepada kurir pengiriman.",
+          transition: "mark_shipped",
         }),
       });
 
       if (res.ok) {
+        const data = await res.json();
         setOrders((prev) =>
-          prev.map((o) =>
-            o.id === orderId
-              ? {
-                  ...o,
-                  fulfillmentStatus: "shipped",
-                }
-              : o,
-          ),
+          prev.map((o) => (o.id === orderId ? data.order || o : o)),
         );
         setToastMessage(
           `🚚 Pesanan #${orderId} telah ditandai 'Dalam Pengiriman'!`,
@@ -126,27 +108,18 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
     setProcessingOrderId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const res = await fetch(`/api/admin/orders/${orderId}/transition`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          status: "cancelled",
-          paymentStatus: "failed",
-          note: "Pesanan dibatalkan oleh Admin.",
+          transition: "cancel",
         }),
       });
 
       if (res.ok) {
+        const data = await res.json();
         setOrders((prev) =>
-          prev.map((o) =>
-            o.id === orderId
-              ? {
-                  ...o,
-                  status: "cancelled",
-                  paymentStatus: "failed",
-                }
-              : o,
-          ),
+          prev.map((o) => (o.id === orderId ? data.order || o : o)),
         );
         setToastMessage(`Pesanan #${orderId} telah dibatalkan.`);
         setTimeout(() => setToastMessage(null), 4000);
@@ -171,21 +144,8 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
   const onLabelPrinted = () => {
     if (!selectedOrderForPrint) return;
-    const orderId = selectedOrderForPrint.id;
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId
-          ? {
-              ...o,
-              status: "processing",
-              paymentStatus: "paid",
-              fulfillmentStatus: "fulfilled",
-            }
-          : o,
-      ),
-    );
     setToastMessage(
-      `✓ Resi dicetak! Status Pesanan #${selectedOrderForPrint.orderNumber} otomatis diubah menjadi 'Sedang Dikemas'.`,
+      `Label untuk pesanan #${selectedOrderForPrint.orderNumber} siap dicetak. Status order tidak berubah tanpa aksi fulfillment yang tervalidasi.`,
     );
     setTimeout(() => setToastMessage(null), 5000);
     router.refresh();

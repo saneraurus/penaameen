@@ -48,9 +48,7 @@ export default function ContactPage() {
                     belajar kami.
                   </p>
                   <div className="flex space-x-4">
-                    {/* We'll use placeholder links for social media */}
-                    <a
-                      href="#"
+                    <span
                       className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
                       aria-label="Facebook"
                     >
@@ -66,9 +64,8 @@ export default function ContactPage() {
                           d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
                         />
                       </svg>
-                    </a>
-                    <a
-                      href="#"
+                    </span>
+                    <span
                       className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
                       aria-label="Instagram"
                     >
@@ -84,9 +81,11 @@ export default function ContactPage() {
                           d="M4 4v16a2 2 0 002 2h16a2 2 0 002-2V4a2 2 0 00-2-2H4a2 2 0 00-2 2z"
                         />
                       </svg>
-                    </a>
+                    </span>
                     <a
-                      href="#"
+                      href="https://wa.me/6282231239158"
+                      target="_blank"
+                      rel="noreferrer"
                       className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
                       aria-label="WhatsApp"
                     >
@@ -113,7 +112,12 @@ export default function ContactPage() {
               <h2 className="mb-6 text-3xl font-serif text-primary-600">
                 Kirim Pesan
               </h2>
-              <form className="space-y-6">
+              <div className="space-y-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+                Formulir kontak belum terhubung ke kanal penerimaan pesan.
+                Gunakan WhatsApp atau email resmi di atas agar pesan tidak
+                hilang.
+              </div>
+              <div className="space-y-6">
                 <div>
                   <label
                     htmlFor="name"
@@ -156,13 +160,13 @@ export default function ContactPage() {
                     className="w-full px-4 py-2 border border-supporting-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
+                <a
+                  href="mailto:cs.penaameen@yahoo.com"
+                  className="block w-full px-6 py-3 text-center bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
                 >
-                  Kirim Pesan
-                </button>
-              </form>
+                  Kirim melalui Email
+                </a>
+              </div>
             </section>
           </div>
         </div>

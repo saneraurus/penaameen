@@ -103,18 +103,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         const apiItems: CartItem[] = data.items ?? [];
-        if (apiItems.length > 0) {
-          const { total, itemCount } = calculateTotals(apiItems);
-          setState({
-            items: apiItems,
-            total,
-            itemCount,
-            isLoading: false,
-            error: null,
-          });
-          saveToLocalStorage(apiItems);
-          return;
-        }
+        const { total, itemCount } = calculateTotals(apiItems);
+        setState({
+          items: apiItems,
+          total,
+          itemCount,
+          isLoading: false,
+          error: null,
+        });
+        saveToLocalStorage(apiItems);
+        return;
       }
     } catch {
       // Ignore network errors and fallback to local storage
@@ -221,11 +219,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // 2. Try sync to API if available
     try {
-      await fetch("/api/cart", {
+      const response = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId, quantity }),
       });
+      if (!response.ok && response.status !== 401) {
+        throw new Error("Server cart rejected the item");
+      }
     } catch {
       // Ignored for offline/guest
     }

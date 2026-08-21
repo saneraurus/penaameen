@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { resolveProductId } from "@/lib/cart/product-id";
 
 const addToCartSchema = z.object({
   productId: z.string().min(1),
@@ -61,7 +62,8 @@ export async function GET() {
     if (isDbConnectionError) {
       return NextResponse.json(
         {
-          error: "Database unavailable — run `npm run db:start` to start embedded Postgres",
+          error:
+            "Database unavailable — run `npm run db:start` to start embedded Postgres",
           code: "DB_UNAVAILABLE",
         },
         { status: 503 },
@@ -84,9 +86,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { productId, quantity } = addToCartSchema.parse(body);
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-    });
+    const canonicalProductId = await resolveProductId(productId);
+    const product = canonicalProductId
+      ? await prisma.product.findUnique({ where: { id: canonicalProductId } })
+      : null;
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -118,7 +121,7 @@ export async function POST(request: Request) {
 
     const existingItem = await prisma.cartItem.findUnique({
       where: {
-        cartId_productId: { cartId: cart.id, productId },
+        cartId_productId: { cartId: cart.id, productId: product.id },
       },
     });
 
@@ -140,7 +143,7 @@ export async function POST(request: Request) {
       await prisma.cartItem.create({
         data: {
           cartId: cart.id,
-          productId,
+          productId: product.id,
           quantity,
         },
       });
@@ -160,7 +163,8 @@ export async function POST(request: Request) {
     if (isDbConnectionError) {
       return NextResponse.json(
         {
-          error: "Database unavailable — run `npm run db:start` to start embedded Postgres",
+          error:
+            "Database unavailable — run `npm run db:start` to start embedded Postgres",
           code: "DB_UNAVAILABLE",
         },
         { status: 503 },

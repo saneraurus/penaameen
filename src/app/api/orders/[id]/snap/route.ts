@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getOrderById } from "@/lib/admin/orders";
 import { createMidtransSnapClient } from "@/lib/payment/midtrans-client";
@@ -9,10 +10,32 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+    }
     const order = await getOrderById(id);
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    const owner = await prisma.user.findFirst({ where: { clerkId: userId } });
+    const ownedOrder = owner
+      ? await prisma.order.findFirst({
+          where: { id: order.id, userId: owner.id },
+          select: { id: true },
+        })
+      : null;
+    if (!ownedOrder) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    if (!order.customerEmail || !order.shippingAddress?.phone) {
+      return NextResponse.json(
+        { error: "Data pelanggan belum lengkap untuk memulai pembayaran" },
+        { status: 422 },
+      );
     }
 
     // C-2: stable correlation id so the webhook can resolve this order.
@@ -28,13 +51,13 @@ export async function POST(
         customer_details: {
           first_name: order.customerName,
           email: order.customerEmail,
-          phone: order.shippingAddress?.phone || "08123456789",
+          phone: order.shippingAddress.phone,
           shipping_address: {
             first_name: order.shippingAddress?.name || order.customerName,
-            address: order.shippingAddress?.address1 || "Surabaya",
-            city: order.shippingAddress?.city || "Surabaya",
-            postal_code: order.shippingAddress?.postalCode || "60238",
-            phone: order.shippingAddress?.phone || "08123456789",
+            address: order.shippingAddress?.address1 || "",
+            city: order.shippingAddress?.city || "",
+            postal_code: order.shippingAddress?.postalCode || "",
+            phone: order.shippingAddress.phone,
           },
         },
         item_details: order.items.map((item) => ({

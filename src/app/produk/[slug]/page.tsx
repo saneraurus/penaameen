@@ -52,7 +52,7 @@ export default function ProductDetailPage() {
           // Fallback to static data
           const fallback = products.find((p) => p.slug === slug);
           if (fallback) {
-            setProduct({ ...fallback, stock: 50 });
+            setProduct({ ...fallback, stock: 0 });
           } else {
             setError(res.error);
           }
@@ -62,7 +62,7 @@ export default function ProductDetailPage() {
       } catch {
         const fallback = products.find((p) => p.slug === slug);
         if (fallback) {
-          setProduct({ ...fallback, stock: 50 });
+          setProduct({ ...fallback, stock: 0 });
         } else {
           if (active) setError("Gagal memuat detail produk");
         }

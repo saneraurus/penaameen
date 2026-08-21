@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { resolveProductId } from "@/lib/cart/product-id";
 
 const updateCartItemSchema = z.object({
   quantity: z.number().int().min(0),
@@ -18,6 +19,10 @@ export async function PATCH(
     }
 
     const { productId } = await params;
+    const canonicalProductId = await resolveProductId(productId);
+    if (!canonicalProductId) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
     const body = await request.json();
     const { quantity } = updateCartItemSchema.parse(body);
 
@@ -31,7 +36,7 @@ export async function PATCH(
 
     const cartItem = await prisma.cartItem.findUnique({
       where: {
-        cartId_productId: { cartId: cart.id, productId },
+        cartId_productId: { cartId: cart.id, productId: canonicalProductId },
       },
       include: { product: true },
     });
@@ -83,6 +88,10 @@ export async function DELETE(
     }
 
     const { productId } = await params;
+    const canonicalProductId = await resolveProductId(productId);
+    if (!canonicalProductId) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
 
     const cart = await prisma.cart.findUnique({
       where: { userId },
@@ -94,7 +103,7 @@ export async function DELETE(
 
     const cartItem = await prisma.cartItem.findUnique({
       where: {
-        cartId_productId: { cartId: cart.id, productId },
+        cartId_productId: { cartId: cart.id, productId: canonicalProductId },
       },
     });
 
