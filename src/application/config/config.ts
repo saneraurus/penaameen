@@ -12,6 +12,21 @@ export type ServerConfig = {
   readonly foundationMode: true;
 };
 
+export type ReadinessState = "ready" | "blocked" | "unknown";
+
+export type EnvironmentReadinessCheck = {
+  readonly id: string;
+  readonly state: ReadinessState;
+  readonly required: boolean;
+  readonly detail: string;
+};
+
+export type EnvironmentReadiness = {
+  readonly state: ReadinessState;
+  readonly environment: ApplicationEnvironment;
+  readonly checks: readonly EnvironmentReadinessCheck[];
+};
+
 export type ConfigurationError = {
   readonly code: "CONFIGURATION_ERROR";
   readonly message: string;
@@ -109,4 +124,100 @@ export function getPublicRuntimeConfig(config: ServerConfig): {
     environment: config.environment,
     foundationMode: config.foundationMode,
   };
+}
+
+function hasValue(
+  values: Readonly<Record<string, string | undefined>>,
+  key: string,
+) {
+  return Boolean(values[key]?.trim());
+}
+
+function readinessCheck(
+  id: string,
+  values: Readonly<Record<string, string | undefined>>,
+  keys: readonly string[],
+  required: boolean,
+  detail: string,
+): EnvironmentReadinessCheck {
+  const configured = keys.every((key) => hasValue(values, key));
+  return {
+    id,
+    state: configured ? "ready" : required ? "blocked" : "unknown",
+    required,
+    detail: configured ? "configured" : detail,
+  };
+}
+
+/** Checks configuration presence without returning secret values. */
+export function getEnvironmentReadiness(
+  values: Readonly<Record<string, string | undefined>>,
+): EnvironmentReadiness {
+  const environment = readEnvironment(values.APP_ENV);
+  const production = environment === "production";
+  const checks = [
+    readinessCheck(
+      "app.base_url",
+      values,
+      ["APP_BASE_URL"],
+      production,
+      "APP_BASE_URL is not configured",
+    ),
+    readinessCheck(
+      "database.url",
+      values,
+      ["DATABASE_URL"],
+      production,
+      "DATABASE_URL is not configured",
+    ),
+    readinessCheck(
+      "auth.clerk",
+      values,
+      ["CLERK_PUBLISHABLE_KEY", "CLERK_SECRET_KEY"],
+      production,
+      "Clerk credentials are not configured",
+    ),
+    readinessCheck(
+      "payment.casaku",
+      values,
+      ["CASAKU_LICENSE_KEY", "CASAKU_WEBHOOK_SECRET", "CASAKU_QR_ID"],
+      false,
+      "Casaku credentials are not configured",
+    ),
+    readinessCheck(
+      "payment.midtrans",
+      values,
+      ["MIDTRANS_SERVER_KEY", "NEXT_PUBLIC_MIDTRANS_CLIENT_KEY"],
+      false,
+      "Midtrans credentials are not configured",
+    ),
+    readinessCheck(
+      "shipping.rajaongkir",
+      values,
+      ["RAJAONGKIR_API_KEY"],
+      false,
+      "RajaOngkir credentials are not configured",
+    ),
+    readinessCheck(
+      "email.resend",
+      values,
+      ["RESEND_API_KEY"],
+      false,
+      "Resend credentials are not configured",
+    ),
+    readinessCheck(
+      "catalog.google_sheets",
+      values,
+      ["GOOGLE_SHEETS_SPREADSHEET_ID"],
+      false,
+      "Google Sheets catalog is not configured",
+    ),
+  ] as const;
+  const state: ReadinessState = checks.some((item) => item.state === "blocked")
+    ? "blocked"
+    : checks.some((item) => item.state === "unknown")
+      ? "unknown"
+      : "ready";
+
+  return { state, environment, checks };
 }

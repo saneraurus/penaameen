@@ -6,12 +6,14 @@ import { getOrderById } from "@/lib/admin/orders";
 import { prisma } from "@/lib/prisma";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
+import { requireRequestOrigin } from "@/application/security/origin-guard";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    requireRequestOrigin(request);
     const actor = await requireStaffActor("orders:transition");
     const correlationId = createRequestCorrelationId(
       request.headers.get("x-request-id"),

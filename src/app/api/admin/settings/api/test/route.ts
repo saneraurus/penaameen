@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { requireRequestOrigin } from "@/application/security/origin-guard";
 import { getApiSettings } from "@/lib/admin/api-settings";
 import { prisma } from "@/lib/prisma";
 
@@ -206,6 +207,7 @@ async function testCasaku(
 
 export async function POST(request: Request) {
   try {
+    requireRequestOrigin(request);
     await requireStaffActor("access:write");
     const body = await request.json();
     const service = body.service as

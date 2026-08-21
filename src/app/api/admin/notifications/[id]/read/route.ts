@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { requireRequestOrigin } from "@/application/security/origin-guard";
 import { markNotificationRead } from "@/lib/admin/notifications";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    requireRequestOrigin(request);
     await requireStaffActor("notifications:write");
     const { id } = await params;
     const updated = await markNotificationRead(id);

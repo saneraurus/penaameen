@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireStaffActor } from "@/application/auth/clerk-auth";
+import { requireRequestOrigin } from "@/application/security/origin-guard";
 import { auditStore } from "@/infrastructure/audit";
 import { recordStaffAudit } from "@/application/audit/audit-store";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
@@ -37,6 +38,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    requireRequestOrigin(request);
     const actor = await requireStaffActor("catalog:write");
     const correlationId = createRequestCorrelationId(
       request.headers.get("x-request-id"),

@@ -1,5 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // Public routes — must stay in sync with src/middleware.ts (legacy) and Clerk resource-based checks.
 // Patterns ending with (.*) mean prefix match.
@@ -41,10 +42,51 @@ function isPublicRoute(req: NextRequest): boolean {
   });
 }
 
+function isAdminMutation(req: NextRequest): boolean {
+  return (
+    req.nextUrl.pathname.startsWith("/api/admin/") &&
+    ["POST", "PATCH", "PUT", "DELETE"].includes(req.method)
+  );
+}
+
+function hasTrustedOrigin(req: NextRequest): boolean {
+  const rawOrigin = req.headers.get("origin");
+  const rawReferer = req.headers.get("referer");
+  const candidate = rawOrigin || rawReferer;
+
+  // Server-to-server requests are validated by route auth/signature checks.
+  if (!candidate) return true;
+
+  try {
+    const candidateOrigin = new URL(candidate).origin;
+    const configuredOrigin = new URL(
+      process.env.APP_BASE_URL || req.nextUrl.origin,
+    ).origin;
+    const trustedOrigins = (process.env.TRUSTED_ORIGINS || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .map((value) => new URL(value).origin);
+    return [configuredOrigin, ...trustedOrigins].includes(candidateOrigin);
+  } catch {
+    return false;
+  }
+}
+
 export default clerkMiddleware(async (auth, req) => {
+  if (isAdminMutation(req) && !hasTrustedOrigin(req)) {
+    return NextResponse.json(
+      { error: "Request origin is not trusted" },
+      { status: 403 },
+    );
+  }
+
   if (!isPublicRoute(req)) {
     await auth.protect();
+    return NextResponse.next();
   }
+
+  return NextResponse.next();
 });
 
 export const config = {

@@ -10,14 +10,16 @@ export function GET(request: Request) {
   );
   const config = getServerConfig();
 
+  const health = getFoundationHealth(config);
   return NextResponse.json(
     {
-      data: getFoundationHealth(config),
+      data: health,
       meta: {
         requestId: correlationId,
       },
     },
     {
+      status: health.readiness.state === "blocked" ? 503 : 200,
       headers: {
         "x-request-id": correlationId,
         "cache-control": "no-store",

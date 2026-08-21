@@ -9,6 +9,7 @@ import {
 } from "@/lib/admin/orders";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
+import { requireRequestOrigin } from "@/application/security/origin-guard";
 
 const VALID_TRANSITIONS: OrderTransition[] = [
   "mark_paid",
@@ -26,6 +27,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    requireRequestOrigin(request);
     const body = await request.json();
     const transition = body.transition as OrderTransition;
     const actor = await requireStaffActor(

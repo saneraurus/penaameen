@@ -10,10 +10,14 @@ describe("foundation health service", () => {
     expect(configResult.ok).toBe(true);
 
     if (configResult.ok) {
-      expect(getFoundationHealth(configResult.value)).toEqual({
+      expect(getFoundationHealth(configResult.value)).toMatchObject({
         status: "ok",
         foundationMode: true,
         environment: "test",
+      });
+      expect(getFoundationHealth(configResult.value).readiness).toMatchObject({
+        environment: "test",
+        state: "unknown",
       });
     }
   });
