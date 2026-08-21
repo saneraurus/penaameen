@@ -82,10 +82,13 @@ export class SheetsApiClient {
     }
 
     if (!response.ok) {
+      const providerMessage = await response.text().catch(() => "");
       throw new SheetsApiError(
         response.status,
         classifyError(response.status),
-        `Google Sheets API gagal (HTTP ${response.status})`,
+        `Google Sheets API gagal (HTTP ${response.status})${
+          providerMessage ? `: ${providerMessage}` : ""
+        }`,
       );
     }
 
@@ -137,7 +140,7 @@ export class SheetsApiClient {
 
   async valuesAppend(range: string, values: unknown[][]): Promise<void> {
     await this.request(
-      `/spreadsheets/${encodeURIComponent(this.config.spreadsheetId)}/values/${encodeURIComponent(range)}:append`,
+      `/spreadsheets/${encodeURIComponent(this.config.spreadsheetId)}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -150,7 +153,7 @@ export class SheetsApiClient {
 
   async valuesUpdate(range: string, values: unknown[][]): Promise<void> {
     await this.request(
-      `/spreadsheets/${encodeURIComponent(this.config.spreadsheetId)}/values/${encodeURIComponent(range)}`,
+      `/spreadsheets/${encodeURIComponent(this.config.spreadsheetId)}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,
       {
         method: "PUT",
         body: JSON.stringify({

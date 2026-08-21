@@ -150,7 +150,7 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
     orderNumber: db.orderNumber,
     customerName:
       addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-    customerEmail: db.user?.email || "pelanggan@penaameen.com",
+    customerEmail: db.user?.email || "",
     status: orderStat,
     paymentStatus: paymentStat,
     fulfillmentStatus: fulfillmentStat,
@@ -160,13 +160,13 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
     createdAt: db.createdAt.toISOString(),
     updatedAt: db.updatedAt.toISOString(),
     shippingAddress: {
-      name: addr?.recipientName || db.user?.name || "Pelanggan Pena Ameen",
-      address1: addr?.addressLine1 || "Alamat Pengiriman",
-      city: addr?.city || "Surabaya",
-      province: addr?.province || "Jawa Timur",
-      postalCode: addr?.postalCode || "60238",
-      country: "Indonesia",
-      phone: addr?.phone || "08123456789",
+      name: addr?.recipientName || db.user?.name || "",
+      address1: addr?.addressLine1 || "",
+      city: addr?.city || "",
+      province: addr?.province || "",
+      postalCode: addr?.postalCode || "",
+      country: addr?.country || "Indonesia",
+      phone: addr?.phone || "",
     },
     items: db.items.map((i) => ({
       id: i.id,
@@ -198,8 +198,7 @@ function mapDbOrder(db: OrderWithRelations): AdminOrder {
           {
             id: `ful-${db.id}`,
             type: "shipped",
-            status:
-              fulfillmentStat === "unfulfilled" ? "pending" : "completed",
+            status: fulfillmentStat === "unfulfilled" ? "pending" : "completed",
             carrier: db.shippingMethod || "JNE",
             trackingNumber: db.trackingNumber,
             createdAt: db.createdAt.toISOString(),

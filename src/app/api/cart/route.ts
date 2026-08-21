@@ -53,6 +53,20 @@ export async function GET() {
     return NextResponse.json({ items, total: total.toString(), itemCount });
   } catch (error) {
     console.error("Error fetching cart:", error);
+    const isDbConnectionError =
+      error instanceof Error &&
+      ("code" in error
+        ? (error as { code?: string }).code === "ECONNREFUSED"
+        : /ECONNREFUSED/i.test(error.message));
+    if (isDbConnectionError) {
+      return NextResponse.json(
+        {
+          error: "Database unavailable — run `npm run db:start` to start embedded Postgres",
+          code: "DB_UNAVAILABLE",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
@@ -138,6 +152,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Error adding to cart:", error);
+    const isDbConnectionError =
+      error instanceof Error &&
+      ("code" in error
+        ? (error as { code?: string }).code === "ECONNREFUSED"
+        : /ECONNREFUSED/i.test(error.message));
+    if (isDbConnectionError) {
+      return NextResponse.json(
+        {
+          error: "Database unavailable — run `npm run db:start` to start embedded Postgres",
+          code: "DB_UNAVAILABLE",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

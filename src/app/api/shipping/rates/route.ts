@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -24,8 +23,6 @@ const shippingRateSchema = z.object({
     .optional(),
 });
 
-const ASSUMED_WEIGHT_GRAMS_PER_ITEM = 500;
-
 interface RajaOngkirCost {
   service: string;
   description: string;
@@ -45,16 +42,6 @@ interface RajaOngkirResponse {
       costs: RajaOngkirCost[];
     }>;
   };
-}
-
-interface CourierRateResult {
-  courier: string;
-  courierName: string;
-  service: string;
-  description: string;
-  cost: number;
-  etd: string;
-  note: string;
 }
 
 type CityCache = { fetchedAt: number; byName: Map<string, number> };
@@ -138,188 +125,8 @@ async function getRajaOngkirRates(
   }
 }
 
-/**
- * Standard Indonesian Courier Tariff Calculation (Origin: Surabaya, Jawa Timur)
- */
-function calculateStandardIndonesianRates(
-  city: string,
-  province: string,
-  weightInGrams: number,
-): CourierRateResult[] {
-  const c = (city || "").toLowerCase();
-  const p = (province || "").toLowerCase();
-  const weightKg = Math.max(1, Math.ceil(weightInGrams / 1000));
-
-  // Regional Tariffs relative to Surabaya Origin
-  let baseJneReg = 17000;
-  let baseJneYes = 28000;
-  let baseJneOke = 14000;
-  let baseJntEz = 18000;
-  let baseSicepatReg = 17000;
-  let basePosKilat = 16000;
-  let etdReg = "2-3";
-  let etdYes = "1";
-  let etdPos = "2-4";
-
-  if (
-    c.includes("surabaya") ||
-    c.includes("sidoarjo") ||
-    c.includes("gresik")
-  ) {
-    baseJneReg = 8000;
-    baseJneYes = 15000;
-    baseJneOke = 7000;
-    baseJntEz = 9000;
-    baseSicepatReg = 8000;
-    basePosKilat = 8000;
-    etdReg = "1-2";
-    etdYes = "1";
-    etdPos = "1-2";
-  } else if (p.includes("jawa timur") || p.includes("jatim")) {
-    baseJneReg = 11000;
-    baseJneYes = 20000;
-    baseJneOke = 9000;
-    baseJntEz = 12000;
-    baseSicepatReg = 11000;
-    basePosKilat = 10000;
-    etdReg = "1-2";
-    etdYes = "1";
-    etdPos = "1-3";
-  } else if (
-    p.includes("dki") ||
-    p.includes("jakarta") ||
-    p.includes("jawa barat") ||
-    p.includes("jabar") ||
-    p.includes("banten") ||
-    p.includes("jawa tengah") ||
-    p.includes("jateng") ||
-    p.includes("yogyakarta") ||
-    p.includes("jogja")
-  ) {
-    baseJneReg = 17000;
-    baseJneYes = 29000;
-    baseJneOke = 13000;
-    baseJntEz = 18000;
-    baseSicepatReg = 17000;
-    basePosKilat = 16000;
-    etdReg = "2-3";
-    etdYes = "1";
-    etdPos = "2-4";
-  } else if (p.includes("bali") || p.includes("nusa tenggara")) {
-    baseJneReg = 22000;
-    baseJneYes = 38000;
-    baseJneOke = 18000;
-    baseJntEz = 23000;
-    baseSicepatReg = 22000;
-    basePosKilat = 20000;
-    etdReg = "2-4";
-    etdYes = "1-2";
-    etdPos = "3-5";
-  } else if (
-    p.includes("sumatera") ||
-    p.includes("sumatra") ||
-    p.includes("riau") ||
-    p.includes("lampung")
-  ) {
-    baseJneReg = 29000;
-    baseJneYes = 48000;
-    baseJneOke = 24000;
-    baseJntEz = 30000;
-    baseSicepatReg = 29000;
-    basePosKilat = 28000;
-    etdReg = "3-4";
-    etdYes = "1-2";
-    etdPos = "3-5";
-  } else if (p.includes("kalimantan") || p.includes("sulawesi")) {
-    baseJneReg = 36000;
-    baseJneYes = 58000;
-    baseJneOke = 30000;
-    baseJntEz = 38000;
-    baseSicepatReg = 36000;
-    basePosKilat = 34000;
-    etdReg = "3-5";
-    etdYes = "2-3";
-    etdPos = "4-6";
-  } else if (p.includes("maluku") || p.includes("papua")) {
-    baseJneReg = 65000;
-    baseJneYes = 95000;
-    baseJneOke = 52000;
-    baseJntEz = 68000;
-    baseSicepatReg = 65000;
-    basePosKilat = 58000;
-    etdReg = "4-7";
-    etdYes = "3-4";
-    etdPos = "5-8";
-  }
-
-  return [
-    {
-      courier: "jne",
-      courierName: "JNE Express",
-      service: "REG",
-      description: "Layanan Reguler JNE",
-      cost: baseJneReg * weightKg,
-      etd: etdReg,
-      note: "Paling Populer",
-    },
-    {
-      courier: "jne",
-      courierName: "JNE Express",
-      service: "YES",
-      description: "Yakin Esok Sampai",
-      cost: baseJneYes * weightKg,
-      etd: etdYes,
-      note: "Pengiriman Prioritas 1 Hari",
-    },
-    {
-      courier: "jnt",
-      courierName: "J&T Express",
-      service: "EZ",
-      description: "Layanan Reguler J&T Express",
-      cost: baseJntEz * weightKg,
-      etd: etdReg,
-      note: "Pick-up Cepat",
-    },
-    {
-      courier: "sicepat",
-      courierName: "SiCepat Ekspres",
-      service: "REG",
-      description: "SiCepat Reguler",
-      cost: baseSicepatReg * weightKg,
-      etd: etdReg,
-      note: "Akurat & Ekonomis",
-    },
-    {
-      courier: "pos",
-      courierName: "POS Indonesia",
-      service: "Kilat Khusus",
-      description: "Pos Kilat Khusus Nusantara",
-      cost: basePosKilat * weightKg,
-      etd: etdPos,
-      note: "Menjangkau Pelosok",
-    },
-    {
-      courier: "jne",
-      courierName: "JNE Express",
-      service: "OKE",
-      description: "Ongkos Kirim Ekonomis",
-      cost: baseJneOke * weightKg,
-      etd: `${parseInt(etdReg) + 1}-${parseInt(etdReg) + 2}`,
-      note: "Hemat Budget",
-    },
-  ];
-}
-
 export async function POST(request: Request) {
   try {
-    let userId: string | null = null;
-    try {
-      const authObj = await auth();
-      userId = authObj?.userId ?? null;
-    } catch {
-      // Unauthenticated / public rates calculation
-    }
-
     const body = await request.json();
     const parsed = shippingRateSchema.parse(body);
 
@@ -341,40 +148,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // Default destination if still empty
-    destinationCity = destinationCity || "Surabaya";
-    destinationProvince = destinationProvince || "Jawa Timur";
-
-    // 2. Compute total weight from cart or items
-    let totalWeight = parsed.weight || 0;
-
-    if (totalWeight <= 0 && parsed.items && parsed.items.length > 0) {
-      totalWeight = parsed.items.reduce(
-        (sum, item) =>
-          sum + (item.quantity || 1) * ASSUMED_WEIGHT_GRAMS_PER_ITEM,
-        0,
+    if (!destinationCity || !destinationProvince) {
+      return NextResponse.json(
+        {
+          error: "Kota dan provinsi tujuan wajib diisi untuk menghitung ongkir",
+        },
+        { status: 400 },
       );
     }
 
-    if (totalWeight <= 0 && userId) {
-      try {
-        const cart = await prisma.cart.findUnique({
-          where: { userId },
-          include: { items: true },
-        });
-        if (cart && cart.items.length > 0) {
-          totalWeight = cart.items.reduce(
-            (sum, item) => sum + item.quantity * ASSUMED_WEIGHT_GRAMS_PER_ITEM,
-            0,
-          );
-        }
-      } catch {
-        // Fallback below
-      }
-    }
+    // 2. Compute total weight from cart or items
+    const totalWeight = parsed.weight || 0;
 
     if (totalWeight <= 0) {
-      totalWeight = ASSUMED_WEIGHT_GRAMS_PER_ITEM; // Minimum 500g default
+      return NextResponse.json(
+        { error: "Berat pesanan wajib tersedia untuk menghitung ongkir" },
+        { status: 400 },
+      );
     }
 
     // 3. Check Live RajaOngkir API Configuration
@@ -395,75 +185,76 @@ export async function POST(request: Request) {
       // Ignore settings file error
     }
 
-    // If API key exists, attempt live API fetch
-    if (apiKey && apiKey.length > 10) {
-      try {
-        const destinationCityId = await resolveDestinationCityId(
-          apiKey,
-          destinationCity,
-          destinationProvince,
-        );
-
-        if (destinationCityId !== null) {
-          const ratesResponse = await getRajaOngkirRates(
-            apiKey,
-            originCityId,
-            destinationCityId,
-            totalWeight,
-            enabledCouriers,
-          );
-
-          if (
-            ratesResponse?.rajaongkir?.results &&
-            ratesResponse.rajaongkir.results.length > 0
-          ) {
-            const formattedRates = ratesResponse.rajaongkir.results.flatMap(
-              (courier) =>
-                courier.costs.flatMap((cost) =>
-                  cost.cost.map((c) => ({
-                    courier: courier.code,
-                    courierName: courier.name,
-                    service: cost.service,
-                    description: cost.description,
-                    cost: c.value,
-                    etd: c.etd,
-                    note: c.note || "",
-                  })),
-                ),
-            );
-
-            if (formattedRates.length > 0) {
-              return NextResponse.json({
-                rates: formattedRates,
-                origin: "Surabaya, Jawa Timur",
-                weightGrams: totalWeight,
-                provider: "rajaongkir",
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.warn(
-          "[Shipping API] Live RajaOngkir query failed, using official tariff engine:",
-          err,
-        );
-      }
+    if (!apiKey || apiKey.length <= 10) {
+      return NextResponse.json(
+        { error: "Provider ongkir belum dikonfigurasi" },
+        { status: 503 },
+      );
     }
 
-    // 4. Standard Indonesian Courier Tariff Engine (Direct & Deterministic)
-    const standardRates = calculateStandardIndonesianRates(
-      destinationCity,
-      destinationProvince,
-      totalWeight,
-    );
+    try {
+      const destinationCityId = await resolveDestinationCityId(
+        apiKey,
+        destinationCity,
+        destinationProvince,
+      );
 
-    return NextResponse.json({
-      rates: standardRates,
-      origin: "Surabaya, Jawa Timur (Penerbit Pena Ameen)",
-      destination: `${destinationCity}, ${destinationProvince}`,
-      weightGrams: totalWeight,
-      provider: "penaameen-courier-engine",
-    });
+      if (destinationCityId === null) {
+        return NextResponse.json(
+          { error: "Kota tujuan tidak ditemukan pada provider ongkir" },
+          { status: 422 },
+        );
+      }
+
+      const ratesResponse = await getRajaOngkirRates(
+        apiKey,
+        originCityId,
+        destinationCityId,
+        totalWeight,
+        enabledCouriers,
+      );
+
+      if (
+        ratesResponse?.rajaongkir?.results &&
+        ratesResponse.rajaongkir.results.length > 0
+      ) {
+        const formattedRates = ratesResponse.rajaongkir.results.flatMap(
+          (courier) =>
+            courier.costs.flatMap((cost) =>
+              cost.cost.map((c) => ({
+                courier: courier.code,
+                courierName: courier.name,
+                service: cost.service,
+                description: cost.description,
+                cost: c.value,
+                etd: c.etd,
+                note: c.note || "",
+              })),
+            ),
+        );
+
+        if (formattedRates.length > 0) {
+          return NextResponse.json({
+            rates: formattedRates,
+            origin: "Surabaya, Jawa Timur",
+            weightGrams: totalWeight,
+            provider: "rajaongkir",
+          });
+        }
+      }
+      return NextResponse.json(
+        {
+          error: "Provider ongkir tidak mengembalikan layanan untuk tujuan ini",
+        },
+        { status: 502 },
+      );
+    } catch (err) {
+      console.warn("[Shipping API] Live RajaOngkir query failed:", err);
+      return NextResponse.json(
+        { error: "Gagal menghitung ongkir dari provider" },
+        { status: 502 },
+      );
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
@@ -473,18 +264,11 @@ export async function POST(request: Request) {
       error instanceof Error ? error.stack : error,
     );
 
-    // Ultimate fallback so checkout never breaks
-    const fallbackRates = calculateStandardIndonesianRates(
-      "Surabaya",
-      "Jawa Timur",
-      500,
+    return NextResponse.json(
+      {
+        error: "Gagal menghitung ongkir dari provider",
+      },
+      { status: 502 },
     );
-
-    return NextResponse.json({
-      rates: fallbackRates,
-      origin: "Surabaya, Jawa Timur",
-      weightGrams: 500,
-      provider: "fallback",
-    });
   }
 }

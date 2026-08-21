@@ -11,6 +11,7 @@ import {
 } from "@/lib/payment/casaku-service";
 import { CasakuError } from "@/lib/payment/casaku";
 import { createMidtransSnapClient } from "@/lib/payment/midtrans-client";
+import { getSheetCatalogProducts } from "@/lib/inventory/sheets-catalog";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -21,9 +22,9 @@ type OrderWithRelations = Prisma.OrderGetPayload<{
 
 const createOrderSchema = z.object({
   addressId: z.string().optional(),
-  shippingMethod: z.string().optional(), // e.g., "JNE Express - REG"
-  shippingCost: z.number().int().nonnegative().optional(),
-  shippingRate: z.any().optional(),
+  shippingMethod: z.string().trim().min(1),
+  shippingCost: z.number().int().nonnegative(),
+  shippingRate: z.record(z.string(), z.unknown()).optional(),
   customerEmail: z.string().optional(),
   customerName: z.string().optional(),
   items: z
@@ -37,19 +38,17 @@ const createOrderSchema = z.object({
         image: z.string().optional(),
       }),
     )
-    .optional(),
-  shippingAddress: z
-    .object({
-      recipientName: z.string().optional(),
-      phone: z.string().optional(),
-      email: z.string().optional(),
-      addressLine1: z.string().optional(),
-      addressLine2: z.string().optional().nullable(),
-      city: z.string().optional(),
-      province: z.string().optional(),
-      postalCode: z.string().optional(),
-    })
-    .optional(),
+    .min(1),
+  shippingAddress: z.object({
+    recipientName: z.string().trim().min(1),
+    phone: z.string().trim().min(5),
+    email: z.string().email().optional(),
+    addressLine1: z.string().trim().min(1),
+    addressLine2: z.string().optional().nullable(),
+    city: z.string().trim().min(1),
+    province: z.string().trim().min(1),
+    postalCode: z.string().trim().min(3),
+  }),
 });
 
 function mapCasakuFailure(error: string, detail?: string): string {
@@ -108,9 +107,7 @@ async function createOrderWithRetry(
   let lastError: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const orderNumber =
-      attempt === 1
-        ? args.orderNumber
-        : generateOrderNumber();
+      attempt === 1 ? args.orderNumber : generateOrderNumber();
     try {
       const order = await prisma.order.create({
         data: {
@@ -178,6 +175,10 @@ async function resolveOrderItems(items: RawOrderItem[]) {
   });
   const bySlug = new Map(products.map((p) => [p.slug, p]));
   const byId = new Map(products.map((p) => [p.id, p]));
+  const sheetProducts = await getSheetCatalogProducts();
+  const bySheetSlug = new Map(
+    (sheetProducts ?? []).map((product) => [product.slug, product]),
+  );
 
   const resolved: Array<{
     productId: string;
@@ -190,19 +191,25 @@ async function resolveOrderItems(items: RawOrderItem[]) {
 
   for (const item of items) {
     const db =
-      (item.slug && bySlug.get(item.slug)) ||
-      byId.get(item.productId) ||
-      null;
+      (item.slug && bySlug.get(item.slug)) || byId.get(item.productId) || null;
     if (!db) {
+      missing.push(item.slug || item.productId);
+      continue;
+    }
+    const sheet = item.slug ? bySheetSlug.get(item.slug) : undefined;
+    if (
+      sheet &&
+      (sheet.status !== "published" || sheet.stock < item.quantity)
+    ) {
       missing.push(item.slug || item.productId);
       continue;
     }
     resolved.push({
       productId: db.id,
       quantity: item.quantity,
-      price: Number(db.price),
-      name: db.name,
-      image: db.image,
+      price: sheet?.price ?? Number(db.price),
+      name: sheet?.name ?? db.name,
+      image: sheet?.image || db.image,
     });
   }
 
@@ -222,8 +229,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       addressId,
-      shippingMethod = "JNE Express - REG",
-      shippingCost = 8000,
+      shippingMethod,
+      shippingCost,
       shippingRate,
       items: clientItems,
       shippingAddress: clientAddress,
@@ -283,15 +290,17 @@ export async function POST(request: Request) {
 
     if (rawItems.length === 0) {
       return NextResponse.json(
-        { error: "Keranjang belanja kosong. Silakan pilih produk terlebih dahulu." },
+        {
+          error:
+            "Keranjang belanja kosong. Silakan pilih produk terlebih dahulu.",
+        },
         { status: 400 },
       );
     }
 
     // Resolve raw items to real DB products (valid FK + authoritative price).
-    const { resolved: orderItemsToSave, missing } = await resolveOrderItems(
-      rawItems,
-    );
+    const { resolved: orderItemsToSave, missing } =
+      await resolveOrderItems(rawItems);
 
     if (orderItemsToSave.length === 0) {
       return NextResponse.json(
@@ -380,9 +389,7 @@ export async function POST(request: Request) {
           }
         }
       } else {
-        const guestEmail =
-          customerEmail ||
-          `guest-${Date.now()}@penaameen.com`;
+        const guestEmail = customerEmail || `guest-${Date.now()}@penaameen.com`;
         dbUser = await prisma.user.upsert({
           where: { email: guestEmail },
           update: {},
@@ -415,7 +422,8 @@ export async function POST(request: Request) {
       console.warn("Could not save order to database:", dbErr);
       return NextResponse.json(
         {
-          error: "Pesanan gagal dibuat di database. Silakan coba lagi atau hubungi admin.",
+          error:
+            "Pesanan gagal dibuat di database. Silakan coba lagi atau hubungi admin.",
           detail: dbErr instanceof Error ? dbErr.message : String(dbErr),
         },
         { status: 500 },

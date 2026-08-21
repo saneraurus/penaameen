@@ -33,7 +33,8 @@ export class SheetsConfigError extends Error {
 export function isSheetsConfigured(): boolean {
   return Boolean(
     process.env.GOOGLE_SHEETS_SPREADSHEET_ID &&
-    process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON,
+    (process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON ||
+      process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_FILE),
   );
 }
 
@@ -41,7 +42,7 @@ export function getSheetsConfig(): SheetsConfig {
   const spreadsheetId =
     process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
     GOOGLE_SHEETS_DEFAULT_SPREADSHEET_ID;
-  const serviceAccountJson = process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON;
+  const serviceAccountJson = readServiceAccountJson();
 
   if (!serviceAccountJson) {
     throw new SheetsConfigError(
@@ -56,6 +57,25 @@ export function getSheetsConfig(): SheetsConfig {
     movementSheetName:
       process.env.GOOGLE_SHEETS_MOVEMENT_SHEET_NAME || "MUTASI STOCK",
   };
+}
+
+function readServiceAccountJson(): string | undefined {
+  const inline = process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON?.trim();
+  if (inline && inline !== "{") return inline;
+
+  const filePath = process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_FILE?.trim();
+  if (!filePath) return undefined;
+
+  try {
+    const file = fs.readFileSync(filePath, "utf8").trim();
+    return file || undefined;
+  } catch (error) {
+    throw new SheetsConfigError(
+      `File service account tidak dapat dibaca: ${
+        error instanceof Error ? error.message : "error tidak diketahui"
+      }`,
+    );
+  }
 }
 
 export function parseServiceAccountCredentials(
@@ -90,3 +110,4 @@ export function parseServiceAccountCredentials(
 
   return { clientEmail, privateKey, tokenUri, projectId };
 }
+import fs from "node:fs";

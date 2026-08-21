@@ -10,6 +10,8 @@ import { requireStaffActor } from "@/application/auth/clerk-auth";
 import {
   getProducts,
   getProductCategories,
+  getSheetProducts,
+  getSheetProductCategories,
   type AdminProduct,
 } from "@/lib/admin/products";
 
@@ -32,15 +34,18 @@ export default async function AdminProductsPage({
   const category = params.category || "";
   const status = params.status || "";
 
-  const { products, total } = await getProducts({
+  const options = {
     page,
     perPage,
     search,
     category,
     status,
-  });
+  };
+  const { products, total } =
+    (await getSheetProducts(options)) ?? (await getProducts(options));
 
-  const categories = await getProductCategories();
+  const categories =
+    (await getSheetProductCategories()) ?? (await getProductCategories());
   const totalPages = Math.ceil(total / perPage);
 
   const columns = [

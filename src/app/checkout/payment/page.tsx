@@ -77,6 +77,10 @@ function CheckoutPaymentPage() {
   const shippingMethod = params.get("shippingMethod");
   const shippingCostRaw = params.get("shippingCost");
   const shippingCost = Number(shippingCostRaw ?? 0);
+  const selectedRateRaw =
+    typeof window !== "undefined"
+      ? localStorage.getItem("penaameen_checkout_selected_rate")
+      : null;
 
   const checkoutIncomplete =
     !addressId ||
@@ -185,7 +189,8 @@ function CheckoutPaymentPage() {
     const realEmail =
       user?.primaryEmailAddress?.emailAddress ||
       user?.emailAddresses?.[0]?.emailAddress ||
-      "customer@penaameen.com";
+      addressData?.email ||
+      "";
 
     const realName =
       user?.fullName ||
@@ -195,18 +200,22 @@ function CheckoutPaymentPage() {
       addressData?.recipientName ||
       "";
 
-    const currentShippingMethod = shippingMethod || "JNE Express — REG";
+    const currentShippingMethod = shippingMethod;
 
-    const finalAddress = addressData || {
-      id: addressId || "addr-default-1",
-      recipientName: realName,
-      phone: "",
-      addressLine1: "",
-      city: "",
-      province: "",
-      postalCode: "",
-      country: "Indonesia",
-    };
+    const finalAddress = addressData;
+    if (
+      !finalAddress?.recipientName ||
+      !finalAddress.phone ||
+      !finalAddress.addressLine1 ||
+      !finalAddress.city ||
+      !finalAddress.province ||
+      !finalAddress.postalCode ||
+      !realEmail
+    ) {
+      setError("Data pelanggan dan alamat pengiriman belum lengkap.");
+      setIsProcessing(false);
+      return null;
+    }
 
     try {
       const res = await fetch("/api/orders", {
@@ -215,7 +224,10 @@ function CheckoutPaymentPage() {
         body: JSON.stringify({
           addressId: addressId || "addr-default-1",
           shippingMethod: currentShippingMethod,
-          shippingCost: Number.isNaN(shippingCost) ? 8000 : shippingCost,
+          shippingCost,
+          shippingRate: selectedRateRaw
+            ? JSON.parse(selectedRateRaw)
+            : undefined,
           customerEmail: realEmail,
           customerName: realName,
           items: cartItems.map((item) => ({
@@ -223,7 +235,7 @@ function CheckoutPaymentPage() {
             slug: item.product.slug,
             quantity: item.quantity,
             name: item.product.name,
-            price: Number(item.product?.price || 378000),
+            price: Number(item.product.price),
             image: item.product?.image,
           })),
           shippingAddress: finalAddress,

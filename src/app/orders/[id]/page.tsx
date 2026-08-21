@@ -452,7 +452,9 @@ function OrderDetailInner() {
     {
       num: 4,
       title: "Dalam Pengiriman",
-      desc: `Kurir ${order.shippingMethod || "SiCepat / JNE"}`,
+      desc: order.shippingMethod
+        ? `Kurir ${order.shippingMethod}`
+        : "Menunggu data kurir yang terverifikasi",
     },
     {
       num: 5,
@@ -671,9 +673,7 @@ function OrderDetailInner() {
                   </h2>
                   <p className="text-xs text-supporting-500 mt-0.5">
                     Ekspedisi:{" "}
-                    <strong>
-                      {order.shippingMethod || "SICEPAT / JNE REGULER"}
-                    </strong>
+                    <strong>{order.shippingMethod || "Belum dipilih"}</strong>
                   </p>
                 </div>
 

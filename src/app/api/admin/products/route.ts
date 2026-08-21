@@ -5,6 +5,7 @@ import { recordStaffAudit } from "@/application/audit/audit-store";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
 import { getProducts, createProduct } from "@/lib/admin/products";
+import { createProductInSheet } from "@/lib/admin/product-sheet-sync";
 
 export async function GET(request: Request) {
   try {
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-    const newProduct = await createProduct({
+    const productInput = {
       name: body.name,
       slug,
       category: body.category || "Umum",
@@ -78,6 +79,11 @@ export async function POST(request: Request) {
       sku: body.sku,
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
+    };
+    const sheetProduct = await createProductInSheet(productInput, actor.email);
+    const newProduct = await createProduct({
+      ...productInput,
+      sku: sheetProduct.sku,
     });
 
     await recordStaffAudit(auditStore, actor, {

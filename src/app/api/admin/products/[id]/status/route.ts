@@ -5,6 +5,7 @@ import { recordStaffAudit } from "@/application/audit/audit-store";
 import { createRequestCorrelationId } from "@/infrastructure/observability/correlation-id";
 import { createResourceId } from "@/domain/common/identifiers";
 import { setProductStatus, getProductById } from "@/lib/admin/products";
+import { updateProductInSheet } from "@/lib/admin/product-sheet-sync";
 
 export async function PATCH(
   request: Request,
@@ -32,6 +33,10 @@ export async function PATCH(
     }
 
     const before = await getProductById(id);
+    if (!before) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    await updateProductInSheet(before, { status }, actor.email);
     const updated = await setProductStatus(id, status);
     if (!updated) {
       await recordStaffAudit(auditStore, actor, {

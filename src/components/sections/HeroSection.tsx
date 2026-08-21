@@ -171,13 +171,15 @@ export function HeroSection() {
         className="absolute inset-0 pointer-events-none overflow-hidden"
         aria-hidden="true"
       >
-        {/* Subtle photo texture overlay */}
+        {/* Subtle photo texture overlay - decorative, low priority; LCP is the showcase image */}
         <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay">
           <Image
             src="/images/penaameen/hero/hero-bg-islamic-learning.jpg"
             alt=""
             fill
             priority
+            fetchPriority="high"
+            loading="eager"
             sizes="100vw"
             className="object-cover"
           />

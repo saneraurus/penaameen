@@ -1,6 +1,9 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
+import type { NextRequest } from "next/server";
 
-const isPublicRoute = createRouteMatcher([
+// Public routes — must stay in sync with src/middleware.ts (legacy) and Clerk resource-based checks.
+// Patterns ending with (.*) mean prefix match.
+const PUBLIC_ROUTE_PATTERNS = [
   "/",
   "/produk(.*)",
   "/sejarah",
@@ -22,7 +25,18 @@ const isPublicRoute = createRouteMatcher([
   "/api/addresses(.*)",
   "/api/assistant(.*)",
   "/api/v1/health(.*)",
-]);
+] as const;
+
+function isPublicRoute(req: NextRequest): boolean {
+  const pathname = req.nextUrl.pathname;
+  return PUBLIC_ROUTE_PATTERNS.some((pattern) => {
+    if (pattern.endsWith("(.*)")) {
+      const base = pattern.slice(0, -4);
+      return pathname === base || pathname.startsWith(base + "/");
+    }
+    return pathname === pattern;
+  });
+}
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {

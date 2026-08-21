@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma, type ProductStatus } from "@/generated/prisma";
+import { isSheetsConfigured } from "@/infrastructure/sheets/sheets-config";
+import { getStockSheetAdapter } from "@/infrastructure/sheets/stock-sheet-adapter";
+import {
+  slugifyName,
+  type StockProduct,
+} from "@/domain/inventory/stock-product";
 
 export interface AdminProduct {
   id: string;
@@ -37,6 +43,63 @@ export interface GetProductsOptions {
 export interface GetProductsResult {
   products: AdminProduct[];
   total: number;
+}
+
+function mapSheetProduct(product: StockProduct): AdminProduct {
+  const tags = product.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  return {
+    id: product.sku,
+    slug: product.slug || slugifyName(product.name),
+    name: product.name,
+    category: product.category,
+    description: product.description,
+    price: product.price,
+    image: product.image,
+    status: product.status,
+    sku: product.sku,
+    stockQuantity: product.stock,
+    salePrice: product.salePrice,
+    tags,
+    createdAt: product.updatedAt,
+    updatedAt: product.updatedAt,
+  };
+}
+
+export async function getSheetProducts(
+  options: GetProductsOptions,
+): Promise<GetProductsResult | null> {
+  if (!isSheetsConfigured()) return null;
+  const products = (await getStockSheetAdapter().readProducts()).map(
+    mapSheetProduct,
+  );
+  const filtered = products.filter((product) => {
+    const query = options.search?.toLowerCase();
+    const matchesSearch =
+      !query ||
+      product.name.toLowerCase().includes(query) ||
+      product.slug.toLowerCase().includes(query) ||
+      product.sku?.toLowerCase().includes(query);
+    const matchesCategory =
+      !options.category || product.category === options.category;
+    const matchesStatus = !options.status || product.status === options.status;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+  const start = (options.page - 1) * options.perPage;
+  return {
+    products: filtered.slice(start, start + options.perPage),
+    total: filtered.length,
+  };
+}
+
+export async function getSheetProductCategories(): Promise<string[] | null> {
+  if (!isSheetsConfigured()) return null;
+  const products = await getStockSheetAdapter().readProducts();
+  return Array.from(
+    new Set(products.map((product) => product.category)),
+  ).sort();
 }
 
 type ProductRow = {
@@ -149,7 +212,7 @@ export async function getProductCategories(): Promise<string[]> {
 
 export async function getProductById(id: string): Promise<AdminProduct | null> {
   const product = await prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }] },
+    where: { OR: [{ id }, { slug: id }, { sku: id }] },
     include: { category: true },
   });
   return product ? mapProduct(product as ProductRow) : null;
@@ -207,7 +270,7 @@ export async function updateProduct(
   data: Partial<Omit<AdminProduct, "id" | "createdAt">>,
 ): Promise<AdminProduct | null> {
   const existing = await prisma.product.findFirst({
-    where: { OR: [{ id }, { slug: id }] },
+    where: { OR: [{ id }, { slug: id }, { sku: id }] },
   });
   if (!existing) return null;
 

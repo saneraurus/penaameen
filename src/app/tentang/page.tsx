@@ -480,6 +480,7 @@ export default function AboutPage() {
             alt=""
             fill
             unoptimized
+            loading="lazy"
             className="object-cover"
           />
         </div>

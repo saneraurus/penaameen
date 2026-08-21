@@ -39,6 +39,19 @@ This plan classifies content for future migration. It does not redesign or rewri
 - UNKNOWN: Full descriptions, SKU, images, stock, dimensions, variants, reviews.
 - Treatment: KEEP source product descriptions for migration baseline; REWRITE only after full export and client approval.
 
+## Verified live shop reconciliation (2026-08-21)
+
+- The live legacy shop archive reports 21 products across `/shop/` and
+  `/shop/page/2/`.
+- Three products were added to the active catalog and `Sheet1` using the live
+  product pages as evidence: `Mengenal Tindak Pidana Ekonomi`, `PENGANTAR ILMU
+  HUKUM`, and `PENGANTAR TEKNOLOGI BETON PRATEGANG`.
+- `Paket Home Learning ALBARQY` remains intentionally excluded based on the
+  owner decision to remove that section, even though it remains present on the
+  legacy site.
+- The final Google Sheets product master was verified at 21 rows with no
+  duplicate SKU or slug and no missing source SKU mapping.
+
 ## Category descriptions
 
 - Product categories `al-barqy`, `flashcard`, `CD`, `Umum`, and tag `ernuwidodo` are discovered.

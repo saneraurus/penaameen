@@ -8,21 +8,12 @@ export interface Product {
   category: string;
   description: string;
   price: number; // in IDR
+  salePrice?: number;
   image: string;
 }
 
 export const products: Product[] = [
   // --- Al-Barqy learning packages ---
-  {
-    id: "1",
-    slug: "paket-home-learning-albarqy",
-    name: "Paket Home Learning ALBARQY",
-    category: "Al-Barqy",
-    description:
-      "Paket Home Learning Al-Barqy melatih mengeja dan menghafalkan huruf. Cocok bagi Guru, Orang Tua, dan Anak-anak.",
-    price: 966000,
-    image: "/images/penaameen/products/home-learning.jpg",
-  },
   {
     id: "2",
     slug: "paket-flashcard-albarqy",
@@ -205,6 +196,40 @@ export const products: Product[] = [
       "Book chapter tentang transformasi nilai pendidikan dan agama menuju masyarakat beradab yang mengharmonisasi nilai Islam ke dalam kehidupan sosial.",
     price: 0,
     image: "/images/penaameen/products/COVER-IC-ISLEH-web.jpg",
+  },
+  {
+    id: "20",
+    slug: "mengenal-tindak-pidana-ekonomi-karakter-dan-bentuk-bentuk-tindak-pidana-ekonomi",
+    name: "Mengenal Tindak Pidana Ekonomi: Karakter dan Bentuk-bentuk Tindak Pidana Ekonomi",
+    category: "Universitas",
+    description:
+      "Buku referensi mahasiswa tentang tindak pidana ekonomi, white collar crime, tindak pidana korporasi, perbankan, pencucian uang, perpajakan, pasar modal, mayantara, korupsi, dan lingkungan hidup.",
+    price: 150000,
+    image: "https://penaameen.com/wp-content/uploads/2024/08/Cover-Web.png",
+  },
+  {
+    id: "21",
+    slug: "pengantar-ilmu-hukum",
+    name: "PENGANTAR ILMU HUKUM",
+    category: "Hukum",
+    description:
+      "Buku pengantar hukum pidana yang membahas konsep dasar perbuatan pidana, pertanggungjawaban pidana, pemidanaan, concursus, deelneming, kausalitas, peraturan, dan contoh kasus.",
+    price: 150000,
+    salePrice: 90000,
+    image:
+      "https://penaameen.com/wp-content/uploads/2025/08/Pengantar-Ilmu-Hukum.jpeg",
+  },
+  {
+    id: "22",
+    slug: "pengantar-teknologi-beton-prategang",
+    name: "PENGANTAR TEKNOLOGI BETON PRATEGANG",
+    category: "Teknik Sipil",
+    description:
+      "Buku referensi tentang prinsip dasar dan aplikasi beton prategang dalam konstruksi untuk mahasiswa, insinyur, dan praktisi teknik sipil.",
+    price: 150000,
+    salePrice: 90000,
+    image:
+      "https://penaameen.com/wp-content/uploads/2025/08/Pengantar-Teknologi-Beton-Prategang.jpeg",
   },
 ];
 

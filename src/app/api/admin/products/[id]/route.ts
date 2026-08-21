@@ -9,6 +9,10 @@ import {
   updateProduct,
   deleteProduct,
 } from "@/lib/admin/products";
+import {
+  updateProductInSheet,
+  deleteProductInSheet,
+} from "@/lib/admin/product-sheet-sync";
 
 export async function GET(
   request: Request,
@@ -41,6 +45,31 @@ export async function PATCH(
     const body = await request.json();
 
     const before = await getProductById(id);
+    if (!before) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    await updateProductInSheet(
+      before,
+      {
+        ...(body.name !== undefined ? { name: body.name } : {}),
+        ...(body.slug !== undefined ? { slug: body.slug } : {}),
+        ...(body.category !== undefined ? { category: body.category } : {}),
+        ...(body.description !== undefined
+          ? { description: body.description }
+          : {}),
+        ...(body.price !== undefined ? { price: Number(body.price) } : {}),
+        ...(body.salePrice !== undefined
+          ? { salePrice: body.salePrice ? Number(body.salePrice) : undefined }
+          : {}),
+        ...(body.stockQuantity !== undefined
+          ? { stockQuantity: Number(body.stockQuantity) }
+          : {}),
+        ...(body.image !== undefined ? { image: body.image } : {}),
+        ...(body.status !== undefined ? { status: body.status } : {}),
+        ...(body.sku !== undefined ? { sku: body.sku } : {}),
+      },
+      actor.email,
+    );
     const updated = await updateProduct(id, {
       ...(body.name !== undefined ? { name: body.name } : {}),
       ...(body.slug !== undefined ? { slug: body.slug } : {}),
@@ -122,6 +151,10 @@ export async function DELETE(
     );
     const { id } = await params;
     const before = await getProductById(id);
+    if (!before) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    await deleteProductInSheet(before, actor.email);
     const ok = await deleteProduct(id);
     if (!ok) {
       await recordStaffAudit(auditStore, actor, {

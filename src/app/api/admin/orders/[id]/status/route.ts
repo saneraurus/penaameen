@@ -56,6 +56,18 @@ export async function PATCH(
     const before = { ...order };
     const changed: string[] = [];
 
+    const requestedFulfillment = body.fulfillmentStatus as string | undefined;
+    if (
+      requestedFulfillment === "shipped" &&
+      !body.trackingNumber &&
+      !order.fulfillmentHistory?.[0]?.trackingNumber
+    ) {
+      return NextResponse.json(
+        { error: "Nomor resi wajib diisi sebelum pesanan ditandai dikirim" },
+        { status: 400 },
+      );
+    }
+
     if (body.status && body.status !== order.status) {
       order.status = body.status;
       changed.push("status");
@@ -97,7 +109,12 @@ export async function PATCH(
         refunded: "REFUNDED",
       };
 
-      const newStatus = prismaStatusMap[order.status] || "PROCESSING";
+      const newStatus =
+        requestedFulfillment === "shipped"
+          ? "SHIPPED"
+          : requestedFulfillment === "delivered"
+            ? "DELIVERED"
+            : prismaStatusMap[order.status] || "PROCESSING";
 
       await prisma.order.update({
         where: { id: order.id },
@@ -111,8 +128,16 @@ export async function PATCH(
           note: body.note || `Status pesanan diupdate: ${newStatus}`,
         },
       });
-    } catch {
-      // DB unavailable - status change cannot be persisted
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error:
+            error instanceof Error
+              ? error.message
+              : "Gagal menyimpan perubahan status pesanan",
+        },
+        { status: 503 },
+      );
     }
 
     await recordStaffAudit(auditStore, actor, {

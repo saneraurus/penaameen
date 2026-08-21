@@ -163,11 +163,7 @@ export default function CheckoutAddressPage() {
                   province: selectedAddr.province,
                   postalCode: selectedAddr.postalCode,
                 }
-              : {
-                  city: "Surabaya",
-                  province: "Jawa Timur",
-                  postalCode: "60238",
-                },
+              : undefined,
             items: cartItems.map((item) => ({
               productId: item.product.id,
               quantity: item.quantity,
@@ -176,13 +172,26 @@ export default function CheckoutAddressPage() {
         });
 
         const data = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            typeof data.error === "string"
+              ? data.error
+              : "Provider ongkir belum tersedia untuk pesanan ini.",
+          );
+        }
         const availableRates: ShippingRate[] = data.rates ?? [];
         setRates(availableRates);
         if (availableRates.length > 0 && availableRates[0]) {
           setSelectedRate(availableRates[0]);
         }
-      } catch {
-        setError("Gagal memuat ongkos kirim. Silakan coba kembali.");
+      } catch (rateError) {
+        setRates([]);
+        setSelectedRate(null);
+        setError(
+          rateError instanceof Error
+            ? rateError.message
+            : "Gagal memuat ongkos kirim. Silakan coba kembali.",
+        );
       } finally {
         setIsLoadingRates(false);
       }
@@ -198,7 +207,9 @@ export default function CheckoutAddressPage() {
       !form.recipientName ||
       !form.phone ||
       !form.addressLine1 ||
-      !form.city
+      !form.city ||
+      !form.province ||
+      !form.postalCode
     ) {
       setError("Mohon lengkapi semua field alamat wajib.");
       return;
@@ -212,8 +223,8 @@ export default function CheckoutAddressPage() {
       addressLine1: form.addressLine1,
       addressLine2: form.addressLine2 || null,
       city: form.city,
-      province: form.province || "Jawa Timur",
-      postalCode: form.postalCode || "60238",
+      province: form.province,
+      postalCode: form.postalCode,
       country: "Indonesia",
       isDefault: addresses.length === 0,
     };

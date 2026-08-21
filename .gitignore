@@ -15,6 +15,9 @@ test-results/
 
 # runtime secrets / live config (payment keys + business identifiers)
 src/data/api_settings.json
+service-account*.json
+google-service-account*.json
+penaameen-website-*.json
 
 # TypeScript incremental state
 *.tsbuildinfo

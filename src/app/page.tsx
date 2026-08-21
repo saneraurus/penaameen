@@ -588,6 +588,7 @@ export default function HomePage() {
             alt=""
             fill
             sizes="100vw"
+            loading="lazy"
             className="object-cover"
           />
         </div>

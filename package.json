@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "cross-env NEXT_TELEMETRY_DISABLED=1 next dev",
+    "dev:all": "node scripts/start-all.mjs",
     "build": "cross-env NEXT_TELEMETRY_DISABLED=1 next build",
     "start": "cross-env NEXT_TELEMETRY_DISABLED=1 next start",
     "lint": "eslint . --max-warnings=0",
@@ -20,6 +21,7 @@
     "db:start": "node scripts/dev-db.mjs",
     "db:push": "prisma db push",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "import:products:sheets": "tsx scripts/import-products-to-sheets.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",

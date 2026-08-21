@@ -88,6 +88,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
+    const expectedGrossAmount = Number(order.total).toFixed(2);
+    if (String(gross_amount) !== expectedGrossAmount) {
+      await recordSystemAudit(auditStore, {
+        action: "payment.webhook",
+        targetType: "order",
+        targetId: createResourceId(order.id),
+        outcome: "failed",
+        after: {
+          reason: "gross_amount_mismatch",
+          expectedGrossAmount,
+          receivedGrossAmount: gross_amount,
+        },
+      });
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 422 });
+    }
+
     const newStatus = mapMidtransStatus(transaction_status, fraud_status);
     let note = "";
 

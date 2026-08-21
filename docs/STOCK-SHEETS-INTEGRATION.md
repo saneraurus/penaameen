@@ -13,7 +13,7 @@ the persistence layer for orders, payments, authentication, and audit.
 |---|---|---|
 | D019 | MANAGE STOCKS on the admin PRODUCTS tab | New tab `Manage Stocks` at `/admin/products/stocks`. |
 | D019 | Authentication via Google Service Account | `GOOGLE_SHEETS_SERVICE_ACCOUNT_JSON` (JSON key, Sheets API enabled) + spreadsheet shared to the service account `client_email` (Editor). |
-| D019 | Sheets is the primary source for products + stock | Admin writes and storefront reads go through the spreadsheet. Empty/unavailable sheet falls back to PostgreSQL then the static catalog so the public storefront never breaks. |
+| D019 | Sheets is the primary source for products + stock | Admin catalog and stock writes go through the spreadsheet first. PostgreSQL is synchronized as a mirror for order/admin relationships. Empty/unavailable sheet falls back to PostgreSQL then the static catalog so the public storefront never breaks. |
 | D019 | Default schema | Defined below; headers are auto-created by `ensureSchema()` when the tabs are missing or empty. |
 
 ## 2. Configuration (environment)
@@ -89,6 +89,11 @@ Storefront    src/lib/inventory/sheets-catalog.ts  cached sheet reader (unstable
 - **Authorization:** `inventory:read` / `inventory:write` capabilities
   (admin and product_manager roles); every mutation is written to the staff
   audit log (`/admin/audit`).
+- **Catalog write-through:** Add, edit, status, and delete actions from
+  `/admin/products/*` write to `Sheet1` first and fail closed if the Sheets
+  mutation fails. Successful catalog writes then synchronize the PostgreSQL
+  mirror. New SKUs are generated as `PENA-001`, `PENA-002`, and so on when the
+  admin leaves SKU empty.
 - **Safety:** stock can never go below zero; duplicate SKUs are rejected
   (`409`); deleting a product clears its spreadsheet row but the movement
   ledger keeps the history.
