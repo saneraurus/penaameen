@@ -29,6 +29,44 @@ export default async function AdminAnalyticsPage() {
           </div>
         ))}
       </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {[
+          ["Customers", analytics.operational.commerce.customerCount],
+          ["Paid orders", analytics.operational.commerce.paidOrderCount],
+          ["Zero stock", analytics.operational.commerce.zeroStockCount],
+          [
+            "Critical alerts",
+            analytics.operational.notifications.criticalUnreadCount,
+          ],
+        ].map(([label, value]) => (
+          <div
+            key={String(label)}
+            className="rounded-2xl border border-gray-200 bg-white p-5"
+          >
+            <p className="text-xs uppercase text-gray-500">{label}</p>
+            <p className="mt-2 font-mono text-2xl">{value}</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Authoritative operational source
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <h2 className="font-semibold">Orders Created, Last 7 Days</h2>
+        <div className="mt-4 grid grid-cols-7 gap-2">
+          {analytics.operational.commerce.orderTrend7d.map((item) => (
+            <div
+              key={item.date}
+              className="rounded-xl bg-gray-50 p-3 text-center"
+            >
+              <p className="text-[10px] text-gray-500">{item.date.slice(5)}</p>
+              <p className="mt-2 font-mono text-lg font-semibold">
+                {item.orders}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
         <h2 className="font-semibold">Operational Sources</h2>
         <p className="mt-2 text-sm text-gray-600">

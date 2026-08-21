@@ -3,6 +3,10 @@ import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { buildLiveWebsiteKnowledge } from "@/lib/assistant/knowledge";
+import {
+  getAssistantHealth,
+  isUsableAssistantKey,
+} from "@/lib/assistant/assistant-health";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +29,7 @@ function buildAssistantProviders(): AssistantProvider[] {
   const providers: AssistantProvider[] = [];
 
   const nvidiaKey = process.env.NVIDIA_API_KEY;
-  if (nvidiaKey) {
+  if (isUsableAssistantKey(nvidiaKey)) {
     const nvidiaModel =
       process.env.NVIDIA_MODEL ??
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning";
@@ -43,7 +47,7 @@ function buildAssistantProviders(): AssistantProvider[] {
     });
 
     const nvidiaFallbackKey = process.env.NVIDIA_API_KEY_FALLBACK;
-    if (nvidiaFallbackKey) {
+    if (isUsableAssistantKey(nvidiaFallbackKey)) {
       providers.push({
         name: "nvidia-backup",
         endpoint: nvidiaEndpoint,
@@ -58,7 +62,7 @@ function buildAssistantProviders(): AssistantProvider[] {
   }
 
   const groqKey = process.env.GROQ_API_KEY;
-  if (groqKey) {
+  if (isUsableAssistantKey(groqKey)) {
     providers.push({
       name: "groq",
       endpoint: GROQ_ENDPOINT,
@@ -101,11 +105,11 @@ async function callProvider(
     });
 
     if (!response.ok) {
-      const detail = await response.text().catch(() => "");
+      await response.text().catch(() => "");
       return {
         ok: false,
         status: response.status,
-        detail: detail.slice(0, 500),
+        detail: `provider_http_${response.status}`,
       };
     }
 
@@ -120,7 +124,9 @@ async function callProvider(
     return {
       ok: false,
       detail:
-        error instanceof Error ? error.message.slice(0, 500) : "network error",
+        error instanceof DOMException && error.name === "TimeoutError"
+          ? "provider_timeout"
+          : "provider_network_error",
     };
   }
 }
@@ -444,9 +450,12 @@ export async function POST(request: Request) {
 
     const providers = buildAssistantProviders();
     if (providers.length === 0) {
-      console.error("No AI provider API keys configured.");
+      console.error("No usable AI provider configured", getAssistantHealth());
       return NextResponse.json(
-        { error: "Layanan asisten belum dikonfigurasi. Hubungi admin." },
+        {
+          error: "Layanan asisten belum dikonfigurasi. Hubungi admin.",
+          code: "ASSISTANT_PROVIDER_UNAVAILABLE",
+        },
         { status: 503 },
       );
     }
@@ -518,8 +527,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { error: "Asisten sedang sibuk. Silakan coba lagi sebentar lagi." },
-      { status: 502 },
+      {
+        error: "Asisten sedang sibuk. Silakan coba lagi sebentar lagi.",
+        code: "ASSISTANT_PROVIDER_FAILED",
+      },
+      { status: 503 },
     );
   } catch (error) {
     console.error("Assistant route error:", error);

@@ -10,6 +10,7 @@
 - `/admin/analytics` and `GET /api/admin/analytics` expose operational health only.
 - Orders, revenue, and conversion are never shown as zero when the source/policy is unavailable; they remain `UNKNOWN`.
 - Existing content, gallery, redirect, and notification health is reused as first-party operational context.
+- Step 10 adds authoritative operational aggregates: order status counts, paid order totals, customer count, zero-stock count, critical unread alerts, and a seven-day order creation trend.
 
 ## Not activated
 
