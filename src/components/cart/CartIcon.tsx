@@ -19,7 +19,7 @@ export function CartIcon() {
     return (
       <Link
         id="header-cart-icon"
-        href="/checkout/address"
+        href="/keranjang"
         className="relative rounded-xl p-2 text-supporting-500 transition-colors hover:bg-supporting-100/80 hover:text-primary-700"
       >
         <svg
