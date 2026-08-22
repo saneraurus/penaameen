@@ -10,7 +10,7 @@ export function SiteLayoutWrapper({ children }: { children: React.ReactNode }) {
 
   if (isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="admin-shell flex min-h-screen flex-col">
         <main id="main-content" className="flex-1">
           {children}
         </main>

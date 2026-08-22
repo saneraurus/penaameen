@@ -20,14 +20,16 @@ export function CartIcon() {
       <Link
         id="header-cart-icon"
         href="/keranjang"
-        className="relative rounded-xl p-2 text-supporting-500 transition-colors hover:bg-supporting-100/80 hover:text-primary-700"
+        aria-label="Keranjang"
+        className="flex h-11 w-11 items-center justify-center rounded-full text-supporting-600 transition-colors hover:bg-background-200 hover:text-primary-900"
       >
         <svg
           className="h-5 w-5 animate-pulse"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
+          aria-hidden="true"
         >
           <circle cx="9" cy="21" r="1" />
           <circle cx="20" cy="21" r="1" />
@@ -41,8 +43,11 @@ export function CartIcon() {
     <Link
       id="header-cart-icon"
       href="/checkout/address"
-      className={`relative rounded-xl p-2 text-supporting-500 transition-all duration-300 hover:bg-supporting-100/80 hover:text-primary-700 ${
-        bumping ? "scale-125 text-primary-600" : "scale-100"
+      aria-label={
+        itemCount > 0 ? `Keranjang, ${itemCount} item` : "Keranjang, kosong"
+      }
+      className={`relative flex h-11 w-11 items-center justify-center rounded-full text-supporting-600 transition-all duration-300 hover:bg-background-200 hover:text-primary-900 ${
+        bumping ? "scale-110 text-primary-900" : "scale-100"
       }`}
     >
       <svg
@@ -50,7 +55,8 @@ export function CartIcon() {
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.5"
+        aria-hidden="true"
       >
         <circle cx="9" cy="21" r="1" />
         <circle cx="20" cy="21" r="1" />
@@ -58,8 +64,8 @@ export function CartIcon() {
       </svg>
       {itemCount > 0 && (
         <span
-          className={`absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center text-xs font-bold text-white bg-primary-600 rounded-full transition-transform duration-300 ${
-            bumping ? "scale-125 bg-primary-700 shadow-md" : "scale-100"
+          className={`absolute right-1 top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-accent-600 text-[10px] font-semibold text-white transition-transform duration-300 ${
+            bumping ? "scale-115" : "scale-100"
           }`}
         >
           {itemCount > 99 ? "99+" : itemCount}

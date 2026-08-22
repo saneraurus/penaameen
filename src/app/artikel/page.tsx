@@ -3,22 +3,40 @@ import Link from "next/link";
 import { getArticles } from "@/lib/content";
 import { ArticleListClient } from "./ArticleListClient";
 
+import { SceneIndex, SectionHeading, Shell } from "@/components/ui/primitives";
+
 export default async function ArticleListPage() {
   const articles = await getArticles();
   return (
     <div className="min-h-screen bg-background-50">
-      <header className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b border-supporting-200">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-            <Link
-              href="/"
-              className="text-supporting-600 hover:text-primary-600"
-            >
-              ← Kembali ke Beranda
-            </Link>
-            <h1 className="text-2xl font-serif text-primary-600">Artikel</h1>
+      <header className="border-b border-supporting-200 bg-white">
+        <Shell className="py-14 sm:py-20">
+          <nav aria-label="Breadcrumb" className="mb-8">
+            <ol className="flex items-center gap-2 text-xs text-supporting-500">
+              <li>
+                <Link
+                  href="/"
+                  className="transition-colors hover:text-primary-900"
+                >
+                  Kembali ke Beranda
+                </Link>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li className="text-supporting-800">Artikel</li>
+            </ol>
+          </nav>
+
+          <div className="max-w-3xl">
+            <SceneIndex index="01" label="Wawasan" />
+            <SectionHeading level={1} className="mt-5">
+              Artikel
+            </SectionHeading>
+            <p className="lede mt-5">
+              Catatan, panduan, dan wawasan untuk pendamping belajar membaca dan
+              mengaji.
+            </p>
           </div>
-        </div>
+        </Shell>
       </header>
 
       <ArticleListClient articles={articles} />

@@ -8,6 +8,18 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
+  {
+    key: "Content-Security-Policy",
+    value:
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https://img.clerk.com https://images.clerk.dev https://*.googleusercontent.com https://penaameen.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com; connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://api.groq.com https://integrate.api.nvidia.com https://api.casaku.id; frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com; form-action 'self'; upgrade-insecure-requests",
+  },
+];
+
+const productionHeaders = [
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains",
+  },
 ];
 
 const nextConfig: NextConfig = {
@@ -41,7 +53,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/(.*)",
-        headers: securityHeaders,
+        headers: [...securityHeaders, ...productionHeaders],
+      },
+      {
+        source: "/(admin|api|orders|checkout)(.*)",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
       },
     ];
   },

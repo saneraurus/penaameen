@@ -1,114 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --surface-canvas: Canvas;
-  --surface-default: Canvas;
-  --surface-subtle: ButtonFace;
-  --text-primary: CanvasText;
-  --text-muted: GrayText;
-  --border-default: GrayText;
-  --interactive-default: LinkText;
-  --interactive-focus: Highlight;
-  --status-success: CanvasText;
-  --status-warning: CanvasText;
-  --status-error: CanvasText;
-}
-
 /*
- * Our design system variables.
+ * PENA AMEEN — VISUAL SYSTEM
  *
- * Tailwind v4 resolves theme tokens from `@theme` only: a plain `:root` block
- * and `tailwind.config.ts` are both ignored, so utilities such as
- * `bg-primary-600` or `text-section` are only generated for tokens declared
- * here. Tailwind also emits every token below as a `:root` custom property,
- * so `var(--color-*)`, `var(--font-*)`, and `var(--radius-*)` keep working in
- * the plain CSS further down this file.
+ * Art direction: warm ink on parchment. Editorial, image-led, restrained.
+ * Images carry the story; type and UI support it.
+ *
+ * These are presentation tokens only. Final brand values remain client-gated
+ * per docs/BRAND-DESIGN-SYSTEM.md, so every value here is provisional and
+ * reversible.
  */
+
 @theme {
-  /* Colors */
-  --color-primary-50: #e6f4ea;
-  --color-primary-100: #c9e9d2;
-  --color-primary-200: #a8d9b8;
-  --color-primary-300: #86c99f;
-  --color-primary-400: #65b985;
-  --color-primary-500: #43a96b;
-  --color-primary-600: #368c57;
-  --color-primary-700: #2a6f43;
-  --color-primary-800: #1e5230;
-  --color-primary-900: #12351d;
-  /* Provisional deepest shade: continues the ramp for dark sections that
-     already reference `primary-950`. Needs brand confirmation. */
-  --color-primary-950: #091a0e;
+  /* ---------------------------------------------------------------
+     Colour — Ink (primary): deep, calm, scholarly green-black
+     --------------------------------------------------------------- */
+  --color-primary-50: #f1f5f2;
+  --color-primary-100: #dde7e0;
+  --color-primary-200: #bccec3;
+  --color-primary-300: #92ae9c;
+  --color-primary-400: #688a76;
+  --color-primary-500: #4a6b57;
+  --color-primary-600: #375343;
+  --color-primary-700: #2a4034;
+  --color-primary-800: #1e2f27;
+  --color-primary-900: #14201b;
+  --color-primary-950: #0b1310;
 
-  --color-secondary-50: #fdfaf6;
-  --color-secondary-100: #f9f3eb;
-  --color-secondary-200: #f2e7d9;
-  --color-secondary-300: #ebdac6;
-  --color-secondary-400: #e4ceb3;
-  --color-secondary-500: #ddc1a0;
-  --color-secondary-600: #b19a7e;
-  --color-secondary-700: #85735c;
-  --color-secondary-800: #5a4d3a;
-  --color-secondary-900: #2e2618;
+  /* Parchment (secondary): warm paper tones */
+  --color-secondary-50: #fdfbf7;
+  --color-secondary-100: #f8f4ec;
+  --color-secondary-200: #f0e9dc;
+  --color-secondary-300: #e5dac6;
+  --color-secondary-400: #d8c9ae;
+  --color-secondary-500: #c9b694;
+  --color-secondary-600: #a89571;
+  --color-secondary-700: #7f7055;
+  --color-secondary-800: #564b39;
+  --color-secondary-900: #2d271e;
 
-  --color-accent-50: #fdf6eb;
-  --color-accent-100: #fbedd5;
-  --color-accent-200: #f9dfad;
-  --color-accent-300: #f7c285;
-  --color-accent-400: #f4a55c;
-  --color-accent-500: #f28833;
-  --color-accent-600: #c26d29;
-  --color-accent-700: #925320;
-  --color-accent-800: #623816;
-  --color-accent-900: #321d0c;
+  /* Clay (accent): warm terracotta-amber for narrative emphasis */
+  --color-accent-50: #fdf5ee;
+  --color-accent-100: #f9e7d6;
+  --color-accent-200: #f2cdab;
+  --color-accent-300: #e8ae7c;
+  --color-accent-400: #db8d51;
+  --color-accent-500: #c9743a;
+  --color-accent-600: #a95c2d;
+  --color-accent-700: #834626;
+  --color-accent-800: #5a3120;
+  --color-accent-900: #331d14;
 
-  --color-supporting-50: #f8f9fa;
-  --color-supporting-100: #e9ecef;
-  --color-supporting-200: #dee2e6;
-  --color-supporting-300: #ced4da;
-  --color-supporting-400: #adb5bd;
-  --color-supporting-500: #6c757d;
-  --color-supporting-600: #566266;
-  --color-supporting-700: #404d52;
-  --color-supporting-800: #2a3840;
-  --color-supporting-900: #14232e;
+  /* Supporting: warm neutral greys (never cold blue-grey) */
+  --color-supporting-50: #faf9f6;
+  --color-supporting-100: #f2f0ea;
+  --color-supporting-200: #e5e1d8;
+  --color-supporting-300: #cfc9bc;
+  --color-supporting-400: #a49d8e;
+  --color-supporting-500: #7a7365;
+  --color-supporting-600: #5c564b;
+  --color-supporting-700: #423d35;
+  --color-supporting-800: #2b2721;
+  --color-supporting-900: #191612;
 
-  --color-background-50: #ffffff;
-  --color-background-100: #fdfaf6;
-  --color-background-200: #f9f3eb;
-  --color-background-300: #f2e7d9;
-  --color-background-400: #ebdac6;
-  --color-background-500: #e4ceb3;
-  --color-background-600: #b69a87;
-  --color-background-700: #89766a;
-  --color-background-800: #5d5148;
-  --color-background-900: #312b2a;
+  /* Background: page canvas ramp */
+  --color-background-50: #fdfcf9;
+  --color-background-100: #faf8f3;
+  --color-background-200: #f4f1e9;
+  --color-background-300: #ece7db;
+  --color-background-400: #ded7c6;
+  --color-background-500: #cac1ac;
+  --color-background-600: #a49b87;
+  --color-background-700: #7a7365;
+  --color-background-800: #4c473f;
+  --color-background-900: #26231e;
 
-  /* shadcn UI Color Tokens */
+  /* Component tokens consumed by existing primitives */
   --color-popover: #ffffff;
-  --color-popover-foreground: #14232e;
-  --color-border: #e9ecef;
-  --color-input: #dee2e6;
-  --color-ring: #368c57;
-  --color-background: #ffffff;
-  --color-foreground: #14232e;
-  --color-muted: #f8f9fa;
-  --color-muted-foreground: #6c757d;
-  --color-accent: #f8f9fa;
-  --color-accent-foreground: #14232e;
+  --color-popover-foreground: #191612;
+  --color-border: #e5e1d8;
+  --color-input: #cfc9bc;
+  --color-ring: #4a6b57;
+  --color-background: #fdfcf9;
+  --color-foreground: #191612;
+  --color-muted: #f2f0ea;
+  --color-muted-foreground: #7a7365;
+  --color-accent: #f9e7d6;
+  --color-accent-foreground: #191612;
 
-  /* Typography */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-serif: "Cormorant Garamond", Georgia, serif;
+  /* ---------------------------------------------------------------
+     Typography — editorial scale with dramatic range
+     --------------------------------------------------------------- */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
 
-  /* Role-based type scale */
-  --text-display: clamp(3.5rem, 8vw, 5rem);
-  --text-hero: clamp(2.75rem, 6vw, 4rem);
-  --text-section: clamp(2rem, 4vw, 3rem);
-  --text-productTitle: clamp(1.25rem, 2vw, 1.75rem);
-  --text-caption: clamp(0.8125rem, 1vw, 0.875rem);
+  --text-display: clamp(3rem, 11vw, 8.5rem);
+  --text-hero: clamp(2.5rem, 7.5vw, 5.5rem);
+  --text-section: clamp(2rem, 5vw, 3.75rem);
+  --text-productTitle: clamp(1.25rem, 2.2vw, 1.875rem);
+  --text-caption: clamp(0.75rem, 1vw, 0.8125rem);
 
-  /* Border radius */
+  /* Radius — soft, not bubbly */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
@@ -116,7 +108,7 @@
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
 
-  /* Spacing */
+  /* Spacing scale */
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
   --spacing-3: 0.75rem;
@@ -136,39 +128,70 @@
   --spacing-32: 8rem;
 }
 
-/*
- * Element defaults.
- *
- * These live in `@layer base` on purpose. Tailwind v4 emits utilities into a
- * real CSS cascade layer, and unlayered rules always beat layered ones, so an
- * unlayered `h1 { color }` or `a { color }` would silently override every
- * `text-*` utility (for example `text-white` on a primary button).
- */
+/* ---------------------------------------------------------------
+   Semantic surface / status / motion tokens
+   --------------------------------------------------------------- */
+:root {
+  --surface-canvas: #fdfcf9;
+  --surface-default: #ffffff;
+  --surface-subtle: #f4f1e9;
+  --surface-ink: #0b1310;
+
+  --text-primary: #191612;
+  --text-secondary: #5c564b;
+  --text-muted: #7a7365;
+  --text-inverse: #fdfcf9;
+
+  --border-hairline: #e5e1d8;
+  --border-strong: #cfc9bc;
+
+  --status-success: #375343;
+  --status-warning: #a95c2d;
+  --status-error: #9c3f37;
+  --status-info: #42605a;
+
+  --shadow-raise: 0 1px 2px rgba(25, 22, 18, 0.04);
+  --shadow-soft: 0 12px 40px -12px rgba(25, 22, 18, 0.16);
+  --shadow-lifted: 0 32px 80px -24px rgba(25, 22, 18, 0.28);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-micro: 160ms;
+  --duration-small: 260ms;
+  --duration-medium: 480ms;
+  --duration-large: 900ms;
+
+  --z-nav: 60;
+  --z-overlay: 70;
+  --z-drawer: 80;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     min-height: 100vh;
     margin: 0;
-    background: var(--color-background-50);
-    color: var(--color-supporting-500);
+    background: var(--surface-canvas);
+    color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   a {
-    color: var(--color-primary-500);
+    color: inherit;
     text-decoration: none;
   }
 
-  a:hover {
-    text-decoration: underline;
-  }
-
-  /* Headings */
   h1,
   h2,
   h3,
@@ -177,97 +200,263 @@
   h6 {
     font-family: var(--font-serif);
     font-weight: 600;
-    line-height: 1.2;
-    color: var(--color-supporting-900);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
     margin-top: 0;
     margin-bottom: 1rem;
+    text-wrap: balance;
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
   }
 
   h2 {
-    font-size: 2rem;
+    font-size: clamp(1.875rem, 4vw, 2.75rem);
   }
 
   h3 {
-    font-size: 1.75rem;
+    font-size: clamp(1.375rem, 2.4vw, 1.875rem);
   }
 
   h4 {
-    font-size: 1.5rem;
-  }
-
-  h5 {
     font-size: 1.25rem;
   }
 
+  h5 {
+    font-size: 1.0625rem;
+  }
+
   h6 {
-    font-size: 1rem;
+    font-size: 0.9375rem;
+  }
+
+  ::selection {
+    background: var(--color-accent-200);
+    color: var(--color-primary-900);
   }
 }
 
 /* Kept unlayered so the visible focus indicator cannot be removed by a
    utility such as `outline-none`. */
 :focus-visible {
-  outline: 3px solid var(--color-primary-500);
+  outline: 2px solid var(--color-primary-500);
   outline-offset: 3px;
+  border-radius: 2px;
 }
 
-/* Container */
+/* ---------------------------------------------------------------
+   Layout primitives
+   --------------------------------------------------------------- */
 .container {
   width: 100%;
-  max-width: 80rem;
+  max-width: 84rem;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: clamp(1.25rem, 4vw, 3rem);
+  padding-right: clamp(1.25rem, 4vw, 3rem);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.25rem, 4vw, 3rem);
+  padding-right: clamp(1.25rem, 4vw, 3rem);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 96rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 3vw, 2.5rem);
+  padding-right: clamp(1rem, 3vw, 2.5rem);
+}
+
+.section-y {
+  padding-top: clamp(4rem, 10vw, 9rem);
+  padding-bottom: clamp(4rem, 10vw, 9rem);
+}
+
+.section-y-tight {
+  padding-top: clamp(2.5rem, 6vw, 5rem);
+  padding-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+
+.text-measure {
+  max-width: 62ch;
+}
+
+.text-measure-tight {
+  max-width: 46ch;
 }
 
 /* Skip link */
 .skip-link {
   position: absolute;
   left: 1rem;
-  top: -4rem;
+  top: -6rem;
+  z-index: 100;
 }
 
 .skip-link:focus-visible {
   top: 1rem;
-  z-index: 1;
-  background: var(--color-background-50);
-  padding: 0.5rem;
+  background: var(--surface-default);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
+/* ---------------------------------------------------------------
+   Editorial type utilities
+   --------------------------------------------------------------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-/* Scrollbar hide utility */
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
+.eyebrow-plain::before {
   display: none;
 }
 
-/*
- * Refined motion + layout utilities.
- *
- * `animate-fade-in` is referenced by the navigation drawer; it was previously
- * undefined, so the mobile menu animated from nothing. We define it here.
- */
+.scene-index {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--color-accent-600);
+}
+
+.display-type {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.lede {
+  font-size: clamp(1.0625rem, 1.6vw, 1.375rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.meta-type {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------
+   Surfaces
+   --------------------------------------------------------------- */
+.surface-card {
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  background: var(--surface-default);
+}
+
+.surface-quiet {
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xl);
+  background: var(--surface-subtle);
+}
+
+.hairline {
+  border-color: var(--border-hairline);
+}
+
+.image-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-supporting-100);
+}
+
+.image-frame img {
+  transition:
+    transform var(--duration-large) var(--ease-out-expo),
+    opacity var(--duration-medium) ease;
+}
+
+.image-frame-zoom:hover img {
+  transform: scale(1.04);
+}
+
+/* Ink scrim for text placed over photography. */
+.image-scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(11, 19, 16, 0.86) 0%,
+    rgba(11, 19, 16, 0.45) 42%,
+    rgba(11, 19, 16, 0.05) 78%
+  );
+  pointer-events: none;
+}
+
+.image-scrim-soft::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(11, 19, 16, 0.62) 0%,
+    rgba(11, 19, 16, 0.18) 55%,
+    transparent 85%
+  );
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+   Admin operations surfaces
+   --------------------------------------------------------------- */
+.admin-shell {
+  background: var(--color-supporting-50);
+}
+
+.admin-panel {
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-raise);
+}
+
+.admin-rail {
+  background: var(--surface-ink);
+  color: var(--text-inverse);
+}
+
+.admin-grid-line {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* ---------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------- */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -282,7 +471,7 @@
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -330,21 +519,49 @@
   }
 }
 
+@keyframes mask-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(3%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @layer utilities {
   .animate-fade-in {
-    animation: fade-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: fade-in var(--duration-small) var(--ease-out-expo) both;
   }
 
   .animate-rise-in {
-    animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise-in var(--duration-medium) var(--ease-out-expo) both;
   }
 
   .animate-chat-panel-in {
-    animation: chat-panel-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: chat-panel-in 0.34s var(--ease-out-expo) both;
   }
 
   .animate-message-in {
-    animation: message-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: message-in 0.28s var(--ease-out-expo) both;
   }
 
   .animate-spin-slow {
@@ -355,11 +572,12 @@
     animation: ping-slow 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
   }
 
-  /* Editorial image-frame used across the marketing pages. */
-  .image-frame {
-    border-radius: var(--radius-3xl);
-    overflow: hidden;
-    background: var(--color-supporting-100);
+  .animate-mask-reveal {
+    animation: mask-reveal var(--duration-large) var(--ease-out-expo) both;
+  }
+
+  .animate-drawer-in {
+    animation: drawer-in var(--duration-small) var(--ease-out-expo) both;
   }
 
   .text-balance {
@@ -369,31 +587,59 @@
   .text-pretty {
     text-wrap: pretty;
   }
+
+  .skeleton-sheen {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-supporting-100);
+  }
+
+  .skeleton-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.65),
+      transparent
+    );
+    animation: shimmer 1.8s infinite;
+  }
 }
 
-/* Consistent vertical rhythm for editorial sections (mobile → desktop). */
-.section-y {
-  padding-top: clamp(3.5rem, 8vw, 7rem);
-  padding-bottom: clamp(3.5rem, 8vw, 7rem);
+/* Scrollbar utilities */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Subtle, premium hairline used for dividers and card edges. */
-.hairline {
-  border-color: color-mix(
-    in srgb,
-    var(--color-supporting-200) 70%,
-    transparent
-  );
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-/* Eyebrow / kicker label — small, tracked, quiet. */
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-primary-700);
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Reduced motion: storytelling must never be required to understand state. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .image-frame-zoom:hover img {
+    transform: none;
+  }
 }

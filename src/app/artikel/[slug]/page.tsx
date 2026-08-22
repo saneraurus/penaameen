@@ -4,6 +4,9 @@ import Image from "next/image";
 import { getArticleBySlug, getArticles } from "@/lib/content";
 import { notFound } from "next/navigation";
 
+import { Reveal } from "@/components/motion/Reveal";
+import { Shell } from "@/components/ui/primitives";
+
 export default async function ArticleDetailPage({
   params,
 }: {
@@ -16,100 +19,110 @@ export default async function ArticleDetailPage({
     notFound();
   }
 
+  const related = (await getArticles())
+    .filter((a) => a.id !== article.id)
+    .slice(0, 2);
+
   return (
     <div className="min-h-screen bg-background-50">
-      <header className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b border-supporting-200">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-            <Link
-              href="/artikel"
-              className="text-supporting-600 hover:text-primary-600"
-            >
-              ← Kembali ke Daftar Artikel
-            </Link>
-            <h1 className="text-2xl font-serif text-primary-600">
-              {article.title}
-            </h1>
-          </div>
-        </div>
-      </header>
+      {/* Breadcrumb */}
+      <div className="border-b border-supporting-200">
+        <Shell className="py-4">
+          <nav aria-label="Breadcrumb">
+            <ol className="flex items-center gap-2 text-xs text-supporting-500">
+              <li>
+                <Link
+                  href="/artikel"
+                  className="transition-colors hover:text-primary-900"
+                >
+                  Kembali ke Daftar Artikel
+                </Link>
+              </li>
+            </ol>
+          </nav>
+        </Shell>
+      </div>
 
-      <main className="py-12">
-        <div className="container px-4 mx-auto">
-          <div className="space-y-8">
-            {/* Article Header */}
-            <div className="mb-8">
-              <div className="flex items-center mb-4">
-                <span className="mr-3 flex-shrink-0">
-                  <span className="px-3 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded">
-                    {article.category}
-                  </span>
-                </span>
-                <span className="text-supporting-500">
-                  {article.date} • {article.readTime} min read
-                </span>
-              </div>
-              <h1 className="mb-6 text-3xl sm:text-4xl font-serif font-bold text-primary-950">
+      <article>
+        {/* Editorial masthead */}
+        <header>
+          <Shell className="pb-12 pt-14 sm:pb-16 sm:pt-20">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="meta-type">
+                {article.category} · {article.date} · {article.readTime} min
+                read
+              </p>
+              <h1 className="display-type mt-6 text-[clamp(2rem,5vw,3.75rem)]">
                 {article.title}
               </h1>
-              {article.image && (
-                <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-md mb-8 border border-supporting-200">
-                  <Image
-                    src={article.image}
-                    alt={article.title}
-                    fill
-                    priority
-                    unoptimized
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              {article.excerpt ? (
+                <p className="lede mx-auto mt-7 max-w-2xl">{article.excerpt}</p>
+              ) : null}
             </div>
+          </Shell>
 
-            {/* Article Content */}
-            <div className="prose prose-lg max-w-none text-supporting-700 leading-relaxed space-y-4 text-base sm:text-lg whitespace-pre-line">
-              {article.content}
-            </div>
-
-            {/* Related Articles (placeholder) */}
-            <div className="mt-12 pt-8 border-t border-supporting-200">
-              <h2 className="mb-6 text-2xl font-serif text-primary-600">
-                Artikel Terkait
-              </h2>
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* We'll show two related articles for now */}
-                {(await getArticles())
-                  .filter((a) => a.id !== article.id)
-                  .slice(0, 2)
-                  .map((related) => (
-                    <Link
-                      key={related.id}
-                      href={`/artikel/${related.slug}`}
-                      className="block bg-white rounded-xl overflow-hidden shadow-sm border border-supporting-200 hover:shadow-md transition-all"
-                    >
-                      <div className="relative aspect-[4/3] bg-supporting-200">
-                        <Image
-                          src={related.image}
-                          alt={related.title}
-                          fill
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <h3 className="mb-2 text-lg font-serif text-primary-600">
-                          {related.title}
-                        </h3>
-                        <p className="line-clamp-2 text-supporting-600">
-                          {related.excerpt}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+          {article.image && (
+            <div className="container-wide">
+              <div className="image-frame aspect-[16/9] w-full">
+                <Image
+                  src={article.image}
+                  alt={article.title}
+                  fill
+                  priority
+                  unoptimized
+                  sizes="100vw"
+                  className="object-cover"
+                />
               </div>
             </div>
+          )}
+        </header>
+
+        {/* Reading column */}
+        <div className="container-narrow py-16 sm:py-20">
+          <div className="whitespace-pre-line text-[1.0625rem] leading-[1.8] text-supporting-700 sm:text-lg">
+            {article.content}
           </div>
         </div>
-      </main>
+      </article>
+
+      {/* Related reading */}
+      {related.length > 0 && (
+        <section className="border-t border-supporting-200 bg-white">
+          <Shell className="py-16 sm:py-20">
+            <h2 className="text-2xl sm:text-3xl">Artikel Terkait</h2>
+            <div className="mt-12 grid gap-x-8 gap-y-12 md:grid-cols-2">
+              {related.map((item, index) => (
+                <Reveal key={item.id} variant="small" delay={index * 0.07}>
+                  <article>
+                    <Link
+                      href={`/artikel/${item.slug}`}
+                      className="group block"
+                    >
+                      <div className="image-frame image-frame-zoom aspect-[16/10] w-full">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="meta-type mt-5">{item.category}</p>
+                      <h3 className="mt-3 text-xl leading-snug text-supporting-900 transition-colors group-hover:text-accent-700">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-supporting-600">
+                        {item.excerpt}
+                      </p>
+                    </Link>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </Shell>
+        </section>
+      )}
     </div>
   );
 }

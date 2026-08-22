@@ -36,6 +36,7 @@
     "test:regression": "vitest run tests/regression",
     "test:e2e": "playwright test",
     "staging:readiness": "node scripts/staging-readiness.mjs",
+    "launch:gate": "node scripts/launch-gate.mjs",
     "db:migration:status": "prisma migrate status",
     "check": "npm run format && npm run lint && npm run typecheck && npm run test && npm run build"
   },

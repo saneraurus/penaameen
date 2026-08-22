@@ -49,33 +49,28 @@ export function HistoryTimelineSection() {
   return (
     <section
       id="garis-waktu"
-      className="py-16 md:py-24 bg-background-100 border-y border-supporting-200/60"
+      className="border-y border-supporting-200 bg-white py-16 sm:py-20"
     >
-      <div className="container px-4 mx-auto">
+      <div className="container max-w-6xl">
         <Reveal>
-          <div className="max-w-3xl mx-auto text-center mb-10 md:mb-14">
-            <span className="mb-3 inline-block text-xs font-semibold tracking-widest uppercase text-primary-700 bg-primary-50 px-3.5 py-1 rounded-full border border-primary-200/70">
-              GARIS WAKTU
-            </span>
-            <h2 className="text-section font-serif text-primary-900 leading-tight mb-4">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="scene-index justify-center">Garis Waktu</p>
+            <h2 className="display-type mt-4 text-supporting-900">
               Enam Babak Perjalanan
             </h2>
-            <p className="text-supporting-600 text-base sm:text-lg">
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-supporting-600 sm:text-base">
               Dari rumah penerbitan di tahun 1995 hingga program pemberantasan
               buta aksara bersama pemerintah daerah dan CSR perusahaan.
             </p>
           </div>
         </Reveal>
 
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10 items-start max-w-6xl mx-auto">
-          {/* Milestone rail: horizontal on compact screens, vertical on large.
-              `min-w-0` keeps the scroller inside its grid column instead of
-              stretching the page. */}
+        <div className="mt-14 grid items-start gap-10 lg:grid-cols-12 lg:gap-10">
           <Reveal className="min-w-0 lg:col-span-4">
             <div
               role="tablist"
               aria-label="Babak sejarah PENA AMEEN"
-              className="flex gap-2.5 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide lg:flex-col lg:gap-2 lg:overflow-visible lg:pb-0"
+              className="flex gap-2 overflow-x-auto pb-3 sm:flex-col sm:gap-1.5 sm:overflow-visible sm:pb-0"
             >
               {historyMilestones.map((milestone, index) => {
                 const isActive = index === activeIndex;
@@ -94,26 +89,20 @@ export function HistoryTimelineSection() {
                     tabIndex={isActive ? 0 : -1}
                     onClick={() => selectTab(index)}
                     onKeyDown={handleTabKeyDown}
-                    className={`group flex-shrink-0 w-[168px] snap-start text-left rounded-2xl border px-4 py-3 transition-all duration-300 cursor-pointer lg:w-full lg:flex lg:items-center lg:gap-3 ${
+                    className={`flex w-[160px] shrink-0 flex-col gap-1 border-b py-3 text-left transition-colors sm:w-full sm:flex-row sm:items-center sm:gap-3 sm:border-0 sm:border-b ${
                       isActive
-                        ? "bg-primary-700 border-primary-700 text-white shadow-sm"
-                        : "bg-white border-supporting-200 text-supporting-700 hover:border-primary-300 hover:bg-primary-50"
+                        ? "border-accent-600 text-supporting-900"
+                        : "border-supporting-200 text-supporting-500 hover:text-supporting-800 sm:hover:border-supporting-300"
                     }`}
                   >
                     <span
-                      className={`mb-1.5 inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-xs font-bold tabular-nums lg:mb-0 lg:flex-shrink-0 ${
-                        isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-primary-50 text-primary-700 group-hover:bg-white"
+                      className={`shrink-0 text-[11px] tabular-nums ${
+                        isActive ? "text-accent-700" : "text-supporting-400"
                       }`}
                     >
                       {milestone.period}
                     </span>
-                    <span
-                      className={`block text-sm font-semibold leading-snug ${
-                        isActive ? "text-white" : "text-supporting-800"
-                      }`}
-                    >
+                    <span className="text-sm leading-snug">
                       {milestone.navLabel}
                     </span>
                   </button>
@@ -121,13 +110,12 @@ export function HistoryTimelineSection() {
               })}
             </div>
 
-            {/* Progress + sequential controls */}
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-white border border-supporting-200 px-3 py-2.5">
+            <div className="mt-6 flex items-center justify-between border-t border-supporting-200 pt-4">
               <button
                 type="button"
                 onClick={() => selectTab(activeIndex - 1)}
                 disabled={activeIndex === 0}
-                className="p-2 rounded-xl border border-supporting-200 text-supporting-600 hover:bg-background-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-supporting-300 text-supporting-600 transition-colors hover:border-primary-700 hover:text-primary-800 disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="Babak sebelumnya"
               >
                 <svg
@@ -145,14 +133,14 @@ export function HistoryTimelineSection() {
                   />
                 </svg>
               </button>
-              <span className="text-xs font-semibold text-supporting-500 tabular-nums">
+              <span className="text-xs tabular-nums text-supporting-500">
                 Babak {activeIndex + 1} dari {total}
               </span>
               <button
                 type="button"
                 onClick={() => selectTab(activeIndex + 1)}
                 disabled={activeIndex === total - 1}
-                className="p-2 rounded-xl border border-supporting-200 text-supporting-600 hover:bg-background-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-supporting-300 text-supporting-600 transition-colors hover:border-primary-700 hover:text-primary-800 disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="Babak selanjutnya"
               >
                 <svg
@@ -173,9 +161,8 @@ export function HistoryTimelineSection() {
             </div>
           </Reveal>
 
-          {/* Milestone panels: all rendered, inactive ones hidden */}
-          <Reveal className="min-w-0 lg:col-span-8" delay={0.15}>
-            <div className="bg-white rounded-3xl border border-supporting-200/90 shadow-sm p-6 sm:p-8">
+          <Reveal className="min-w-0 lg:col-span-8" delay={0.12}>
+            <div className="border-t border-supporting-200 pt-8">
               {historyMilestones.map((milestone, index) => (
                 <div
                   key={milestone.id}
@@ -196,34 +183,30 @@ export function HistoryTimelineSection() {
                         </span>
                       </div>
 
-                      <h3 className="text-2xl sm:text-3xl font-serif font-bold text-primary-900 leading-tight mb-3">
+                      <h3 className="font-serif text-2xl text-supporting-900 sm:text-3xl">
                         {milestone.title}
                       </h3>
 
-                      <p className="text-sm sm:text-base text-supporting-600 leading-relaxed mb-6">
+                      <p className="mt-4 max-w-prose text-sm leading-relaxed text-supporting-600 sm:text-base">
                         {milestone.narrative}
                       </p>
 
-                      <dl className="space-y-3 pt-4 border-t border-supporting-100">
+                      <dl className="mt-8 space-y-3 border-t border-supporting-100 pt-6">
                         {milestone.highlights.map((highlight) => (
                           <div
                             key={highlight.label}
-                            className="flex items-start gap-2.5"
+                            className="flex gap-3 text-sm"
                           >
                             <span
-                              className="mt-0.5 w-5 h-5 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold flex-shrink-0"
                               aria-hidden="true"
-                            >
-                              ✓
+                              className="mt-2 h-px w-4 shrink-0 bg-accent-500"
+                            />
+                            <span className="leading-relaxed text-supporting-600">
+                              <strong className="font-medium text-supporting-900">
+                                {highlight.label}
+                              </strong>
+                              : {highlight.detail}
                             </span>
-                            <div className="text-xs sm:text-sm">
-                              <dt className="inline font-semibold text-primary-800">
-                                {highlight.label}:
-                              </dt>{" "}
-                              <dd className="inline text-supporting-700">
-                                {highlight.detail}
-                              </dd>
-                            </div>
                           </div>
                         ))}
                       </dl>
@@ -231,7 +214,7 @@ export function HistoryTimelineSection() {
 
                     <div className="md:col-span-5">
                       <figure className="m-0">
-                        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-supporting-100 border border-supporting-200">
+                        <div className="image-frame aspect-[4/3] w-full">
                           <Image
                             src={milestone.image}
                             alt={milestone.imageAlt}
@@ -240,7 +223,7 @@ export function HistoryTimelineSection() {
                             className="object-cover"
                           />
                         </div>
-                        <figcaption className="mt-2.5 text-caption text-supporting-500">
+                        <figcaption className="mt-2.5 text-xs text-supporting-500">
                           {milestone.caption}
                         </figcaption>
                       </figure>
@@ -252,50 +235,45 @@ export function HistoryTimelineSection() {
           </Reveal>
         </div>
 
-        {/* Compact recap so the whole arc stays readable at a glance */}
-        <Reveal delay={0.25}>
-          <ol className="mt-10 max-w-6xl mx-auto grid gap-3 sm:grid-cols-2 lg:grid-cols-3 list-none p-0">
-            {historyMilestones.map((milestone, index) => {
-              const isActive = index === activeIndex;
+        <ol className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {historyMilestones.map((milestone, index) => {
+            const isActive = index === activeIndex;
 
-              return (
-                <li key={milestone.id}>
-                  <button
-                    type="button"
-                    onClick={() => selectTab(index)}
-                    aria-current={isActive ? "step" : undefined}
-                    className={`w-full h-full text-left p-4 rounded-2xl border transition-all duration-300 cursor-pointer ${
-                      isActive
-                        ? "bg-white border-primary-400 ring-1 ring-primary-300 shadow-sm"
-                        : "bg-white/70 border-supporting-200/80 hover:bg-white hover:border-supporting-300"
-                    }`}
-                  >
-                    <span className="flex items-center justify-between gap-2 mb-1.5">
-                      <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded-md tabular-nums ${
-                          isActive
-                            ? "bg-primary-700 text-white"
-                            : "bg-primary-50 text-primary-700"
-                        }`}
-                      >
-                        {milestone.period}
-                      </span>
-                      <span className="text-[11px] font-medium text-supporting-500">
-                        {milestone.eyebrow}
-                      </span>
+            return (
+              <li key={milestone.id}>
+                <button
+                  type="button"
+                  onClick={() => selectTab(index)}
+                  aria-current={isActive ? "step" : undefined}
+                  className={`w-full border-t py-4 text-left transition-colors ${
+                    isActive
+                      ? "border-accent-500"
+                      : "border-supporting-200 hover:border-supporting-300"
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span
+                      className={`text-[11px] tabular-nums ${
+                        isActive ? "text-accent-700" : "text-supporting-400"
+                      }`}
+                    >
+                      {milestone.period}
                     </span>
-                    <span className="block text-sm font-serif font-bold text-primary-800 mb-1 leading-snug">
-                      {milestone.title}
+                    <span className="text-[11px] text-supporting-500">
+                      {milestone.eyebrow}
                     </span>
-                    <span className="block text-xs text-supporting-500">
-                      {milestone.summary}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </Reveal>
+                  </span>
+                  <span className="mt-2 block text-sm font-medium leading-snug text-supporting-900">
+                    {milestone.title}
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed text-supporting-500">
+                    {milestone.summary}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
 
         {/* Screen-reader friendly statement of the currently shown milestone */}
         <p aria-live="polite" className="sr-only">

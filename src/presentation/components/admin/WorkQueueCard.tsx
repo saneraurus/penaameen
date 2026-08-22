@@ -10,6 +10,11 @@ interface WorkQueueCardProps {
   variant?: "default" | "warning" | "critical";
 }
 
+/**
+ * Actionable operational queue entry.
+ *
+ * The count is the primary signal; state is carried by text, not colour alone.
+ */
 export function WorkQueueCard({
   title,
   count,
@@ -18,32 +23,51 @@ export function WorkQueueCard({
   icon,
   variant = "default",
 }: WorkQueueCardProps) {
-  const variantClasses = {
-    default: "border-gray-200 hover:border-gray-300",
-    warning: "border-yellow-200 bg-yellow-50 hover:border-yellow-300",
-    critical: "border-red-200 bg-red-50 hover:border-red-300",
-  };
+  const accent = {
+    default: "bg-supporting-300",
+    warning: "bg-accent-500",
+    critical: "bg-red-500",
+  }[variant];
+
+  const statusLabel = {
+    default: "Normal",
+    warning: "Perlu tindakan",
+    critical: "Kritis",
+  }[variant];
 
   return (
     <Link
       href={href}
-      className={`block p-5 border rounded-xl transition-all duration-200 ${variantClasses[variant]} hover:shadow-md`}
+      className="group relative block overflow-hidden rounded-lg border border-supporting-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-supporting-300 hover:shadow-[0_12px_40px_-12px_rgba(25,22,18,0.16)]"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl" aria-hidden="true">
+      <span
+        aria-hidden="true"
+        className={`absolute inset-y-0 left-0 w-0.5 ${accent}`}
+      />
+
+      <div className="flex items-start justify-between gap-5">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-supporting-400" aria-hidden="true">
               {icon}
             </span>
-            <h3 className="text-lg font-semibold text-gray-900 truncate">
+            <h3 className="truncate text-sm font-medium text-supporting-900">
               {title}
             </h3>
           </div>
-          <p className="text-sm text-gray-500">{description}</p>
+          <p className="mt-2 text-xs leading-relaxed text-supporting-500">
+            {description}
+          </p>
+          <p className="mt-3 text-[11px] uppercase tracking-[0.14em] text-supporting-400">
+            {statusLabel}
+          </p>
         </div>
-        <div className="flex-shrink-0 text-right">
-          <div className="text-3xl font-bold text-gray-900">{count}</div>
-          <div className="text-xs text-gray-400 mt-1">items</div>
+
+        <div className="shrink-0 text-right">
+          <div className="font-serif text-3xl leading-none text-supporting-900">
+            {count}
+          </div>
+          <div className="mt-1.5 text-[11px] text-supporting-400">items</div>
         </div>
       </div>
     </Link>

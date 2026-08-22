@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Reveal } from "@/components/motion/Reveal";
+
 
 export interface JourneyStage {
   id: string;
@@ -182,181 +182,149 @@ export function LearningJourneySection() {
   const activeStage = journeyStages[activeStepIndex] ?? journeyStages[0]!;
 
   return (
-    <section className="py-14 sm:py-16 md:py-24 bg-background-100/80 border-t border-supporting-200/80 overflow-hidden">
-      <div className="container px-4 mx-auto max-w-5xl">
-        <Reveal>
-          <div className="max-w-2xl mx-auto text-center mb-8 sm:mb-12">
-            <span className="mb-2.5 inline-block text-xs font-bold tracking-widest uppercase text-primary-700 bg-primary-100 px-3.5 py-1 rounded-full border border-primary-200/70">
-              ALUR PENDAMPINGAN EFEKTIF
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-950 leading-tight mb-2.5">
-              Perjalanan Belajar Bersama PENA AMEEN
-            </h2>
-            <p className="text-xs sm:text-sm text-supporting-600">
-              Panduan terstruktur 5 langkah dari pengenalan awal hingga
-              kemandirian membaca anak.
+    <section className="border-t border-supporting-200 bg-white py-16 sm:py-20">
+      <div className="container max-w-5xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="display-type text-supporting-900">
+            Perjalanan Belajar Bersama PENA AMEEN
+          </h2>
+          <p className="scene-index mt-3 justify-center text-[11px]">
+            Alur Pendampingan Efektif
+          </p>
+          <span aria-hidden="true" className="sr-only">
+            ALUR PENDAMPINGAN EFEKTIF
+          </span>
+          <p className="mt-4 text-sm leading-relaxed text-supporting-600">
+            Panduan terstruktur 5 langkah dari pengenalan awal hingga
+            kemandirian membaca anak.
+          </p>
+        </div>
+
+        <nav
+          aria-label="Langkah perjalanan belajar"
+          className="mt-10 flex gap-4 overflow-x-auto border-y border-supporting-200 py-3 sm:justify-center"
+        >
+          {journeyStages.map((stage, idx) => {
+            const isActive = idx === activeStepIndex;
+            return (
+              <button
+                key={stage.id}
+                type="button"
+                aria-label={`Langkah ${stage.number}: ${stage.stepName}`}
+                aria-current={isActive ? "step" : undefined}
+                onClick={() => setActiveStepIndex(idx)}
+                className={`relative shrink-0 py-2 text-left transition-colors ${
+                  isActive
+                    ? "text-supporting-900"
+                    : "text-supporting-400 hover:text-supporting-700"
+                }`}
+              >
+                <span className="block text-[11px] font-medium">
+                  {stage.number}
+                </span>
+                <span className="mt-1 block text-xs font-medium leading-tight">
+                  {stage.stepName}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-x-0 bottom-0 h-px bg-accent-600 transition-transform ${
+                    isActive ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-supporting-500">
+                Tahap {activeStage.number} dari 05 · {activeStage.badge}
+              </p>
+              <h3 className="mt-3 font-serif text-2xl leading-tight text-supporting-900 sm:text-3xl">
+                {activeStage.title}
+              </h3>
+              <p className="mt-2 text-sm font-medium text-supporting-700">
+                {activeStage.subtitle}
+              </p>
+              <p className="mt-4 max-w-prose text-sm leading-relaxed text-supporting-600">
+                {activeStage.description}
+              </p>
+
+              <ul className="mt-8 space-y-3 border-t border-supporting-100 pt-6">
+                {activeStage.highlights.map((h) => (
+                  <li
+                    key={h.label}
+                    className="flex gap-3 text-sm leading-relaxed"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="mt-2 h-px w-4 shrink-0 bg-accent-500"
+                    />
+                    <span className="text-supporting-700">
+                      <strong className="font-medium text-supporting-900">
+                        {h.label}
+                      </strong>
+                      : {h.desc}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link
+                  href={activeStage.ctaHref}
+                  className="inline-flex min-h-10 items-center rounded-full bg-primary-900 px-5 text-sm font-medium text-white transition-colors hover:bg-primary-800"
+                >
+                  {activeStage.ctaText} →
+                </Link>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveStepIndex((prev) => Math.max(0, prev - 1))
+                    }
+                    disabled={activeStepIndex === 0}
+                    aria-label="Tahap Sebelumnya"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-supporting-300 text-supporting-600 transition-colors hover:border-primary-700 hover:text-primary-800 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    ←
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveStepIndex((prev) =>
+                        Math.min(journeyStages.length - 1, prev + 1),
+                      )
+                    }
+                    disabled={activeStepIndex === journeyStages.length - 1}
+                    aria-label="Tahap Selanjutnya"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-supporting-300 text-supporting-600 transition-colors hover:border-primary-700 hover:text-primary-800 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5">
+            <div className="image-frame aspect-[4/3] w-full">
+              <Image
+                key={activeStage.image}
+                src={activeStage.image}
+                alt={activeStage.imageAlt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover"
+              />
+            </div>
+            <p className="mt-3 text-[11px] text-supporting-500">
+              Langkah {activeStage.number} · {activeStage.stepName}
             </p>
           </div>
-        </Reveal>
-
-        {/* Step Progress Navigation Bar */}
-        <Reveal delay={0.1}>
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8">
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5 bg-white p-1.5 sm:p-2 rounded-2xl shadow-2xs border border-supporting-200">
-              {journeyStages.map((stage, idx) => {
-                const isActive = idx === activeStepIndex;
-                const isPast = idx < activeStepIndex;
-
-                return (
-                  <button
-                    key={stage.id}
-                    onClick={() => setActiveStepIndex(idx)}
-                    className={`group relative flex flex-col items-center py-2 px-1 sm:px-2 rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                      isActive
-                        ? "bg-primary-600 text-white shadow-xs"
-                        : isPast
-                          ? "bg-primary-50 text-primary-900 hover:bg-primary-100"
-                          : "text-supporting-600 hover:bg-supporting-50"
-                    }`}
-                    aria-label={`Langkah ${stage.number}: ${stage.stepName}`}
-                  >
-                    <span
-                      className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold mb-0.5 transition-colors ${
-                        isActive
-                          ? "bg-white text-primary-700"
-                          : isPast
-                            ? "bg-primary-200 text-primary-900"
-                            : "bg-supporting-100 text-supporting-700"
-                      }`}
-                    >
-                      {stage.number}
-                    </span>
-                    <span
-                      className={`text-[9px] sm:text-[11px] font-semibold leading-tight line-clamp-1 ${
-                        isActive ? "text-white" : ""
-                      }`}
-                    >
-                      {stage.stepName}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </Reveal>
-
-        {/* Active Stage Spotlight Panel */}
-        <Reveal delay={0.2}>
-          <div className="bg-white rounded-3xl p-5 sm:p-7 md:p-9 shadow-sm border border-supporting-200 transition-all duration-300">
-            <div className="grid gap-6 lg:grid-cols-12 items-center">
-              {/* Left Column: Contextual Details & Guidance */}
-              <div className="lg:col-span-7 flex flex-col justify-between space-y-4 sm:space-y-5">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-primary-100 text-primary-800 rounded-md">
-                      Tahap {activeStage.number} dari 05
-                    </span>
-                    <span className="text-[11px] font-medium text-supporting-500">
-                      • {activeStage.badge}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-primary-950 leading-tight mb-1.5">
-                    {activeStage.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm font-semibold text-emerald-800 mb-3">
-                    {activeStage.subtitle}
-                  </p>
-                  <p className="text-xs sm:text-sm text-supporting-600 leading-relaxed mb-4">
-                    {activeStage.description}
-                  </p>
-
-                  {/* Highlights checklist */}
-                  <div className="space-y-2 pt-3 border-t border-supporting-100">
-                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-supporting-400">
-                      Poin Kunci Pendampingan:
-                    </h4>
-                    {activeStage.highlights.map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-2 text-xs sm:text-sm"
-                      >
-                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">
-                          ✓
-                        </span>
-                        <p className="text-supporting-700 leading-snug">
-                          <strong className="text-primary-950 font-semibold">
-                            {h.label}:
-                          </strong>{" "}
-                          {h.desc}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stage CTA & Navigation Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-supporting-100">
-                  <Link
-                    href={activeStage.ctaHref}
-                    className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-2xs transition-colors"
-                  >
-                    <span>{activeStage.ctaText}</span>
-                    <span>→</span>
-                  </Link>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActiveStepIndex((prev) => Math.max(0, prev - 1))
-                      }
-                      disabled={activeStepIndex === 0}
-                      aria-label="Tahap Sebelumnya"
-                      className="px-3 py-2 text-xs font-bold rounded-xl border border-supporting-200 text-supporting-700 hover:bg-supporting-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                    >
-                      ← Sebelumnya
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActiveStepIndex((prev) =>
-                          Math.min(journeyStages.length - 1, prev + 1),
-                        )
-                      }
-                      disabled={activeStepIndex === journeyStages.length - 1}
-                      aria-label="Tahap Selanjutnya"
-                      className="px-3.5 py-2 text-xs font-bold rounded-xl bg-supporting-900 hover:bg-primary-950 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
-                    >
-                      Selanjutnya →
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Visual Stage Illustration */}
-              <div className="lg:col-span-5">
-                <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl overflow-hidden shadow-md border border-supporting-200 bg-supporting-100">
-                  <Image
-                    src={activeStage.image}
-                    alt={activeStage.imageAlt}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-supporting-200 shadow-2xs flex items-center justify-between text-xs">
-                    <span className="font-bold text-primary-950 text-[11px]">
-                      Langkah {activeStage.number}
-                    </span>
-                    <span className="text-[10px] font-semibold text-emerald-700">
-                      {activeStage.stepName}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

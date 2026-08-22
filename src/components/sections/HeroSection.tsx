@@ -145,6 +145,13 @@ const heroMetrics = [
   },
 ];
 
+/**
+ * Opening scene.
+ *
+ * The photograph is the protagonist: it fills the viewport, and type sits
+ * quietly on top of it. Search, showcase switching, and every destination
+ * behave exactly as before.
+ */
 export function HeroSection() {
   const router = useRouter();
   const [activeTabId, setActiveTabId] = useState<string>("home-learning");
@@ -165,174 +172,120 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[calc(100vh-4.5rem)] flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#06140a] via-primary-950 to-[#051108] text-white">
-      {/* ── Background Aesthetic Atmosphere (Subtle Real Visual + Deep Glow) ── */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        aria-hidden="true"
-      >
-        {/* Subtle photo texture overlay - decorative, low priority; LCP is the showcase image */}
-        <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay">
-          <Image
-            src="/images/penaameen/hero/hero-bg-islamic-learning.jpg"
-            alt=""
-            fill
-            priority
-            fetchPriority="high"
-            loading="eager"
-            sizes="100vw"
-            className="object-cover"
-          />
-        </div>
-
-        {/* Ambient Glowing Orbs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px]" />
-        <div className="absolute top-1/3 -right-24 w-96 h-96 bg-accent-500/15 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-24 left-1/3 w-[500px] h-72 bg-emerald-500/10 rounded-full blur-[110px]" />
-
-        {/* Subtle Geometric Grid Lines */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]" />
+    <section className="relative isolate bg-primary-950 text-background-50">
+      {/* Full-bleed opening photograph */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <Image
+          src="/images/penaameen/hero/hero-family-learning.jpg"
+          alt=""
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-primary-950/76" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/35 to-primary-950/70" />
       </div>
 
-      {/* ── Main Hero Body Container ─────────────────────────────── */}
-      <div className="container mx-auto px-4 pt-10 pb-12 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-16 relative z-10 my-auto">
-        <div className="grid gap-10 lg:gap-12 xl:gap-16 items-center lg:grid-cols-12">
-          {/* ═════════════════════════════════════════════════════════
-              LEFT COLUMN : Authority Headline, Value Prop, CTA, Search
-          ══════════════════════════════════════════════════════════ */}
-          <div className="flex flex-col gap-6 lg:col-span-7 xl:col-span-6">
-            {/* Live Trust Accolade Ribbon */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/15 text-white/90 text-xs font-semibold shadow-xs">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-400" />
-                </span>
-                <span className="tracking-wide uppercase text-[11px] font-bold text-accent-300">
-                  Penerbit Resmi
-                </span>
-                <span className="text-white/40">|</span>
-                <span className="text-white/80 font-medium text-[11px]">
-                  Teruji Sejak 1995
-                </span>
-              </div>
-              <span className="text-white/60 text-xs font-medium hidden sm:inline-flex items-center gap-1.5">
-                <span className="text-accent-400">★</span> 500+ Lembaga &amp;
-                TPQ
+      <div className="container relative z-10 pb-16 pt-20 sm:pb-20 sm:pt-28 lg:pb-24 lg:pt-32">
+        <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+          {/* Statement */}
+          <div className="lg:col-span-6">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-2 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-300">
+              <span>Penerbit Resmi</span>
+              <span className="h-px w-6 bg-accent-400/60" aria-hidden="true" />
+              <span className="text-background-300">Teruji Sejak 1995</span>
+            </p>
+
+            <h1 className="display-type mt-7 text-[clamp(2.5rem,7.5vw,5.25rem)] text-background-50">
+              Kuasai Membaca &amp; Mengaji.
+              <span className="mt-2 block text-accent-200">
+                Lebih Cepat, Tepat &amp; Anti-Lupa.
               </span>
-            </div>
+            </h1>
 
-            {/* Dominant Headline with Master Typography */}
-            <div className="space-y-2">
-              <h1 className="font-serif font-bold text-white text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-[3.8rem] leading-[1.12] tracking-tight text-balance">
-                <span>Kuasai Membaca &amp; Mengaji.</span>
-                <span className="block mt-1 text-accent-300 font-serif">
-                  Lebih Cepat, Tepat &amp;{" "}
-                  <span className="bg-gradient-to-r from-amber-200 via-accent-300 to-amber-100 bg-clip-text text-transparent underline decoration-accent-500/40 decoration-wavy decoration-2 underline-offset-8">
-                    Anti-Lupa.
-                  </span>
-                </span>
-              </h1>
-            </div>
-
-            {/* Sub-headline / Core Positioning */}
-            <p className="text-sm sm:text-base md:text-lg text-white/80 leading-relaxed max-w-2xl font-normal">
-              Penerbit resmi metode revolusioner{" "}
-              <strong className="text-white font-semibold underline decoration-accent-400/50 underline-offset-2">
+            <p className="mt-7 max-w-xl text-base leading-relaxed text-background-200 sm:text-lg">
+              Penerbit resmi metode{" "}
+              <strong className="font-semibold text-background-50">
                 AL-BARQY (200 Menit Anti-Lupa)
               </strong>{" "}
               dan{" "}
-              <strong className="text-white font-semibold underline decoration-accent-400/50 underline-offset-2">
+              <strong className="font-semibold text-background-50">
                 ACM (Aku Cepat Membaca Tanpa Mengeja)
               </strong>
-              . Membimbing jutaan santri, guru, dan keluarga sejak 1995 dengan
-              garansi orisinalitas 100%.
+              . Membimbing santri, guru, dan keluarga sejak 1995.
             </p>
 
-            {/* Primary & Secondary Action CTAs */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/produk"
-                className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-400 hover:to-accent-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-accent-500/25 transition-all duration-200 hover:shadow-accent-500/40 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                className="group inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full bg-background-50 px-8 text-sm font-medium text-primary-950 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white sm:text-base"
               >
                 <span>Jelajahi Paket &amp; Produk</span>
-                <svg
-                  className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <span
                   aria-hidden="true"
+                  className="transition-transform duration-200 group-hover:translate-x-1"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.5"
-                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                  />
-                </svg>
+                  &rarr;
+                </span>
               </Link>
               <Link
                 href="/metode"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/20 text-white font-semibold text-sm sm:text-base backdrop-blur-sm transition-all duration-200 hover:border-white/40 cursor-pointer"
+                className="inline-flex min-h-13 items-center justify-center rounded-full border border-white/25 px-7 text-sm font-medium text-background-100 transition-colors duration-200 hover:border-white/60 hover:text-white sm:text-base"
               >
                 Pelajari 2 Metode
               </Link>
             </div>
 
-            {/* Smart Search Bar & Quick Recommendation Chips */}
-            <div className="space-y-2.5 pt-2">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative w-full max-w-xl group"
-              >
+            {/* Search */}
+            <div className="mt-10 max-w-xl">
+              <form onSubmit={handleSearchSubmit} className="group relative">
                 <label htmlFor="hero-search-input" className="sr-only">
                   Cari produk atau metode
                 </label>
-                <div className="relative flex items-center">
-                  <div className="absolute left-4 pointer-events-none text-white/50 group-focus-within:text-accent-300 transition-colors">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
+                <div className="relative flex items-center border-b border-white/25 transition-colors focus-within:border-accent-300">
+                  <svg
+                    className="pointer-events-none h-4 w-4 shrink-0 text-background-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
                   <input
                     id="hero-search-input"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari paket Al-Barqy, buku ACM, flashcard..."
-                    className="w-full pl-11 pr-24 py-3 bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.14] text-white placeholder-white/50 border border-white/15 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-accent-400/50 focus:border-accent-400/60 backdrop-blur-md"
+                    className="w-full bg-transparent px-3 py-3.5 text-sm text-background-50 outline-none placeholder:text-background-400"
                   />
                   <button
                     type="submit"
-                    className="absolute right-2 px-4 py-1.5 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+                    className="shrink-0 px-2 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent-300 transition-colors hover:text-accent-200"
                   >
                     Cari
                   </button>
                 </div>
               </form>
 
-              {/* Quick Tags */}
-              <div className="flex items-center gap-1.5 flex-wrap text-xs text-white/60">
-                <span className="text-[11px] font-medium text-white/40">
-                  Populer:
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-[11px] uppercase tracking-[0.16em] text-background-400">
+                  Populer
                 </span>
                 {quickSearchTags.map((tag) => (
                   <button
                     key={tag}
                     type="button"
                     onClick={() => handleQuickTagClick(tag)}
-                    className="px-2.5 py-0.5 rounded-md bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white/80 hover:text-white text-[11px] transition-colors cursor-pointer"
+                    className="rounded-full border border-white/15 px-3 py-1.5 text-xs text-background-200 transition-colors hover:border-white/45 hover:text-white"
                   >
                     {tag}
                   </button>
@@ -341,12 +294,9 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* ═════════════════════════════════════════════════════════
-              RIGHT COLUMN : High-Impact Interactive Showcase Stage
-          ══════════════════════════════════════════════════════════ */}
-          <div className="flex flex-col gap-4 lg:col-span-5 xl:col-span-6">
-            {/* Interactive Tab Switcher */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-black/30 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md">
+          {/* Showcase */}
+          <div className="lg:col-span-6">
+            <div className="flex flex-wrap gap-x-5 gap-y-2 border-b border-white/15 pb-4">
               {showcaseTabs.map((tab) => {
                 const isActive = tab.id === activeTabId;
                 return (
@@ -354,156 +304,114 @@ export function HeroSection() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTabId(tab.id)}
-                    className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
-                      isActive
-                        ? "bg-white text-primary-950 shadow-lg shadow-white/10 scale-[1.02]"
-                        : "text-white/70 hover:text-white hover:bg-white/[0.08]"
-                    }`}
                     aria-pressed={isActive}
+                    className={`relative py-1.5 text-xs font-medium transition-colors sm:text-sm ${
+                      isActive
+                        ? "text-background-50"
+                        : "text-background-400 hover:text-background-200"
+                    }`}
                   >
-                    <span aria-hidden="true" className="text-sm">
+                    <span aria-hidden="true" className="mr-1.5">
                       {tab.icon}
                     </span>
-                    <span className="truncate">{tab.label}</span>
+                    <span>{tab.label}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute -bottom-4 left-0 right-0 h-px origin-left bg-accent-400 transition-transform duration-300 ${
+                        isActive ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
                   </button>
                 );
               })}
             </div>
 
-            {/* Showcase Stage Card (Full visual fidelity, zero placeholders) */}
-            <div className="relative rounded-3xl overflow-hidden bg-white/[0.06] border border-white/15 backdrop-blur-xl shadow-2xl transition-all duration-300">
-              {/* Authentic Product / Method Photography Stage */}
-              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-primary-950">
+            <figure className="mt-8">
+              <div className="image-frame aspect-[4/3] w-full sm:aspect-[16/11]">
                 <Image
+                  key={activeTab.image}
                   src={activeTab.image}
                   alt={activeTab.imageAlt}
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-700 hover:scale-105"
-                  key={activeTab.image}
+                  className="animate-fade-in object-cover"
                 />
-
-                {/* Visual Depth Gradient */}
-                <div
-                  className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/20 to-transparent pointer-events-none"
-                  aria-hidden="true"
-                />
-
-                {/* Top Corner Authenticity Seal */}
-                <div className="absolute top-3.5 left-3.5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] font-semibold">
-                  <span className="text-accent-400">✓</span>
-                  <span>Aset Orisinal Pena Ameen</span>
-                </div>
               </div>
+            </figure>
 
-              {/* Showcase Detail Section */}
-              <div className="p-5 sm:p-6 space-y-4">
-                {/* Badge Category Tag */}
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-500/20 text-accent-300 text-xs font-bold border border-accent-400/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-400" />
-                    {activeTab.badge}
-                  </span>
-                  <span className="text-xs font-medium text-white/50">
-                    {activeTab.id === "home-learning"
-                      ? "Edisi Keluarga"
-                      : "Kurikulum Resmi"}
-                  </span>
-                </div>
+            <div className="mt-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-300">
+                {activeTab.badge}
+              </p>
+              <h2 className="mt-3 font-serif text-xl leading-snug text-background-50 sm:text-2xl">
+                {activeTab.title}
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-background-300">
+                {activeTab.description}
+              </p>
 
-                {/* Title & Description */}
-                <div>
-                  <h2 className="font-serif font-bold text-white text-lg sm:text-xl leading-snug">
-                    {activeTab.title}
-                  </h2>
-                  <p className="mt-1.5 text-xs sm:text-sm text-white/75 leading-relaxed line-clamp-2">
-                    {activeTab.description}
-                  </p>
-                </div>
-
-                {/* Highlights Feature Pills */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {activeTab.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.08] text-white/90 text-[11px] font-medium border border-white/10"
-                    >
-                      <svg
-                        className="w-3 h-3 text-accent-400 shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Direct Action Link Pair */}
-                <div className="flex items-center gap-2.5 pt-3 border-t border-white/10">
-                  <Link
-                    href={activeTab.ctaHref}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+              <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
+                {activeTab.highlights.map((highlight) => (
+                  <li
+                    key={highlight}
+                    className="text-xs text-background-200 before:mr-2 before:text-accent-400 before:content-['—']"
                   >
-                    <span>{activeTab.ctaText}</span>
-                    <span aria-hidden="true">→</span>
-                  </Link>
-                  <Link
-                    href={activeTab.secondaryCtaHref}
-                    className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-white/90 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <Link
+                  href={activeTab.ctaHref}
+                  className="group inline-flex items-center gap-2 text-sm font-medium text-background-50"
+                >
+                  <span className="border-b border-accent-400 pb-0.5">
+                    {activeTab.ctaText}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform duration-200 group-hover:translate-x-1"
                   >
-                    {activeTab.secondaryCtaText}
-                  </Link>
-                </div>
+                    &rarr;
+                  </span>
+                </Link>
+                <Link
+                  href={activeTab.secondaryCtaHref}
+                  className="text-sm text-background-300 transition-colors hover:text-background-100"
+                >
+                  {activeTab.secondaryCtaText}
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Bottom Impact Metrics Bar (Integrated full-width base ribbon) ── */}
-      <div className="relative z-10 border-t border-white/10 bg-black/40 backdrop-blur-xl">
-        <div className="container mx-auto px-4 py-4 sm:py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 divide-y md:divide-y-0 md:divide-x divide-white/10">
-            {heroMetrics.map((metric, idx) => (
-              <div
-                key={metric.label}
-                className={`flex items-center gap-3.5 ${
-                  idx !== 0 ? "pt-3 md:pt-0 md:pl-6" : ""
-                }`}
-              >
-                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/[0.08] border border-white/15 text-xl shrink-0 shadow-inner">
-                  <span aria-hidden="true">{metric.icon}</span>
-                </div>
-                <div className="min-w-0">
-                  <div className="font-serif font-bold text-white text-base sm:text-lg lg:text-xl leading-none">
+      {/* Standing record */}
+      <div className="relative z-10 border-t border-white/10">
+        <div className="container">
+          <dl className="grid grid-cols-2 gap-x-8 gap-y-8 py-10 md:grid-cols-4">
+            {heroMetrics.map((metric) => (
+              <div key={metric.label}>
+                <dt className="sr-only">{metric.label}</dt>
+                <dd>
+                  <span className="block font-serif text-2xl leading-none text-background-50 sm:text-3xl">
                     {metric.value}
-                  </div>
-                  <div className="text-xs font-semibold text-accent-300 mt-1 truncate">
+                  </span>
+                  <span className="mt-2.5 block text-xs font-medium text-accent-300">
                     {metric.label}
-                  </div>
-                  <div className="text-[10px] text-white/50 hidden sm:block truncate">
+                  </span>
+                  <span className="mt-1 block text-[11px] text-background-400">
                     {metric.sublabel}
-                  </div>
-                </div>
+                  </span>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       </div>
-
-      {/* ── Subtitle bottom hairline ─────────────────────────────── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-400/30 to-transparent pointer-events-none"
-        aria-hidden="true"
-      />
     </section>
   );
 }

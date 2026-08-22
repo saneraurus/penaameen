@@ -109,9 +109,10 @@ const aboutItems: NavItem[] = [
   },
 ];
 
+/** Editorial dropdown panel: quiet rows, one accent, no card noise. */
 function DropdownPanel({ items }: { items: NavItem[] }) {
   return (
-    <ul className="grid w-[460px] gap-1 rounded-2xl border border-supporting-200 bg-white p-3 shadow-xl">
+    <ul className="grid w-[420px] gap-0 rounded-xl border border-supporting-200 bg-white p-2 shadow-[0_32px_80px_-24px_rgba(25,22,18,0.28)]">
       {items.map((item) => {
         const Icon = item.icon;
         return (
@@ -119,16 +120,16 @@ function DropdownPanel({ items }: { items: NavItem[] }) {
             <NavigationMenuLink asChild>
               <Link
                 href={item.href}
-                className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-primary-50/80"
+                className="group flex gap-4 rounded-lg px-4 py-3.5 transition-colors hover:bg-background-100"
               >
-                <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition-colors group-hover:bg-primary-600 group-hover:text-white">
-                  <Icon className="h-4 w-4" />
+                <span className="mt-0.5 text-supporting-400 transition-colors group-hover:text-accent-600">
+                  <Icon className="h-4 w-4" strokeWidth={1.5} />
                 </span>
-                <span>
-                  <span className="block text-sm font-semibold text-primary-900 group-hover:text-primary-700">
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-supporting-900">
                     {item.title}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-relaxed text-supporting-500">
+                  <span className="mt-1 block text-xs leading-relaxed text-supporting-500">
                     {item.description}
                   </span>
                 </span>
@@ -167,39 +168,39 @@ function CustomerMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-xl p-1.5 text-supporting-700 transition-colors hover:bg-supporting-100/80"
+        className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-background-200"
         aria-label="Akun"
         aria-expanded={isOpen}
       >
         <Image
           src={user.imageUrl}
           alt={displayName}
-          width={28}
-          height={28}
+          width={30}
+          height={30}
           unoptimized
-          className="rounded-full object-cover ring-1 ring-supporting-200"
+          className="rounded-full object-cover"
         />
-        <span className="hidden text-xs font-medium sm:block">
+        <span className="hidden max-w-[9rem] truncate pr-1 text-xs font-medium text-supporting-700 sm:block">
           {displayName}
         </span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-supporting-200 bg-white py-1.5 shadow-xl animate-fade-in">
-          <div className="px-3.5 py-2.5 border-b border-supporting-100">
-            <p className="text-xs font-semibold text-supporting-900 truncate">
+        <div className="animate-fade-in absolute right-0 top-full z-50 mt-3 w-60 overflow-hidden rounded-xl border border-supporting-200 bg-white shadow-[0_32px_80px_-24px_rgba(25,22,18,0.28)]">
+          <div className="border-b border-supporting-100 px-4 py-3.5">
+            <p className="truncate text-sm font-medium text-supporting-900">
               {displayName}
             </p>
-            <p className="text-[11px] text-supporting-500 truncate">
+            <p className="truncate text-xs text-supporting-500">
               {user.emailAddresses[0]?.emailAddress}
             </p>
           </div>
           <button
             type="button"
             onClick={() => signOut()}
-            className="flex w-full items-center gap-2 px-3.5 py-2.5 text-xs font-medium text-supporting-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+            className="flex w-full items-center gap-2.5 px-4 py-3.5 text-sm text-supporting-700 transition-colors hover:bg-background-100 hover:text-primary-800"
           >
-            <LogOut className="h-3.5 w-3.5" />
+            <LogOut className="h-4 w-4" strokeWidth={1.5} />
             Keluar
           </button>
         </div>
@@ -238,26 +239,40 @@ export function Header() {
     };
   }, [isMobileOpen]);
 
+  const desktopLinkClass = (href: string) =>
+    `relative px-3.5 text-sm font-medium transition-colors ${
+      isActive(href)
+        ? "text-primary-900"
+        : "text-supporting-600 hover:text-primary-900"
+    }`;
+
+  const rule = (active: boolean) =>
+    `absolute inset-x-3.5 -bottom-0.5 h-px origin-left bg-accent-600 transition-transform duration-300 ${
+      active ? "scale-x-100" : "scale-x-0"
+    }`;
+
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-supporting-200/80 bg-white/80 backdrop-blur-md transition-shadow duration-300 ${
-        scrolled ? "shadow-sm" : ""
+      className={`sticky top-0 z-[60] border-b transition-colors duration-300 ${
+        scrolled
+          ? "border-supporting-200/80 bg-background-50/92 backdrop-blur-xl"
+          : "border-transparent bg-background-50"
       }`}
     >
-      <div className="container px-4 mx-auto">
-        <div className="flex items-center justify-between gap-4 py-3.5">
+      <div className="container">
+        <div className="flex items-center justify-between gap-6 py-4">
           {/* Brand */}
           <Link
             href="/"
-            className="group flex items-center py-1"
+            className="group flex min-w-0 shrink-0 items-center"
             aria-label="PENA AMEEN"
           >
-            <span className="relative block h-11 w-44 sm:h-12 sm:w-52">
+            <span className="relative block h-9 w-32 sm:h-10 sm:w-40">
               <Image
                 src="/images/logo.png"
                 alt="PENA AMEEN"
                 fill
-                className="object-contain object-left transition-transform duration-200 group-hover:scale-[1.02]"
+                className="object-contain object-left"
                 priority
                 unoptimized
               />
@@ -266,38 +281,27 @@ export function Header() {
 
           {/* Desktop navigation */}
           <nav
-            className="hidden lg:flex items-center"
+            className="hidden lg:flex lg:flex-1 lg:justify-center"
             aria-label="Navigasi utama"
           >
             <NavigationMenu viewport={false}>
-              <NavigationMenuList className="gap-1">
+              <NavigationMenuList className="gap-0.5">
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     asChild
                     className={navigationMenuTriggerStyle()}
                   >
-                    <Link
-                      href="/"
-                      className={`relative px-4 font-medium transition-colors ${
-                        isActive("/")
-                          ? "text-primary-700"
-                          : "text-supporting-700 hover:text-primary-700"
-                      }`}
-                    >
+                    <Link href="/" className={desktopLinkClass("/")}>
                       Beranda
-                      <span
-                        className={`absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 transition-opacity ${
-                          isActive("/") ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
+                      <span className={rule(isActive("/"))} />
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="group relative px-4 font-medium text-supporting-700 transition-colors hover:text-primary-700 data-[state=open]:text-primary-700">
+                  <NavigationMenuTrigger className="group relative px-3.5 text-sm font-medium text-supporting-600 transition-colors hover:text-primary-900 data-[state=open]:text-primary-900">
                     Metode
-                    <span className="absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 opacity-0 transition-opacity group-data-[state=open]:opacity-100" />
+                    <span className="absolute inset-x-3.5 -bottom-0.5 h-px origin-left scale-x-0 bg-accent-600 transition-transform duration-300 group-data-[state=open]:scale-x-100" />
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <DropdownPanel items={programItems} />
@@ -305,9 +309,9 @@ export function Header() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="group relative px-4 font-medium text-supporting-700 transition-colors hover:text-primary-700 data-[state=open]:text-primary-700">
+                  <NavigationMenuTrigger className="group relative px-3.5 text-sm font-medium text-supporting-600 transition-colors hover:text-primary-900 data-[state=open]:text-primary-900">
                     Produk
-                    <span className="absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 opacity-0 transition-opacity group-data-[state=open]:opacity-100" />
+                    <span className="absolute inset-x-3.5 -bottom-0.5 h-px origin-left scale-x-0 bg-accent-600 transition-transform duration-300 group-data-[state=open]:scale-x-100" />
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <DropdownPanel items={productItems} />
@@ -315,9 +319,9 @@ export function Header() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="group relative px-4 font-medium text-supporting-700 transition-colors hover:text-primary-700 data-[state=open]:text-primary-700">
+                  <NavigationMenuTrigger className="group relative px-3.5 text-sm font-medium text-supporting-600 transition-colors hover:text-primary-900 data-[state=open]:text-primary-900">
                     Tentang
-                    <span className="absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 opacity-0 transition-opacity group-data-[state=open]:opacity-100" />
+                    <span className="absolute inset-x-3.5 -bottom-0.5 h-px origin-left scale-x-0 bg-accent-600 transition-transform duration-300 group-data-[state=open]:scale-x-100" />
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <DropdownPanel items={aboutItems} />
@@ -331,18 +335,10 @@ export function Header() {
                   >
                     <Link
                       href="/cabang"
-                      className={`relative px-4 font-medium transition-colors ${
-                        isActive("/cabang")
-                          ? "text-primary-700"
-                          : "text-supporting-700 hover:text-primary-700"
-                      }`}
+                      className={desktopLinkClass("/cabang")}
                     >
                       Cabang
-                      <span
-                        className={`absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 transition-opacity ${
-                          isActive("/cabang") ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
+                      <span className={rule(isActive("/cabang"))} />
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -354,18 +350,10 @@ export function Header() {
                   >
                     <Link
                       href="/artikel"
-                      className={`relative px-4 font-medium transition-colors ${
-                        isActive("/artikel")
-                          ? "text-primary-700"
-                          : "text-supporting-700 hover:text-primary-700"
-                      }`}
+                      className={desktopLinkClass("/artikel")}
                     >
                       Artikel
-                      <span
-                        className={`absolute inset-x-4 -bottom-1 h-0.5 rounded-full bg-primary-600 transition-opacity ${
-                          isActive("/artikel") ? "opacity-100" : "opacity-0"
-                        }`}
-                      />
+                      <span className={rule(isActive("/artikel"))} />
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -374,15 +362,15 @@ export function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <CartIcon />
 
             <Show when="signed-in">
               <Link
                 href="/orders"
-                className="hidden items-center gap-1.5 rounded-xl border border-primary-200 bg-primary-50 px-3.5 py-1.5 text-xs font-semibold text-primary-800 transition-colors hover:bg-primary-100 sm:inline-flex"
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium text-supporting-600 transition-colors hover:text-primary-900 sm:inline-flex"
               >
-                <Package className="h-3.5 w-3.5" />
+                <Package className="h-4 w-4" strokeWidth={1.5} />
                 Pesanan
               </Link>
               <CustomerMenu />
@@ -391,16 +379,16 @@ export function Header() {
             <Show when="signed-out">
               <Link
                 href="/sign-in"
-                className="hidden items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-supporting-700 transition-colors hover:text-primary-700 sm:inline-flex"
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium text-supporting-600 transition-colors hover:text-primary-900 sm:inline-flex"
               >
-                <LogIn className="h-3.5 w-3.5" />
+                <LogIn className="h-4 w-4" strokeWidth={1.5} />
                 Masuk
               </Link>
               <Link
                 href="/sign-up"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-primary-700"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-primary-900 px-5 text-xs font-medium text-background-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800"
               >
-                <UserPlus className="h-3.5 w-3.5" />
+                <UserPlus className="h-3.5 w-3.5" strokeWidth={1.5} />
                 Daftar
               </Link>
             </Show>
@@ -408,20 +396,20 @@ export function Header() {
             <button
               type="button"
               onClick={() => setIsMobileOpen(true)}
-              className="rounded-xl p-2 text-supporting-600 transition-colors hover:bg-supporting-100/80 hover:text-primary-700 lg:hidden"
+              className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-supporting-700 transition-colors hover:bg-background-200 lg:hidden"
               aria-label="Buka menu navigasi"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" strokeWidth={1.5} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile slide-over drawer */}
+      {/* Mobile full-surface navigation */}
       {isMobileOpen && (
         <div className="lg:hidden">
           <div
-            className="fixed inset-0 z-40 bg-supporting-900/40 backdrop-blur-sm animate-fade-in"
+            className="animate-fade-in fixed inset-0 z-[70] bg-primary-950/45 backdrop-blur-sm"
             onClick={() => setIsMobileOpen(false)}
             aria-hidden="true"
           />
@@ -429,10 +417,10 @@ export function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu navigasi"
-            className="fixed right-0 top-0 z-50 flex h-full w-[84%] max-w-sm animate-fade-in flex-col bg-white shadow-2xl"
+            className="animate-drawer-in fixed inset-y-0 right-0 z-[80] flex h-full w-full max-w-md flex-col bg-background-50 shadow-[0_32px_80px_-24px_rgba(25,22,18,0.28)]"
           >
-            <div className="flex items-center justify-between border-b border-supporting-200/80 px-5 py-4">
-              <span className="relative block h-9 w-36">
+            <div className="flex items-center justify-between px-6 py-5">
+              <span className="relative block h-9 w-32">
                 <Image
                   src="/images/logo.png"
                   alt="PENA AMEEN"
@@ -444,61 +432,71 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setIsMobileOpen(false)}
-                className="rounded-xl p-2 text-supporting-600 transition-colors hover:bg-supporting-100 hover:text-primary-700"
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-supporting-700 transition-colors hover:bg-background-200"
                 aria-label="Tutup menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" strokeWidth={1.5} />
               </button>
             </div>
 
             <nav
-              className="flex-1 space-y-1 overflow-y-auto px-3 py-4"
+              className="flex-1 overflow-y-auto px-6 pb-6"
               aria-label="Navigasi seluler"
             >
-              <MobileLink
-                href="/"
-                label="Beranda"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/metode"
-                label="Metode"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/produk"
-                label="Produk"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/tentang"
-                label="Tentang"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/cabang"
-                label="Cabang"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/artikel"
-                label="Artikel"
-                onClose={() => setIsMobileOpen(false)}
-              />
-              <MobileLink
-                href="/galeri-kegiatan"
-                label="Galeri Kegiatan"
-                onClose={() => setIsMobileOpen(false)}
-              />
+              <p className="eyebrow mb-4 mt-2">Jelajahi</p>
+              <ul className="border-t border-supporting-200">
+                <MobileLink
+                  href="/"
+                  label="Beranda"
+                  index="01"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/metode"
+                  label="Metode"
+                  index="02"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/produk"
+                  label="Produk"
+                  index="03"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/tentang"
+                  label="Tentang"
+                  index="04"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/cabang"
+                  label="Cabang"
+                  index="05"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/artikel"
+                  label="Artikel"
+                  index="06"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+                <MobileLink
+                  href="/galeri-kegiatan"
+                  label="Galeri Kegiatan"
+                  index="07"
+                  onClose={() => setIsMobileOpen(false)}
+                />
+              </ul>
 
-              <div className="border-t border-supporting-200/70 px-2 pt-4">
+              <div className="mt-8 space-y-2.5">
                 <Show when="signed-in">
                   <Link
                     href="/orders"
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center justify-center gap-1.5 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-xs"
+                    className="flex min-h-13 items-center justify-center gap-2 rounded-full bg-primary-900 px-6 text-sm font-medium text-background-50"
                   >
-                    <Package className="h-4 w-4" />
+                    <Package className="h-4 w-4" strokeWidth={1.5} />
                     Pesanan Saya
                   </Link>
                   <button
@@ -507,9 +505,9 @@ export function Header() {
                       setIsMobileOpen(false);
                       signOut();
                     }}
-                    className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-supporting-200 px-4 py-3 text-sm font-semibold text-supporting-700 transition-colors hover:bg-supporting-50"
+                    className="flex min-h-13 w-full items-center justify-center gap-2 rounded-full border border-supporting-300 px-6 text-sm font-medium text-supporting-700 transition-colors hover:border-primary-700 hover:text-primary-800"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="h-4 w-4" strokeWidth={1.5} />
                     Keluar
                   </button>
                 </Show>
@@ -517,17 +515,17 @@ export function Header() {
                   <Link
                     href="/sign-in"
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center justify-center gap-1.5 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-xs"
+                    className="flex min-h-13 items-center justify-center gap-2 rounded-full bg-primary-900 px-6 text-sm font-medium text-background-50"
                   >
-                    <LogIn className="h-4 w-4" />
+                    <LogIn className="h-4 w-4" strokeWidth={1.5} />
                     Masuk
                   </Link>
                   <Link
                     href="/sign-up"
                     onClick={() => setIsMobileOpen(false)}
-                    className="mt-2 flex items-center justify-center gap-1.5 rounded-xl border border-primary-200 px-4 py-3 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-50"
+                    className="flex min-h-13 items-center justify-center gap-2 rounded-full border border-supporting-300 px-6 text-sm font-medium text-supporting-800 transition-colors hover:border-primary-700"
                   >
-                    <UserPlus className="h-4 w-4" />
+                    <UserPlus className="h-4 w-4" strokeWidth={1.5} />
                     Daftar
                   </Link>
                 </Show>
@@ -543,19 +541,31 @@ export function Header() {
 function MobileLink({
   href,
   label,
+  index,
   onClose,
 }: {
   href: string;
   label: string;
+  index: string;
   onClose: () => void;
 }) {
   return (
-    <Link
-      href={href}
-      onClick={onClose}
-      className="block rounded-xl px-3 py-3 font-semibold text-supporting-800 transition-colors hover:bg-primary-50 hover:text-primary-700"
-    >
-      {label}
-    </Link>
+    <li className="border-b border-supporting-200">
+      <Link
+        href={href}
+        onClick={onClose}
+        className="group flex items-baseline gap-4 py-4 transition-colors hover:text-accent-700"
+      >
+        <span
+          aria-hidden="true"
+          className="text-[10px] font-medium tracking-[0.2em] text-supporting-400"
+        >
+          {index}
+        </span>
+        <span className="font-serif text-2xl text-supporting-900 transition-colors group-hover:text-accent-700">
+          {label}
+        </span>
+      </Link>
+    </li>
   );
 }

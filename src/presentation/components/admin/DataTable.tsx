@@ -16,6 +16,11 @@ interface DataTableProps<T> {
   rowClassName?: (row: T) => string;
 }
 
+/**
+ * Operational record table.
+ *
+ * Presentation only: sorting, filtering, and authorization stay with callers.
+ */
 export function DataTable<T>({
   columns,
   data,
@@ -25,35 +30,48 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">{emptyMessage}</div>
+      <div className="px-6 py-16 text-center">
+        <span
+          aria-hidden="true"
+          className="mx-auto mb-4 block h-px w-12 bg-supporting-300"
+        />
+        <p className="text-sm text-supporting-500">{emptyMessage}</p>
+      </div>
     );
   }
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left">
+      <table className="w-full border-collapse text-left text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
+          <tr className="border-b border-supporting-200">
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={`px-4 py-3 font-medium text-gray-600 uppercase tracking-wider ${column.className ?? ""}`}
+                scope="col"
+                className={`whitespace-nowrap px-5 py-3.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-supporting-500 ${
+                  column.className ?? ""
+                }`}
               >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody>
           {data.map((row) => (
             <tr
               key={keyAccessor(row)}
-              className={`transition-colors ${rowClassName?.(row) ?? ""}`}
+              className={`border-b border-supporting-100 transition-colors last:border-b-0 hover:bg-supporting-50 ${
+                rowClassName?.(row) ?? ""
+              }`}
             >
               {columns.map((column) => (
                 <td
                   key={column.key}
-                  className={`px-4 py-3 text-gray-900 ${column.className ?? ""}`}
+                  className={`px-5 py-4 align-middle text-supporting-800 ${
+                    column.className ?? ""
+                  }`}
                 >
                   {column.render
                     ? column.render(row)
@@ -93,15 +111,18 @@ export function Pagination({
   );
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
-      <div className="text-sm text-gray-600">
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-between gap-4 border-t border-supporting-200 px-5 py-4"
+    >
+      <p className="text-xs text-supporting-500">
         Page {currentPage} of {totalPages}
-      </div>
+      </p>
       <div className="flex items-center gap-1">
         {currentPage > 1 && (
           <Link
             href={`${baseUrl}?page=${currentPage - 1}`}
-            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+            className="rounded-full border border-supporting-300 px-3.5 py-1.5 text-xs text-supporting-700 transition-colors hover:border-primary-700 hover:text-primary-900"
           >
             Previous
           </Link>
@@ -110,10 +131,11 @@ export function Pagination({
           <Link
             key={page}
             href={`${baseUrl}?page=${page}`}
-            className={`w-8 h-8 text-sm rounded-md font-medium flex items-center justify-center ${
+            aria-current={page === currentPage ? "page" : undefined}
+            className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors ${
               page === currentPage
-                ? "bg-primary-600 text-white"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary-900 text-background-50"
+                : "text-supporting-600 hover:bg-supporting-100"
             }`}
           >
             {page}
@@ -122,12 +144,12 @@ export function Pagination({
         {currentPage < totalPages && (
           <Link
             href={`${baseUrl}?page=${currentPage + 1}`}
-            className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700"
+            className="rounded-full border border-supporting-300 px-3.5 py-1.5 text-xs text-supporting-700 transition-colors hover:border-primary-700 hover:text-primary-900"
           >
             Next
           </Link>
         )}
       </div>
-    </div>
+    </nav>
   );
 }

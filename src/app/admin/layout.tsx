@@ -7,10 +7,12 @@ export default async function AdminLayout(props: {
   await requireStaffActor();
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="admin-shell flex min-h-screen flex-col lg:flex-row">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <main className="flex-1 p-6">{props.children}</main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <main className="flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+          {props.children}
+        </main>
       </div>
     </div>
   );

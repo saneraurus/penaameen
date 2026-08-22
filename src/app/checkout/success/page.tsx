@@ -5,6 +5,14 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 
+import {
+  ActionLink,
+  SceneIndex,
+  SectionHeading,
+  Shell,
+  Skeleton,
+} from "@/components/ui/primitives";
+
 interface Order {
   id: string;
   orderNumber: string;
@@ -56,72 +64,80 @@ function SuccessPageInner() {
 
   return (
     <div className="min-h-screen bg-background-50">
-      <div className="container px-4 mx-auto py-16 text-center">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <svg
-            className="h-8 w-8 text-green-600"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-serif text-primary-600 mb-2">
-          {pending ? "Menunggu Pembayaran" : "Pesanan Diterima!"}
-        </h1>
-        <p className="text-supporting-600 mb-8">
-          {pending
-            ? "Silakan selesaikan pembayaran Anda. Kami akan mengonfirmasi pesanan setelah pembayaran berhasil."
-            : "Terima kasih! Pesanan Anda sedang kami proses. Konfirmasi akan dikirim ke email Anda."}
-        </p>
+      <Shell className="py-20 sm:py-28">
+        <div className="mx-auto max-w-2xl">
+          <SceneIndex
+            index="04"
+            label={pending ? "Menunggu Pembayaran" : "Pesanan Diterima"}
+          />
 
-        {isLoading ? (
-          <p className="text-supporting-600">Memuat detail pesanan...</p>
-        ) : order ? (
-          <div className="mx-auto max-w-md rounded-2xl border border-supporting-200 bg-white p-6 text-left">
-            <p className="mb-1">
-              <span className="text-supporting-500">No. Pesanan:</span>{" "}
-              <strong>{order.orderNumber}</strong>
-            </p>
-            <p className="mb-1">
-              <span className="text-supporting-500">Total:</span>{" "}
-              <strong>Rp{Number(order.total).toLocaleString()}</strong>
-            </p>
-            <p className="mb-1">
-              <span className="text-supporting-500">Status:</span>{" "}
-              {order.status}
-            </p>
-            {order.shippingAddress && (
-              <p className="mt-3 text-sm text-supporting-600">
-                Kirim ke: {order.shippingAddress.recipientName},{" "}
-                {order.shippingAddress.addressLine1},{" "}
-                {order.shippingAddress.city} {order.shippingAddress.postalCode}
-              </p>
-            )}
+          <SectionHeading level={1} className="mt-6">
+            {pending ? "Menunggu Pembayaran" : "Pesanan Diterima!"}
+          </SectionHeading>
+
+          <p className="lede mt-6">
+            {pending
+              ? "Silakan selesaikan pembayaran Anda. Kami akan mengonfirmasi pesanan setelah pembayaran berhasil."
+              : "Terima kasih! Pesanan Anda sedang kami proses. Konfirmasi akan dikirim ke email Anda."}
+          </p>
+
+          <div className="mt-12">
+            {isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-32" />
+                <p className="sr-only" role="status">
+                  Memuat detail pesanan...
+                </p>
+              </div>
+            ) : order ? (
+              <dl className="border-t border-supporting-200">
+                <div className="flex items-baseline justify-between gap-6 border-b border-supporting-200 py-4">
+                  <dt className="text-sm text-supporting-500">No. Pesanan</dt>
+                  <dd className="font-mono text-sm font-medium text-supporting-900">
+                    {order.orderNumber}
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-6 border-b border-supporting-200 py-4">
+                  <dt className="text-sm text-supporting-500">Total</dt>
+                  <dd className="font-serif text-xl text-supporting-900">
+                    Rp{Number(order.total).toLocaleString()}
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-6 border-b border-supporting-200 py-4">
+                  <dt className="text-sm text-supporting-500">Status</dt>
+                  <dd className="text-sm font-medium text-supporting-900">
+                    {order.status}
+                  </dd>
+                </div>
+                {order.shippingAddress && (
+                  <div className="flex items-baseline justify-between gap-6 border-b border-supporting-200 py-4">
+                    <dt className="text-sm text-supporting-500">Kirim ke</dt>
+                    <dd className="max-w-sm text-right text-sm leading-relaxed text-supporting-700">
+                      {order.shippingAddress.recipientName},{" "}
+                      {order.shippingAddress.addressLine1},{" "}
+                      {order.shippingAddress.city}{" "}
+                      {order.shippingAddress.postalCode}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            ) : null}
           </div>
-        ) : null}
 
-        <div className="mt-8 flex justify-center gap-4">
-          <Link
-            href="/orders"
-            className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700"
-          >
-            Lihat Pesanan Saya
-          </Link>
-          <Link
-            href="/produk"
-            className="px-6 py-3 border border-supporting-300 rounded-xl hover:bg-supporting-50"
-          >
-            Lanjut Belanja
-          </Link>
+          <div className="mt-12 flex flex-col gap-3 sm:flex-row">
+            <ActionLink href="/orders" tone="ink" size="lg">
+              Lihat Pesanan Saya
+            </ActionLink>
+            <Link
+              href="/produk"
+              className="inline-flex min-h-13 items-center justify-center rounded-full border border-supporting-300 px-7 text-sm font-medium text-supporting-800 transition-colors hover:border-primary-700 hover:text-primary-900"
+            >
+              Lanjut Belanja
+            </Link>
+          </div>
         </div>
-      </div>
+      </Shell>
     </div>
   );
 }
@@ -130,8 +146,14 @@ export default function CheckoutSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent" />
+        <div className="min-h-screen bg-background-50">
+          <Shell className="py-20 sm:py-28">
+            <div className="mx-auto max-w-2xl space-y-5">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-12 w-72" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </Shell>
         </div>
       }
     >
