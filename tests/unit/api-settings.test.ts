@@ -97,19 +97,17 @@ describe("api-settings secret handling", () => {
   });
 
   it("isPlaceholderSecret returns false for real credentials", () => {
-    expect(
-      isPlaceholderSecret("non_placeholder_custom_secret_key_1234567890"),
-    ).toBe(false);
-    expect(isPlaceholderSecret("non_placeholder_publishable_key_abcdefghij")).toBe(
+    expect(isPlaceholderSecret("valid_custom_secret_key_1234567890abcdef")).toBe(
+      false,
+    );
+    expect(isPlaceholderSecret("valid_custom_publishable_key_abcdef123456")).toBe(
+      false,
+    );
+    expect(isPlaceholderSecret("valid_custom_ai_key_9876543210fedcba")).toBe(
       false,
     );
     expect(
-      isPlaceholderSecret("non_placeholder_ai_model_api_key_9876543210"),
-    ).toBe(false);
-    expect(
-      isPlaceholderSecret(
-        "non_placeholder_gateway_license_key_4567891234567890",
-      ),
+      isPlaceholderSecret("valid_custom_license_key_4567891234567890"),
     ).toBe(false);
   });
 

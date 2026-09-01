@@ -55,7 +55,7 @@ function configurationError(message: string): ConfigurationError {
 }
 
 function readEnvironment(value: string | undefined): ApplicationEnvironment {
-  const resolved = value ?? "development";
+  const resolved = (value ?? "development").toLowerCase();
 
   if (!environments.has(resolved)) {
     throw new Error(`APP_ENV must be one of development, test, production.`);
@@ -65,7 +65,7 @@ function readEnvironment(value: string | undefined): ApplicationEnvironment {
 }
 
 function readLogLevel(value: string | undefined): LogLevel {
-  const resolved = value ?? "info";
+  const resolved = (value ?? "info").toLowerCase();
 
   if (!logLevels.has(resolved)) {
     throw new Error(`LOG_LEVEL must be one of debug, info, warn, error.`);

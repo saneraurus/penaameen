@@ -1,0 +1,27 @@
+﻿# Local database and data archives
+.pgdata/
+.pgdata-*/
+OLD WEBSITE FILES/
+PRODUK/
+.worktrees/
+
+# Dependencies and build
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+
+# Editor and agent folders
+.git
+.claude
+.windsurf
+.kilo
+
+# Secrets and local credentials
+service-account*.json
+google-service-account*.json
+penaameen-website-*.json
+src/data/api_settings.json
+*.tsbuildinfo
