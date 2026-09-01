@@ -10,7 +10,7 @@ const globalForPrisma = globalThis as unknown as {
 function getPgPool(): Pool {
   if (!globalForPrisma.pgPool) {
     const pool = new Pool({
-      connectionString: process.env["DATABASE_URL"],
+      connectionString: process.env["SUPABASE_DB_URL"],
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 4000,

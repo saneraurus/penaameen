@@ -8,10 +8,10 @@ const globalForStaffPrisma = globalThis as unknown as {
 
 function getStaffPrismaClient(): PrismaClient {
   if (!globalForStaffPrisma.staffPrisma) {
-    const connectionString = process.env.DATABASE_STAFF_URL;
+    const connectionString = process.env.SUPABASE_DB_STAFF_URL;
     if (!connectionString) {
       throw new Error(
-        "DATABASE_STAFF_URL is required for staff database operations",
+        "SUPABASE_DB_STAFF_URL is required for staff database operations",
       );
     }
 

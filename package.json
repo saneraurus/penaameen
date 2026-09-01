@@ -18,9 +18,7 @@
     "format:write": "prettier --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.{ts,tsx}\" \"*.{json,ts,mjs}\"",
     "typecheck": "tsc --noEmit",
     "db:seed": "tsx prisma/seed.ts",
-    "db:start": "node scripts/dev-db.mjs",
-    "db:push": "prisma db push",
-    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "db:migrate": "prisma migrate deploy",
     "import:products:sheets": "tsx scripts/import-products-to-sheets.ts",
     "import:weights:sheets": "tsx scripts/import-product-weights-to-sheets.ts",
     "test": "vitest run",
@@ -73,7 +71,6 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "cross-env": "^10.1.0",
-    "embedded-postgres": "^18.4.0-beta.17",
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.3.1",
     "jsdom": "^27.0.1",
@@ -85,7 +82,6 @@
     "vitest": "^4.1.10"
   },
   "allowScripts": {
-    "@embedded-postgres/windows-x64@18.4.0-beta.17": true,
     "@prisma/engines@7.9.1": true,
     "esbuild@0.28.2": true,
     "prisma@7.9.1": true,

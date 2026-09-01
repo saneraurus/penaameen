@@ -4,7 +4,8 @@ import fs from "node:fs";
 const required = [
   "APP_ENV",
   "APP_BASE_URL",
-  "DATABASE_URL",
+  "SUPABASE_DB_URL",
+  "SUPABASE_DB_STAFF_URL",
   "CLERK_SECRET_KEY",
   "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
 ];

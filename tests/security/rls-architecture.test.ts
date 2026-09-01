@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 const migration = readFileSync(
   resolve(
     process.cwd(),
-    "prisma/migrations/20260822_rls_policies/migration.sql",
+    "prisma/migrations/20260822000000_rls_policies/migration.sql",
   ),
   "utf8",
 );

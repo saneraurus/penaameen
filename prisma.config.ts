@@ -3,6 +3,12 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+function usable(value: string | undefined): string | undefined {
+  if (!value || value.includes("REPLACE-AFTER-DASHBOARD-RESET"))
+    return undefined;
+  return value;
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -10,7 +16,8 @@ export default defineConfig({
   },
   datasource: {
     url:
-      process.env["DATABASE_URL"] ??
-      "postgresql://postgres:password@localhost:5432/penaameen",
+      usable(process.env["SUPABASE_DB_MIGRATE_URL"]) ??
+      process.env["SUPABASE_DB_STAFF_URL"] ??
+      "",
   },
 });

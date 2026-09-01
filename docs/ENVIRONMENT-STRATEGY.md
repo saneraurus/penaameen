@@ -27,10 +27,11 @@
 
 | Conceptual variable/group | Purpose | Status |
 |---|---|---|
-| `DATABASE_URL` or equivalent secure connection components | PostgreSQL connection | PROPOSED; provider unknown |
-| `DATABASE_SSL_MODE` | Approved transport/security posture | DEFERRED to host/security architecture |
-| `DATABASE_POOL_*` | Connection/pool limits | DEFERRED until runtime/load design |
-| `DATABASE_MIGRATION_*` | Future migration execution guard/configuration | DEFERRED; no migration created |
+| `SUPABASE_DB_URL` | Supabase transaction-pooler connection (RLS-bound `penaameen_app` role) | IMPLEMENTED 2026-09-01; Supabase Postgres is the single database source of truth |
+| `SUPABASE_DB_STAFF_URL` | Supabase session-pooler staff connection (`penaameen_staff`, `BYPASSRLS`); also used by `prisma migrate deploy` and seeding | IMPLEMENTED 2026-09-01 |
+| `SUPABASE_DB_MIGRATE_URL` | Optional owner (postgres) session connection for CLI migrations after Dashboard password reset | PENDING user password reset |
+| `RLS_ENABLED` | Enforces RLS context helpers | IMPLEMENTED; `true` in all environments |
+| Compute hosting | Vercel hosts only the stateless Next.js runtime (SSR/API/middleware); no database, storage, or auth service runs on Vercel | IMPLEMENTED via client decision 2026-09-01 (TDR-020) |
 
 ## 4. Authentication and session configuration
 

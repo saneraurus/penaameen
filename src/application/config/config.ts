@@ -187,9 +187,9 @@ export function getEnvironmentReadiness(
     readinessCheck(
       "database.url",
       effective,
-      ["DATABASE_URL"],
+      ["SUPABASE_DB_URL"],
       production,
-      "DATABASE_URL is not configured",
+      "SUPABASE_DB_URL is not configured",
     ),
     readinessCheck(
       "auth.clerk",

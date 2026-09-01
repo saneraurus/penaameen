@@ -51,7 +51,7 @@ describe("loadServerConfig", () => {
     const readiness = getEnvironmentReadiness({
       APP_ENV: "production",
       APP_BASE_URL: "https://store.example",
-      DATABASE_URL: "postgresql://secret",
+      SUPABASE_DB_URL: "postgresql://secret",
       CLERK_PUBLISHABLE_KEY: "pk_test_secret",
       CLERK_SECRET_KEY: "sk_test_secret",
     });

@@ -97,12 +97,12 @@ describe("api-settings secret handling", () => {
   });
 
   it("isPlaceholderSecret returns false for real credentials", () => {
-    expect(isPlaceholderSecret("valid_custom_secret_key_1234567890abcdef")).toBe(
-      false,
-    );
-    expect(isPlaceholderSecret("valid_custom_publishable_key_abcdef123456")).toBe(
-      false,
-    );
+    expect(
+      isPlaceholderSecret("valid_custom_secret_key_1234567890abcdef"),
+    ).toBe(false);
+    expect(
+      isPlaceholderSecret("valid_custom_publishable_key_abcdef123456"),
+    ).toBe(false);
     expect(isPlaceholderSecret("valid_custom_ai_key_9876543210fedcba")).toBe(
       false,
     );

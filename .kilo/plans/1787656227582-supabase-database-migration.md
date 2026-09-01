@@ -207,10 +207,22 @@ Note: `db:push` is removed. `db:start` assumes Supabase CLI is installed.
 
 ## Open Decisions
 
-1. **Local development data**: The embedded Postgres likely contains development data (test orders, carts, chat sessions). Should we:
-   - **(Recommended) Discard it**: Local dev data is reproducible via seed; Supabase starts clean.
-   - **Preserve and migrate it**: Export via `pg_dump` from embedded Postgres, import to Supabase via SQL Editor or `psql`. Requires `pg_dump` to be available and data to be worth preserving.
+1. **Local development data**: RESOLVED 2026-09-01 — discarded; Supabase seeded from `prisma/seed.ts`.
+2. **Local dev mode**: RESOLVED 2026-09-01 — direct connection to the Supabase cloud project (no Docker); matches Vercel production topology exactly.
+3. **Supabase region**: RESOLVED — project `pvlclmdcirhmcakqehcc` exists in `ap-south-1`; pooler host `aws-0-ap-south-1.pooler.supabase.com`.
 
-2. **Local dev mode**: `supabase start` (Docker required, runs local Supabase stack on ports 54322/54323) vs connect directly to the Supabase cloud project. Recommend `supabase start` for offline parity and faster iteration.
+## Execution Status (2026-09-01) — COMPLETE except owner-password reset
 
-3. **Supabase region**: User must select region closest to Indonesia (e.g., `ap-southeast-1`, `ap-southeast-2`, or `sgp-1`).
+Done:
+- Supabase linked (`supabase link`, project ref above); `.env` files rewired to `SUPABASE_DB_URL` / `SUPABASE_DB_STAFF_URL` / `SUPABASE_DB_MIGRATE_URL`, `RLS_ENABLED=true`.
+- Roles: `penaameen_app` (LOGIN, NOBYPASSRLS) and `penaameen_staff` (LOGIN, BYPASSRLS) with default-privilege grants; tables/functions owned via `prisma migrate deploy` run as staff.
+- Both migrations applied and recorded by Prisma (`20260821000000_baseline_schema`, `20260822000000_rls_policies` — directory renamed to canonical 14-digit form); baseline's generated `CREATE SCHEMA` statement removed (Supabase schema pre-exists; staff lacks database-level CREATE).
+- Live RLS verification passed: app role blocked on anon customer insert, self-row access with `SET LOCAL app.current_clerk_id`, staff bypass insert/delete; 20 tables, 9 policy tables, 30 policies.
+- DB seeded (21 products, 6 categories, articles/branches/methods/history/testimonials/admin).
+- `embedded-postgres` and `scripts/dev-db.mjs` removed; `start-all.mjs` rewritten for cloud checks; `db:start`/`db:push`/`db:reset` replaced by `db:migrate`.
+- Code refs updated (`prisma.ts`, `prisma-staff.ts`, `seed.ts` → staff URL, `config.ts`, `staging-readiness.mjs`, tests); 53 suites / 204 tests pass; typecheck + build pass.
+- Vercel (`snrs/penaameen-web`): pushed `SUPABASE_DB_URL`, `SUPABASE_DB_STAFF_URL`, `RLS_ENABLED`, `APP_BASE_URL`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAILS`, `EMAIL_FROM` to production/preview/development.
+
+Deviations from original plan: staff/migrate use the session pooler (port 5432) instead of the IPv6-only `db.<ref>` direct host (Vercel egress is IPv4); `uselibpqcompat=true&sslmode=require` in URLs because Supavisor presents an unverifiable chain (libpq-semantic encryption-only, per Supabase guidance); pooler usernames require the `.pvlclmdcirhmcakqehcc` suffix.
+
+Remaining: user must reset the Supabase Dashboard database password (Connect → Database) to activate `SUPABASE_DB_MIGRATE_URL`; rotate the Supabase CLI access token and any secrets exposed in chat; Vercel still lacks a `CLERK_SECRET_KEY` matching its (v2-format) publishable key.

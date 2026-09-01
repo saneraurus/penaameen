@@ -25,9 +25,11 @@ penaameen-website-*.json
 # local editor/system files
 .DS_Store
 
-# local embedded PostgreSQL data directory (runtime, machine-specific)
-.pgdata/
-.pgdata-*/
+# supabase/CLI local temp artifacts (supabase/.temp has own gitignore)
+.sb-*
+sb-*.tmp.mjs
+.baseline.sql
+.diff-err.txt
 
 /generated/prisma
 .vercel

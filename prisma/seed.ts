@@ -11,7 +11,7 @@ import { testimonials } from "../src/data/testimonials";
 import { hashPassword } from "../src/lib/admin/auth";
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg(new Pool({ connectionString: process.env["DATABASE_URL"] })),
+  adapter: new PrismaPg(new Pool({ connectionString: process.env["SUPABASE_DB_STAFF_URL"] })),
 });
 
 async function main() {
