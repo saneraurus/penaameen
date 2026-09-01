@@ -9,20 +9,10 @@ export default async function AdminStaffAccessPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <AdminHeader
-          title="Staff Access"
-          description="Manage team members, roles, and capabilities"
-        />
-        <button
-          type="button"
-          disabled
-          title="Invite flow requires Clerk configuration"
-          className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg opacity-50 cursor-not-allowed"
-        >
-          Invite Staff
-        </button>
-      </div>
+      <AdminHeader
+        title="Staff & Admin Access"
+        description="Kelola pengguna administrator, peran hak akses, dan kata sandi tim operasional"
+      />
 
       <StaffAccessManager initialMembers={members} />
     </div>

@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import type { Order, OrderStatus } from "@/generated/prisma";
+import { createNotification } from "@/lib/admin/notifications";
+import { isSystemControlEnabled } from "@/lib/admin/system-controls";
+import {
+  sendOrderConfirmationEmail,
+  sendOrderShippedEmail,
+} from "@/lib/payment/order-email";
 
 export interface AdminOrder {
   id: string;
@@ -459,10 +465,10 @@ export async function transitionOrder(
   id: string,
   transition: OrderTransition,
 ): Promise<AdminOrder | null> {
-  const order = await getOrderById(id);
-  if (!order) return null;
+  const adminOrder = await getOrderById(id);
+  if (!adminOrder) return null;
 
-  const allowed = ALLOWED_TRANSITIONS[transition]?.[order.status];
+  const allowed = ALLOWED_TRANSITIONS[transition]?.[adminOrder.status];
   if (!allowed) return null;
 
   const prismaStatusMap: Record<string, OrderStatus> = {
@@ -475,24 +481,107 @@ export async function transitionOrder(
 
   const newPrismaStatus = prismaStatusMap[allowed] || "PROCESSING";
 
-  const updateData: Record<string, unknown> = { status: newPrismaStatus };
-  if (transition === "mark_paid") updateData.paidAt = new Date();
-  if (transition === "mark_shipped") updateData.shippedAt = new Date();
-  if (transition === "mark_delivered") updateData.deliveredAt = new Date();
-  if (transition === "cancel") updateData.cancelledAt = new Date();
+  // Fetch raw order with items for atomic stock management
+  const rawOrder = await prisma.order.findUnique({
+    where: { id: adminOrder.id },
+    include: { items: true },
+  });
+  if (!rawOrder) return null;
 
-  await prisma.order.update({
-    where: { id: order.id },
-    data: updateData as Parameters<typeof prisma.order.update>[0]["data"],
+  const needsStockDecrement = transition === "mark_paid";
+  const needsStockIncrement =
+    (transition === "cancel" || transition === "refund") &&
+    rawOrder.status !== "PENDING_PAYMENT";
+
+  // Atomic transaction: status update + stock management
+  await prisma.$transaction(async (tx) => {
+    const updateData: Record<string, unknown> = { status: newPrismaStatus };
+    if (transition === "mark_paid") updateData.paidAt = new Date();
+    if (transition === "mark_shipped") updateData.shippedAt = new Date();
+    if (transition === "mark_delivered") updateData.deliveredAt = new Date();
+    if (transition === "cancel") updateData.cancelledAt = new Date();
+
+    await tx.order.update({
+      where: { id: rawOrder.id },
+      data: updateData as Parameters<typeof prisma.order.update>[0]["data"],
+    });
+
+    // For mark_paid: record intermediate PAID step for audit trail
+    // so user order timeline shows "Pembayaran Diterima" in history
+    if (transition === "mark_paid") {
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: rawOrder.id,
+          status: "PAID",
+          note: "Pembayaran manual diverifikasi oleh Admin",
+        },
+      });
+    }
+
+    await tx.orderStatusHistory.create({
+      data: {
+        orderId: rawOrder.id,
+        status: newPrismaStatus,
+        note: `Status diperbarui oleh Admin: ${transition.replace("_", " ").toUpperCase()}`,
+      },
+    });
+
+    // Stock decrement on mark_paid (matches webhook behavior)
+    if (needsStockDecrement) {
+      for (const item of rawOrder.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.quantity } },
+        });
+      }
+    }
+
+    // Stock increment on cancel/refund from paid states
+    if (needsStockIncrement) {
+      for (const item of rawOrder.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+    }
   });
 
-  await prisma.orderStatusHistory.create({
-    data: {
-      orderId: order.id,
-      status: newPrismaStatus,
-      note: `Status diperbarui oleh Admin: ${transition.replace("_", " ").toUpperCase()}`,
-    },
-  });
+  // Post-transaction side effects (non-blocking)
+  if (transition === "mark_paid") {
+    await createNotification({
+      type: "order.paid",
+      severity: "info",
+      title: `Pesanan ${adminOrder.orderNumber} dikonfirmasi lunas`,
+      message:
+        "Pembayaran manual diverifikasi oleh admin. Stok telah dikurangi otomatis.",
+      targetType: "order",
+      targetId: rawOrder.id,
+    }).catch(() => undefined);
 
-  return getOrderById(order.id);
+    if (!(await isSystemControlEnabled("disable_outbound_email"))) {
+      await sendOrderConfirmationEmail(rawOrder.id).catch(() => undefined);
+    }
+  }
+
+  if (transition === "mark_shipped") {
+    if (!(await isSystemControlEnabled("disable_outbound_email"))) {
+      await sendOrderShippedEmail(rawOrder.id).catch(() => undefined);
+    }
+  }
+
+  if (transition === "cancel") {
+    await createNotification({
+      type: "order.cancelled",
+      severity: "info",
+      title: `Pesanan ${adminOrder.orderNumber} dibatalkan oleh admin`,
+      message: needsStockIncrement
+        ? "Pesanan dibatalkan; stok dikembalikan."
+        : "Pesanan dibatalkan.",
+      targetType: "order",
+      targetId: rawOrder.id,
+    }).catch(() => undefined);
+  }
+
+  return getOrderById(rawOrder.id);
 }

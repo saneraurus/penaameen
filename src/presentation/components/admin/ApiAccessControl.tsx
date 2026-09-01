@@ -10,8 +10,14 @@ interface ApiAccessControlProps {
 export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
   const [settings, setSettings] = useState<ApiSettings>(initialSettings);
   const [activeTab, setActiveTab] = useState<
-    "casaku" | "midtrans" | "rajaongkir" | "email" | "forwarding" | "auth"
-  >("casaku");
+    | "buatqris"
+    | "casaku"
+    | "midtrans"
+    | "rajaongkir"
+    | "email"
+    | "forwarding"
+    | "auth"
+  >("buatqris");
 
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -51,7 +57,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
   };
 
   const handleTest = async (
-    service: "casaku" | "midtrans" | "rajaongkir" | "email",
+    service: "buatqris" | "casaku" | "midtrans" | "rajaongkir" | "email",
   ) => {
     setTestingService(service);
     try {
@@ -130,13 +136,13 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
       )}
 
       {/* Top Header Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-supporting-200 shadow-xs">
         <div>
-          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <h2 className="text-base font-semibold text-supporting-900 flex items-center gap-2">
             <span>🔌</span>
             <span>Pusat Kontrol API & Integrasi Backend</span>
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-supporting-500 mt-0.5">
             Kelola kredensial resmi Casaku QRIS, Midtrans, RajaOngkir,
             Auto-Email, dan Webhooks Pena Ameen
           </p>
@@ -156,20 +162,38 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
       </div>
 
       {/* Main Settings Tabs Container */}
-      <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xs">
+      <div className="bg-white rounded-3xl border border-supporting-200 overflow-hidden shadow-xs">
         {/* Navigation Tabs Bar */}
-        <div className="flex overflow-x-auto border-b border-gray-200 bg-gray-50/70 p-2 gap-1.5 scrollbar-none">
+        <div className="flex overflow-x-auto border-b border-supporting-200 bg-supporting-50/70 p-2 gap-1.5 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setActiveTab("buatqris")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === "buatqris"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
+            }`}
+          >
+            <span>🪙</span>
+            <span>QRIS (BuatQRIS)</span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                settings.buatqris?.enabled ? "bg-emerald-500" : "bg-amber-500"
+              }`}
+            />
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab("casaku")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "casaku"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>🪙</span>
-            <span>QRIS (Casaku)</span>
+            <span>QRIS (Casaku Legacy)</span>
             <span
               className={`w-2 h-2 rounded-full ${
                 settings.casaku.enabled ? "bg-emerald-500" : "bg-amber-500"
@@ -182,8 +206,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             onClick={() => setActiveTab("midtrans")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "midtrans"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>💳</span>
@@ -200,8 +224,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             onClick={() => setActiveTab("rajaongkir")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "rajaongkir"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>🚚</span>
@@ -218,8 +242,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             onClick={() => setActiveTab("email")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "email"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>✉️</span>
@@ -232,8 +256,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             onClick={() => setActiveTab("forwarding")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "forwarding"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>📬</span>
@@ -245,8 +269,8 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             onClick={() => setActiveTab("auth")}
             className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "auth"
-                ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-white text-supporting-900 shadow-xs border border-supporting-200"
+                : "text-supporting-600 hover:text-supporting-900 hover:bg-supporting-100"
             }`}
           >
             <span>🔐</span>
@@ -256,15 +280,220 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
         {/* Tab Body Content */}
         <div className="p-6 md:p-8">
-          {/* TAB 0: CASAKU QRIS (PRIMARY) */}
+          {/* TAB 0: BUATQRIS (PRIMARY) */}
+          {activeTab === "buatqris" && (
+            <div className="space-y-6 max-w-4xl">
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                <div>
+                  <h3 className="text-base font-semibold text-supporting-900">
+                    Konfigurasi BuatQRIS (Primary Payment Gateway)
+                  </h3>
+                  <p className="text-xs text-supporting-500 mt-0.5">
+                    Dynamic QRIS otomatis untuk semua e-wallet & mobile banking
+                    (https://buatqris.site).
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSettings((s) => ({
+                      ...s,
+                      buatqris: {
+                        ...s.buatqris,
+                        enabled: !s.buatqris?.enabled,
+                      },
+                    }))
+                  }
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    settings.buatqris?.enabled
+                      ? "bg-emerald-600 text-white shadow-xs"
+                      : "bg-supporting-100 text-supporting-700 border border-supporting-300"
+                  }`}
+                >
+                  {settings.buatqris?.enabled ? "🟢 Aktif" : "⚪ Nonaktif"}
+                </button>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
+                    Account ID *
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.buatqris?.accountId || ""}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        buatqris: {
+                          ...s.buatqris,
+                          accountId: e.target.value,
+                        },
+                      }))
+                    }
+                    placeholder="user_..."
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Diperoleh dari Dashboard BuatQRIS → Open API (awalan user_…)
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
+                    Secret Token *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showSecrets.buatqrisSecret ? "text" : "password"}
+                      value={settings.buatqris?.secretToken || ""}
+                      onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          buatqris: {
+                            ...s.buatqris,
+                            secretToken: e.target.value,
+                          },
+                        }))
+                      }
+                      placeholder="sk_live_..."
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleSecret("buatqrisSecret")}
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
+                    >
+                      {showSecrets.buatqrisSecret ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Diperoleh dari Dashboard BuatQRIS → Open API (awalan
+                    sk_live_…)
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
+                    API Base URL
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      settings.buatqris?.apiBaseUrl ||
+                      "https://api.buatqris.site"
+                    }
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        buatqris: {
+                          ...s.buatqris,
+                          apiBaseUrl: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
+                    Kedaluwarsa QR (menit)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={settings.buatqris?.expiryMinutes || 15}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        buatqris: {
+                          ...s.buatqris,
+                          expiryMinutes: Number(e.target.value) || 15,
+                        },
+                      }))
+                    }
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
+                    Webhook Notification URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={settings.buatqris?.webhookUrl || ""}
+                      className="w-full px-3 py-2.5 bg-supporting-100 border border-supporting-300 rounded-xl text-xs font-mono text-supporting-600 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        copyToClipboard(
+                          settings.buatqris?.webhookUrl || "",
+                          "Webhook BuatQRIS",
+                        )
+                      }
+                      className="px-3 py-2 bg-supporting-200 hover:bg-gray-300 text-supporting-700 text-xs font-semibold rounded-xl cursor-pointer"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                  <span className="text-[11px] text-gray-400 mt-1 block">
+                    Daftarkan di Dashboard BuatQRIS → Webhook Settings
+                  </span>
+                </div>
+              </div>
+
+              {/* Test Ping Action */}
+              <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="text-xs">
+                  {testResults.buatqris && (
+                    <div
+                      className={`p-3 rounded-xl border font-medium ${
+                        testResults.buatqris.success
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          : "bg-red-50 text-red-800 border-red-200"
+                      }`}
+                    >
+                      {testResults.buatqris.success ? "✓ " : "⚠️ "}
+                      {testResults.buatqris.message}
+                      {testResults.buatqris.latencyMs && (
+                        <span className="text-xs opacity-75">
+                          {" "}
+                          ({testResults.buatqris.latencyMs}ms)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleTest("buatqris")}
+                  disabled={testingService === "buatqris"}
+                  className="px-4 py-2 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {testingService === "buatqris"
+                    ? "Menguji Koneksi..."
+                    : "⚡ Uji Koneksi BuatQRIS"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 1: CASAKU QRIS (LEGACY) */}
           {activeTab === "casaku" && (
             <div className="space-y-6 max-w-4xl">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">
-                    Konfigurasi Casaku QRIS (Primary Gateway)
+                  <h3 className="text-base font-semibold text-supporting-900">
+                    Konfigurasi Casaku QRIS (Legacy Gateway)
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-supporting-500 mt-0.5">
                     Dynamic QRIS — nominal menyesuaikan total pesanan. Migrasi
                     dari Cashify ke Casaku.id (docs: casaku.id/docs)
                   </p>
@@ -281,7 +510,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     settings.casaku.enabled
                       ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-gray-100 text-gray-700 border border-gray-300"
+                      : "bg-supporting-100 text-supporting-700 border border-supporting-300"
                   }`}
                 >
                   {settings.casaku.enabled ? "🟢 Aktif" : "⚪ Nonaktif"}
@@ -290,7 +519,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     License Key *
                   </label>
                   <div className="relative">
@@ -306,12 +535,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("casakuLicense")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.casakuLicense ? "🙈" : "👁️"}
                     </button>
@@ -323,7 +552,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Webhook Secret *
                   </label>
                   <div className="relative">
@@ -339,12 +568,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("casakuWebhook")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.casakuWebhook ? "🙈" : "👁️"}
                     </button>
@@ -352,7 +581,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     QRIS Merchant ID *
                   </label>
                   <input
@@ -364,12 +593,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         casaku: { ...s.casaku, qrId: e.target.value },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Kedaluwarsa QR (menit)
                   </label>
                   <input
@@ -385,12 +614,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Package IDs (pisahkan dengan koma)
                   </label>
                   <input
@@ -408,7 +637,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Contoh:
@@ -417,7 +646,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     API Base URL
                   </label>
                   <input
@@ -429,12 +658,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         casaku: { ...s.casaku, apiBaseUrl: e.target.value },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Webhook Notification URL
                   </label>
                   <div className="flex gap-2">
@@ -442,7 +671,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       type="text"
                       readOnly
                       value={settings.casaku.webhookUrl}
-                      className="w-full px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-mono text-gray-600 focus:outline-none"
+                      className="w-full px-3 py-2.5 bg-supporting-100 border border-supporting-300 rounded-xl text-xs font-mono text-supporting-600 focus:outline-none"
                     />
                     <button
                       type="button"
@@ -452,7 +681,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           "Webhook Casaku",
                         )
                       }
-                      className="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
+                      className="px-3 py-2 bg-supporting-200 hover:bg-gray-300 text-supporting-700 text-xs font-semibold rounded-xl cursor-pointer"
                     >
                       Salin
                     </button>
@@ -490,7 +719,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   type="button"
                   onClick={() => handleTest("casaku")}
                   disabled={testingService === "casaku"}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
                   {testingService === "casaku"
                     ? "Menguji Koneksi..."
@@ -505,17 +734,17 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             <div className="space-y-6 max-w-4xl">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <h3 className="text-base font-semibold text-supporting-900">
                     Konfigurasi Midtrans Snap & Core API
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-supporting-500 mt-0.5">
                     Mendukung pembayaran otomatis QRIS, Virtual Account (BCA,
                     Mandiri, BRI, BNI), dan Kartu Kredit
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">
+                  <span className="text-xs font-medium text-supporting-600">
                     Mode Lingkungan:
                   </span>
                   <button
@@ -544,7 +773,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Server Key *
                   </label>
                   <div className="relative">
@@ -560,12 +789,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("midtransServer")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.midtransServer ? "🙈" : "👁️"}
                     </button>
@@ -576,7 +805,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Client Key *
                   </label>
                   <div className="relative">
@@ -592,12 +821,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("midtransClient")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.midtransClient ? "🙈" : "👁️"}
                     </button>
@@ -608,7 +837,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Merchant ID
                   </label>
                   <input
@@ -620,12 +849,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         midtrans: { ...s.midtrans, merchantId: e.target.value },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Webhook Notification URL
                   </label>
                   <div className="flex gap-2">
@@ -633,7 +862,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       type="text"
                       readOnly
                       value={settings.midtrans.webhookUrl}
-                      className="w-full px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-mono text-gray-600 focus:outline-none"
+                      className="w-full px-3 py-2.5 bg-supporting-100 border border-supporting-300 rounded-xl text-xs font-mono text-supporting-600 focus:outline-none"
                     />
                     <button
                       type="button"
@@ -643,7 +872,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           "Webhook Midtrans",
                         )
                       }
-                      className="px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
+                      className="px-3 py-2 bg-supporting-200 hover:bg-gray-300 text-supporting-700 text-xs font-semibold rounded-xl cursor-pointer"
                     >
                       Salin
                     </button>
@@ -682,7 +911,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   type="button"
                   onClick={() => handleTest("midtrans")}
                   disabled={testingService === "midtrans"}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
                   {testingService === "midtrans"
                     ? "Menguji Koneksi..."
@@ -697,17 +926,17 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             <div className="space-y-6 max-w-4xl">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <h3 className="text-base font-semibold text-supporting-900">
                     Konfigurasi Ekspedisi & Ongkos Kirim (RajaOngkir)
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-supporting-500 mt-0.5">
                     Menghitung ongkos kirim real-time berdasarkan berat buku dan
                     alamat tujuan pembeli
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">
+                  <span className="text-xs font-medium text-supporting-600">
                     Paket Akun:
                   </span>
                   <select
@@ -721,7 +950,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold"
+                    className="px-3 py-1.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-semibold"
                   >
                     <option value="starter">Starter Tier (Gratis)</option>
                     <option value="basic">Basic Tier</option>
@@ -732,7 +961,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     API Key RajaOngkir *
                   </label>
                   <div className="relative">
@@ -748,12 +977,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("rajaongkir")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.rajaongkir ? "🙈" : "👁️"}
                     </button>
@@ -761,7 +990,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Kota Asal Pengiriman (Gudang Pena Ameen)
                   </label>
                   <input
@@ -776,7 +1005,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Gudang Pusat: Surabaya, Jawa Timur (ID: 444)
@@ -784,7 +1013,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Kurir Ekspedisi Aktif
                   </label>
                   <div className="flex flex-wrap gap-2 pt-1">
@@ -827,7 +1056,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   type="button"
                   onClick={() => handleTest("rajaongkir")}
                   disabled={testingService === "rajaongkir"}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
                   {testingService === "rajaongkir"
                     ? "Menguji..."
@@ -842,17 +1071,17 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
             <div className="space-y-6 max-w-4xl">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-100">
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <h3 className="text-base font-semibold text-supporting-900">
                     Otomatisasi Email Transaksional & Invoice
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs text-supporting-500 mt-0.5">
                     Kirim email bukti pembayaran, kwitansi resmi, dan nomor resi
                     otomatis kepada pelanggan
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-gray-600">
+                  <span className="text-xs font-medium text-supporting-600">
                     Provider Email:
                   </span>
                   <select
@@ -867,7 +1096,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold"
+                    className="px-3 py-1.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-semibold"
                   >
                     <option value="resend">
                       Resend API (Rekomendasi Modern)
@@ -880,7 +1109,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     API Key / Secret Token *
                   </label>
                   <div className="relative">
@@ -893,12 +1122,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                           autoEmail: { ...s.autoEmail, apiKey: e.target.value },
                         }))
                       }
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
+                      className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => toggleSecret("emailApiKey")}
-                      className="absolute right-3 top-2.5 text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+                      className="absolute right-3 top-2.5 text-xs text-supporting-500 hover:text-supporting-800 cursor-pointer"
                     >
                       {showSecrets.emailApiKey ? "🙈" : "👁️"}
                     </button>
@@ -906,7 +1135,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Nama Pengirim (Sender Name)
                   </label>
                   <input
@@ -921,12 +1150,12 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Email Pengirim Resmi (Sender Email)
                   </label>
                   <input
@@ -941,16 +1170,16 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Triger Otomatis
                   </label>
                   <div className="space-y-2 pt-1">
-                    <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs text-supporting-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={settings.autoEmail.sendInvoiceOnPaid}
@@ -970,7 +1199,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                       </span>
                     </label>
 
-                    <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs text-supporting-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={settings.autoEmail.sendTrackingOnShipped}
@@ -1015,7 +1244,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                   type="button"
                   onClick={() => handleTest("email")}
                   disabled={testingService === "email"}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
                 >
                   {testingService === "email"
                     ? "Mengirim Email..."
@@ -1029,10 +1258,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
           {activeTab === "forwarding" && (
             <div className="space-y-6 max-w-4xl">
               <div>
-                <h3 className="text-base font-semibold text-gray-900">
+                <h3 className="text-base font-semibold text-supporting-900">
                   Email Forwarding & Notifikasi Admin / CS
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-supporting-500 mt-0.5">
                   Setiap pesanan baru dan pertanyaan pelanggan akan diteruskan
                   langsung ke email & WA pengelola
                 </p>
@@ -1040,7 +1269,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Email Forwarding Utama (Penerima Laporan)
                   </label>
                   <input
@@ -1055,7 +1284,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Email ini menerima notifikasi instan saat ada pembeli
@@ -1064,7 +1293,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Nomor WhatsApp CS / Admin Toko
                   </label>
                   <input
@@ -1079,7 +1308,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Digunakan untuk link konfirmasi manual WhatsApp di halaman
@@ -1094,10 +1323,10 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
           {activeTab === "auth" && (
             <div className="space-y-6 max-w-4xl">
               <div>
-                <h3 className="text-base font-semibold text-gray-900">
+                <h3 className="text-base font-semibold text-supporting-900">
                   Autentikasi & Whitelist Administrator
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-supporting-500 mt-0.5">
                   Memastikan hanya email terverifikasi yang dapat masuk ke Panel
                   Admin Pena Ameen
                 </p>
@@ -1105,7 +1334,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Admin Email Whitelist (Pisahkan dengan koma)
                   </label>
                   <input
@@ -1120,7 +1349,7 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                         },
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                   />
                   <span className="text-[11px] text-gray-400 mt-1 block">
                     Email yang diizinkan mengakses panel ini:{" "}
@@ -1129,26 +1358,26 @@ export function ApiAccessControl({ initialSettings }: ApiAccessControlProps) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Clerk Publishable Key
                   </label>
                   <input
                     type="text"
                     readOnly
                     value={settings.clerkAuth.publishableKey}
-                    className="w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-mono text-gray-600"
+                    className="w-full px-4 py-2.5 bg-supporting-100 border border-supporting-300 rounded-xl text-xs font-mono text-supporting-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                     Clerk Secret Key
                   </label>
                   <input
                     type="password"
                     readOnly
                     value={settings.clerkAuth.secretKey}
-                    className="w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-xl text-xs font-mono text-gray-600"
+                    className="w-full px-4 py-2.5 bg-supporting-100 border border-supporting-300 rounded-xl text-xs font-mono text-supporting-600"
                   />
                 </div>
               </div>

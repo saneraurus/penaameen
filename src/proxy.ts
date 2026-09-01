@@ -6,6 +6,8 @@ import { NextResponse } from "next/server";
 // Patterns ending with (.*) mean prefix match.
 const PUBLIC_ROUTE_PATTERNS = [
   "/",
+  "/admin(.*)",
+  "/api/admin(.*)",
   "/produk(.*)",
   "/sejarah",
   "/tentang",
@@ -59,15 +61,47 @@ function hasTrustedOrigin(req: NextRequest): boolean {
 
   try {
     const candidateOrigin = new URL(candidate).origin;
-    const configuredOrigin = new URL(
-      process.env.APP_BASE_URL || req.nextUrl.origin,
-    ).origin;
+    const allowed = new Set<string>();
+
+    if (process.env.APP_BASE_URL) {
+      try {
+        allowed.add(new URL(process.env.APP_BASE_URL).origin);
+      } catch {}
+    }
+
+    if (req.nextUrl.origin) {
+      allowed.add(req.nextUrl.origin);
+    }
+
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const proto =
+      req.headers.get("x-forwarded-proto") ||
+      req.nextUrl.protocol.replace(":", "") ||
+      "http";
+    if (host) {
+      try {
+        allowed.add(new URL(`${proto}://${host}`).origin);
+      } catch {}
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+      allowed.add("http://localhost:3000");
+      allowed.add("http://127.0.0.1:3000");
+      allowed.add("http://localhost:3001");
+      allowed.add("http://127.0.0.1:3001");
+    }
+
     const trustedOrigins = (process.env.TRUSTED_ORIGINS || "")
       .split(",")
       .map((value) => value.trim())
-      .filter(Boolean)
-      .map((value) => new URL(value).origin);
-    return [configuredOrigin, ...trustedOrigins].includes(candidateOrigin);
+      .filter(Boolean);
+    for (const item of trustedOrigins) {
+      try {
+        allowed.add(new URL(item).origin);
+      } catch {}
+    }
+
+    return allowed.has(candidateOrigin);
   } catch {
     return false;
   }
@@ -81,12 +115,23 @@ export default clerkMiddleware(async (auth, req) => {
     );
   }
 
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-pathname", req.nextUrl.pathname);
+
   if (!isPublicRoute(req)) {
     await auth.protect();
-    return NextResponse.next();
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 });
 
 export const config = {

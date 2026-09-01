@@ -28,11 +28,13 @@ export default async function AdminStockSheetsPage() {
         }
       />
       <ProductsTabs />
-      <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs">
-        <div className="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-4">
+      <section className="admin-panel overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-supporting-200 px-5 py-4">
           <div>
-            <h2 className="font-semibold text-gray-900">Spreadsheet Produk</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <h2 className="text-sm font-medium text-supporting-900">
+              Spreadsheet Produk
+            </h2>
+            <p className="mt-0.5 text-xs text-supporting-500">
               Tampilan langsung spreadsheet publik untuk pemeriksaan cepat.
             </p>
           </div>
@@ -40,12 +42,12 @@ export default async function AdminStockSheetsPage() {
             href={GOOGLE_SHEET_URL}
             target="_blank"
             rel="noreferrer"
-            className="text-sm font-medium text-primary-700 hover:text-primary-900"
+            className="text-xs font-semibold text-primary-800 transition-colors hover:text-accent-700"
           >
             Buka penuh ↗
           </a>
         </div>
-        <div className="h-[520px] w-full bg-gray-50 sm:h-[680px]">
+        <div className="h-[520px] w-full bg-supporting-50 sm:h-[680px]">
           <iframe
             src={PUBLISHED_SHEET_URL}
             title="Spreadsheet produk PENA AMEEN"

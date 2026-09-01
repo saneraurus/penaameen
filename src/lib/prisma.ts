@@ -4,25 +4,32 @@ import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
+  pgPool: Pool | undefined;
 };
+
+function getPgPool(): Pool {
+  if (!globalForPrisma.pgPool) {
+    const pool = new Pool({
+      connectionString: process.env["DATABASE_URL"],
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 4000,
+    });
+    pool.on("error", (err) => {
+      console.warn("[pgPool background error]", err.message);
+    });
+    globalForPrisma.pgPool = pool;
+  }
+  return globalForPrisma.pgPool;
+}
 
 function getPrismaClient(): PrismaClient {
   if (!globalForPrisma.prisma) {
-    const adapter = new PrismaPg(
-      new Pool({
-        connectionString: process.env["DATABASE_URL"],
-        // Force UTF-8 client encoding. Windows PostgreSQL defaults to the
-        // locale encoding (WIN1252), which rejects characters such as U+2011
-        // (non-breaking hyphen) emitted by AI providers with "22P05".
-        options: "-c client_encoding=UTF8",
-      }),
-    );
+    const adapter = new PrismaPg(getPgPool());
     globalForPrisma.prisma = new PrismaClient({
       adapter,
       log:
-        process.env.NODE_ENV === "development"
-          ? ["query", "error", "warn"]
-          : ["error"],
+        process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
     });
   }
   return globalForPrisma.prisma;

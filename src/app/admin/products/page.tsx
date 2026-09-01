@@ -57,7 +57,7 @@ export default async function AdminProductsPage({
         <div className="flex items-center gap-3">
           <Link
             href={`/admin/products/${product.id}`}
-            className="font-medium text-gray-900 hover:text-primary-600 line-clamp-1"
+            className="font-medium text-supporting-900 hover:text-primary-600 line-clamp-1"
           >
             {product.name}
           </Link>
@@ -68,7 +68,7 @@ export default async function AdminProductsPage({
       key: "category",
       header: "Kategori",
       render: (product: AdminProduct) => (
-        <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+        <span className="text-xs text-supporting-600 bg-supporting-100 px-2 py-0.5 rounded-md">
           {product.category}
         </span>
       ),
@@ -78,7 +78,7 @@ export default async function AdminProductsPage({
       header: "Harga",
       className: "w-36",
       render: (product: AdminProduct) => (
-        <span className="font-mono font-medium text-gray-900 text-xs">
+        <span className="font-mono font-medium text-supporting-900 text-xs">
           {new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
@@ -110,9 +110,9 @@ export default async function AdminProductsPage({
           },
           archived: {
             label: "📦 Archived",
-            bg: "bg-gray-100",
-            text: "text-gray-600",
-            border: "border-gray-200",
+            bg: "bg-supporting-100",
+            text: "text-supporting-600",
+            border: "border-supporting-200",
           },
         };
         const cfg = statusConfigs[product.status] || statusConfigs.published;
@@ -133,7 +133,7 @@ export default async function AdminProductsPage({
         <div className="flex items-center gap-2">
           <Link
             href={`/admin/products/${product.id}`}
-            className="px-2.5 py-1 text-xs font-semibold border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors"
+            className="px-2.5 py-1 text-xs font-semibold border border-supporting-300 rounded-lg hover:bg-supporting-50 text-supporting-700 transition-colors"
           >
             Edit
           </Link>
@@ -148,37 +148,37 @@ export default async function AdminProductsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <AdminHeader
           title="Products"
-          description="Manage product catalog, pricing, inventory, and SEO"
+          description="Kelola katalog produk, harga, stok, dan SEO"
         />
         <Link
           href="/admin/products/new"
-          className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-4 py-2 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-900"
         >
-          Add Product
+          + Tambah Produk
         </Link>
       </div>
 
       <ProductsTabs />
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex flex-wrap gap-4">
-          <form className="flex gap-4 flex-1">
+      <div className="admin-panel overflow-hidden">
+        <div className="flex flex-wrap items-center gap-3 border-b border-supporting-200 px-5 py-4">
+          <form className="flex flex-1 flex-wrap gap-3">
             <input
               type="search"
               name="search"
               defaultValue={search}
-              placeholder="Search products..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              placeholder="Cari produk..."
+              className="flex-1 min-w-[180px] rounded-lg border border-supporting-200 bg-supporting-50 px-3.5 py-2 text-xs tracking-tight text-supporting-900 placeholder:text-supporting-400 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
             />
             <select
               name="category"
               defaultValue={category}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="rounded-lg border border-supporting-200 bg-supporting-50 px-3 py-2 text-xs font-semibold tracking-tight text-supporting-800 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
             >
-              <option value="">All Categories</option>
+              <option value="">Semua Kategori</option>
               {categories.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -188,16 +188,16 @@ export default async function AdminProductsPage({
             <select
               name="status"
               defaultValue={status}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="rounded-lg border border-supporting-200 bg-supporting-50 px-3 py-2 text-xs font-semibold tracking-tight text-supporting-800 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
             >
-              <option value="">All Status</option>
+              <option value="">Semua Status</option>
               <option value="published">Published</option>
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
             <button
               type="submit"
-              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-supporting-300 px-4 py-2 text-xs font-semibold text-supporting-800 tracking-tight transition-colors hover:bg-supporting-50"
             >
               Filter
             </button>
@@ -208,7 +208,7 @@ export default async function AdminProductsPage({
           columns={columns}
           data={products}
           keyAccessor={(p) => p.id}
-          emptyMessage="No products found"
+          emptyMessage="Tidak ada produk ditemukan"
           rowClassName={(p) => (p.status === "archived" ? "opacity-50" : "")}
         />
 

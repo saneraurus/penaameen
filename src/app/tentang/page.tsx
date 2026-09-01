@@ -122,12 +122,16 @@ export default function AboutPage() {
               <Reveal>
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-emerald-300 mb-6">
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>PROFIL PENERBIT &amp; LEMBAGA EDUKASI</span>
+                  <span>PROFIL PENERBIT & LEMBAGA EDUKASI</span>
                 </div>
+              </Reveal>
+              <Reveal delay={0.05}>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-serif font-bold text-white leading-[1.15] mb-6">
                   Membuka Gerbang Literasi Membaca &amp; Mengaji untuk Seluruh
                   Generasi.
                 </h1>
+              </Reveal>
+              <Reveal delay={0.1}>
                 <p className="text-base sm:text-lg text-white/90 leading-relaxed mb-8 max-w-2xl font-normal">
                   <strong className="text-emerald-300 font-semibold">
                     Penerbit Pena Ameen (Ameen Educare)
@@ -137,6 +141,8 @@ export default function AboutPage() {
                   lupa, dan membahagiakan bagi anak-anak, orang tua, santri,
                   hingga dewasa di seluruh Nusantara.
                 </p>
+              </Reveal>
+              <Reveal delay={0.14}>
                 <div className="flex flex-wrap items-center gap-4">
                   <Link
                     href="/produk"

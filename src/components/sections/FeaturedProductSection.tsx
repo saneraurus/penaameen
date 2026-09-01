@@ -7,53 +7,32 @@ import { Reveal } from "@/components/motion/Reveal";
 import { CartContext } from "@/context/CartContext";
 
 export function FeaturedProductSection() {
-  const [activeTab, setActiveTab] = useState<"isi" | "keunggulan">("isi");
+  const [openDropdown, setOpenDropdown] = useState<"isi" | "keunggulan" | null>(
+    null,
+  );
   const [isAdded, setIsAdded] = useState(false);
   const cartContext = useContext(CartContext);
 
   const formatPrice = (price: number) => `Rp${price.toLocaleString("id-ID")}`;
 
   const kitContents = [
-    {
-      title: "Buku Utama & Modul Praktik AL-BARQY",
-      desc: "Panduan belajar membaca Al-Qur'an sistematis dari dasar hingga mahir tajwid.",
-    },
-    {
-      title: "Flashcard Hijaiyah Interaktif",
-      desc: "Kartu tebal dua sisi bergambar untuk melatih daya ingat visual dan bunyi huruf.",
-    },
-    {
-      title: "Set 12 Poster Edukasi Klasikal",
-      desc: "Poster dinding berukuran besar untuk ruang belajar di rumah atau TPQ.",
-    },
-    {
-      title: "Buku Panduan Pendamping (Orang Tua & Guru)",
-      desc: "Instruksi praktis mendampingi 15–20 menit per hari secara mandiri.",
-    },
-    {
-      title: "Bonus Tas Eksklusif PENA AMEEN",
-      desc: "Tas kanvas tebal untuk menyimpan seluruh perlengkapan agar rapi dan mudah dibawa.",
-    },
+    { title: "Buku Utama & Modul Praktik AL-BARQY", icon: "📖" },
+    { title: "Flashcard Hijaiyah Interaktif 2 Sisi", icon: "🃏" },
+    { title: "Set 12 Poster Edukasi Klasikal Dinding", icon: "🖼️" },
+    { title: "Buku Panduan Pendamping Orang Tua & Guru", icon: "👨‍👩‍👧" },
+    { title: "Bonus Tas Kanvas Eksklusif PENA AMEEN", icon: "👜" },
   ];
 
   const keyAdvantages = [
-    {
-      title: "Sistem Cepat 200 Menit",
-      desc: "Kurikulum padat yang terbukti mengantarkan santri lancar membaca dalam 200 menit.",
-    },
-    {
-      title: "Formula Kata Anti-Lupa",
-      desc: "Menggunakan asosiasi bunyi kata alami bahasa Indonesia sehingga tidak mudah lupa.",
-    },
-    {
-      title: "Cocok untuk Semua Usia",
-      desc: "Efektif digunakan untuk anak usia sekolah, remaja, mualaf, hingga lansia.",
-    },
-    {
-      title: "Bahan Cetak Standar Premium",
-      desc: "Kertas tebal ramah anak, warna jelas tidak silau, dan awet bertahun-tahun.",
-    },
+    { title: "Sistem Cepat 200 Menit Tuntas", stat: "200′" },
+    { title: "Formula Kata Kunci Anti Lupa", stat: "A-DA" },
+    { title: "Untuk Semua Usia (Anak hingga Lansia)", stat: "4–60+" },
+    { title: "Cetak Tebal Premium & Awet Digunakan", stat: "PREM" },
   ];
+
+  const toggleDropdown = (key: "isi" | "keunggulan") => {
+    setOpenDropdown((prev) => (prev === key ? null : key));
+  };
 
   const handleQuickAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -69,178 +48,241 @@ export function FeaturedProductSection() {
   };
 
   return (
-    <section className="border-y border-supporting-200 bg-white py-16 sm:py-20">
-      <div className="container max-w-6xl">
-        <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-14">
-          <Reveal className="lg:col-span-5">
-            <figure className="m-0">
-              <div className="image-frame aspect-[4/3] w-full">
-                <Image
-                  src="/images/penaameen/products/featured-home-learning.jpg"
-                  alt="Paket Home Learning ALBARQY Box Set Lengkap dengan Buku, Flashcard, Poster, dan Tas Eksklusif"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  className="object-cover"
-                />
-              </div>
-              <figcaption className="mt-4 flex items-center justify-between text-[11px] text-supporting-500">
-                <span>Paket Unggulan Terlengkap · Box Set 5-in-1</span>
-                <span className="font-medium text-supporting-700">
-                  4.9 / 5.0 · 3.200+ keluarga
-                </span>
-              </figcaption>
-            </figure>
-          </Reveal>
+    <section
+      id="bestseller-albarqy"
+      className="relative overflow-hidden bg-primary-950 py-8 sm:py-14 lg:py-16"
+    >
+      {/* Background glow & subtle pattern */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute -top-32 -right-32 h-[450px] w-[450px] rounded-full bg-accent-500/10 blur-[80px]" />
+        <div className="absolute -bottom-32 -left-32 h-[450px] w-[450px] rounded-full bg-primary-600/20 blur-[80px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/30 to-transparent" />
+      </div>
 
-          <div className="lg:col-span-7">
-            <Reveal delay={0.08}>
-              <p className="scene-index">Pilihan Belajar Utama</p>
-              <span aria-hidden="true" className="sr-only">
-                PILIHAN BELAJAR UTAMA
-              </span>
-              <h2 className="display-type mt-4 text-supporting-900">
-                Paket Home Learning ALBARQY
-              </h2>
-              <p className="mt-4 max-w-prose text-sm leading-relaxed text-supporting-600 sm:text-base">
-                Solusi menyeluruh pembelajaran membaca Al-Qur&apos;an mandiri di
-                rumah. Dirancang agar anak dan pembelajar dewasa dapat belajar
-                secara runtut, menyenangkan, dan cepat mahir tanpa rasa bosan.
-              </p>
+      <div className="container relative max-w-5xl">
+        {/* Eyebrow */}
+        <Reveal variant="micro" className="flex justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent-400/20 bg-white/[0.07] px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-accent-200 backdrop-blur sm:text-[11px] sm:tracking-[0.2em]">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
+            Pilihan Belajar Utama · 3.200+ Keluarga Terbimbing
+          </span>
+        </Reveal>
 
-              <nav
-                aria-label="Rincian paket"
-                className="mt-8 flex gap-6 border-b border-supporting-200"
-              >
-                <button
-                  type="button"
-                  aria-pressed={activeTab === "isi"}
-                  onClick={() => setActiveTab("isi")}
-                  className={`relative py-2.5 text-sm transition-colors ${
-                    activeTab === "isi"
-                      ? "text-supporting-900"
-                      : "text-supporting-500 hover:text-supporting-900"
-                  }`}
-                >
-                  Isi Paket Box
-                  <span
-                    aria-hidden="true"
-                    className={`absolute inset-x-0 bottom-0 h-px bg-accent-600 transition-transform ${
-                      activeTab === "isi" ? "scale-x-100" : "scale-x-0"
-                    }`}
+        {/* Compact unified product card */}
+        <div className="mx-auto mt-4 max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl sm:mt-6 sm:rounded-3xl">
+          <div className="grid lg:grid-cols-12">
+            {/* LEFT: Clean Visual */}
+            <div className="flex flex-col justify-between bg-gradient-to-br from-background-50 via-white to-background-100 p-4 sm:p-6 lg:col-span-5">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-950 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-accent-300">
+                    ★ Paket Terlaris
+                  </span>
+                  <span className="rounded-full border border-supporting-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-primary-800">
+                    Box Set 5-in-1
+                  </span>
+                </div>
+
+                <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-xl border border-supporting-200 bg-white p-2 shadow-sm sm:mt-4">
+                  <Image
+                    src="/images/penaameen/products/featured-home-learning.jpg"
+                    alt="Paket Home Learning ALBARQY Box Set Lengkap"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 360px"
+                    className="object-cover rounded-lg"
+                    priority
                   />
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={activeTab === "keunggulan"}
-                  onClick={() => setActiveTab("keunggulan")}
-                  className={`relative py-2.5 text-sm transition-colors ${
-                    activeTab === "keunggulan"
-                      ? "text-supporting-900"
-                      : "text-supporting-500 hover:text-supporting-900"
-                  }`}
-                >
-                  Keunggulan Metode
-                  <span
-                    aria-hidden="true"
-                    className={`absolute inset-x-0 bottom-0 h-px bg-accent-600 transition-transform ${
-                      activeTab === "keunggulan" ? "scale-x-100" : "scale-x-0"
-                    }`}
-                  />
-                </button>
-              </nav>
-
-              <div className="mt-8">
-                {activeTab === "isi" && (
-                  <ol className="space-y-3 border-t border-supporting-200">
-                    {kitContents.map((item, index) => (
-                      <li
-                        key={item.title}
-                        className="flex gap-4 border-b border-supporting-100 py-3.5"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="mt-1.5 text-[11px] font-medium text-supporting-400"
-                        >
-                          0{index + 1}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium leading-snug text-supporting-900">
-                            {item.title}
-                          </p>
-                          <p className="mt-1 text-xs leading-relaxed text-supporting-600">
-                            {item.desc}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-
-                {activeTab === "keunggulan" && (
-                  <ul className="space-y-3 border-t border-supporting-200">
-                    {keyAdvantages.map((adv) => (
-                      <li
-                        key={adv.title}
-                        className="border-b border-supporting-100 py-3.5"
-                      >
-                        <p className="text-sm font-medium text-supporting-900">
-                          {adv.title}
-                        </p>
-                        <p className="mt-1 text-xs leading-relaxed text-supporting-600">
-                          {adv.desc}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  <div className="absolute right-2 top-2 rounded-md bg-gradient-to-br from-amber-400 to-accent-600 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow">
+                    10+ Bonus
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-10 border-t border-supporting-200 pt-6">
-                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <p className="font-serif text-2xl text-supporting-900">
-                    {formatPrice(966000)}
+              {/* 3 Quick specs */}
+              <div className="mt-3 grid grid-cols-3 divide-x divide-supporting-200 rounded-xl border border-supporting-200 bg-white py-2 text-center text-supporting-900 shadow-xs sm:mt-4">
+                <div>
+                  <p className="font-serif text-xs font-bold leading-none sm:text-sm">
+                    30 Thn
                   </p>
-                  <p className="text-xs text-supporting-400 line-through">
-                    {formatPrice(1250000)}
-                  </p>
-                  <p className="text-xs font-medium text-accent-700">
-                    Hemat Rp284.000
+                  <p className="mt-0.5 text-[9px] text-supporting-500">
+                    Sejak 1995
                   </p>
                 </div>
-                <p className="mt-1 text-[11px] text-supporting-500">
-                  + Bonus Tas Eksklusif · 100% orisinal
+                <div>
+                  <p className="font-serif text-xs font-bold leading-none sm:text-sm">
+                    200 Menit
+                  </p>
+                  <p className="mt-0.5 text-[9px] text-supporting-500">
+                    Anti Lupa
+                  </p>
+                </div>
+                <div>
+                  <p className="font-serif text-xs font-bold leading-none text-accent-700 sm:text-sm">
+                    4.9 ★
+                  </p>
+                  <p className="mt-0.5 text-[9px] text-supporting-500">
+                    3.200+ Ulasan
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Compact Info + Dropdowns + Action */}
+            <div className="flex flex-col justify-between p-4 sm:p-6 lg:col-span-7">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent-700 sm:text-[11px]">
+                  Paket Terlengkap
                 </p>
+                <h2 className="display-type mt-1 text-xl font-bold leading-tight text-supporting-900 sm:text-2xl">
+                  Paket Home Learning ALBARQY
+                </h2>
+                <p className="mt-1 text-xs leading-relaxed text-supporting-600 sm:text-sm">
+                  Solusi menyeluruh belajar membaca Al-Qur&apos;an mandiri di
+                  rumah dengan metode 200 menit anti lupa.
+                </p>
+
+                {/* Price block */}
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-y border-supporting-100 py-2.5 sm:gap-3">
+                  <span className="font-serif text-xl font-bold text-primary-950 sm:text-2xl">
+                    {formatPrice(966000)}
+                  </span>
+                  <span className="text-xs text-supporting-400 line-through">
+                    {formatPrice(1250000)}
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+                    Hemat Rp284.000
+                  </span>
+                </div>
+
+                {/* Compact Collapsible Dropdowns */}
+                <div className="mt-3 space-y-2">
+                  {/* Dropdown 1: Isi Paket Box */}
+                  <div className="overflow-hidden rounded-xl border border-supporting-200 bg-background-50/70 transition-colors hover:bg-background-50">
+                    <button
+                      type="button"
+                      aria-expanded={openDropdown === "isi"}
+                      onClick={() => toggleDropdown("isi")}
+                      className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs font-semibold text-supporting-900 sm:text-sm"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>📦</span>
+                        <span>Isi Paket Box (5 Item Lengkap)</span>
+                      </span>
+                      <span
+                        className={`text-xs text-supporting-500 transition-transform duration-200 ${openDropdown === "isi" ? "rotate-180" : ""}`}
+                      >
+                        ▾
+                      </span>
+                    </button>
+                    {openDropdown === "isi" && (
+                      <div className="border-t border-supporting-200 bg-white px-3.5 py-2.5">
+                        <ul className="space-y-1.5">
+                          {kitContents.map((item, idx) => (
+                            <li
+                              key={item.title}
+                              className="flex items-center gap-2 text-xs text-supporting-700"
+                            >
+                              <span className="text-sm">{item.icon}</span>
+                              <span className="text-[11px] font-semibold text-supporting-400">
+                                0{idx + 1}
+                              </span>
+                              <span className="leading-snug">{item.title}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dropdown 2: Keunggulan Metode */}
+                  <div className="overflow-hidden rounded-xl border border-supporting-200 bg-background-50/70 transition-colors hover:bg-background-50">
+                    <button
+                      type="button"
+                      aria-expanded={openDropdown === "keunggulan"}
+                      onClick={() => toggleDropdown("keunggulan")}
+                      className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs font-semibold text-supporting-900 sm:text-sm"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>⚡</span>
+                        <span>Keunggulan Metode (Formula 200 Menit)</span>
+                      </span>
+                      <span
+                        className={`text-xs text-supporting-500 transition-transform duration-200 ${openDropdown === "keunggulan" ? "rotate-180" : ""}`}
+                      >
+                        ▾
+                      </span>
+                    </button>
+                    {openDropdown === "keunggulan" && (
+                      <div className="border-t border-supporting-200 bg-white px-3.5 py-2.5">
+                        <ul className="grid gap-1.5 sm:grid-cols-2">
+                          {keyAdvantages.map((adv) => (
+                            <li
+                              key={adv.title}
+                              className="flex items-center justify-between rounded-lg bg-background-50 px-2.5 py-1.5 text-xs text-supporting-800"
+                            >
+                              <span className="text-[11.5px] leading-tight">
+                                {adv.title}
+                              </span>
+                              <span className="shrink-0 rounded bg-accent-100 px-1.5 py-0.5 text-[9px] font-bold text-accent-800">
+                                {adv.stat}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                {cartContext?.addToCart && (
-                  <button
-                    type="button"
-                    onClick={handleQuickAdd}
-                    className={`text-sm font-medium underline-offset-4 transition-colors ${
-                      isAdded
-                        ? "text-primary-700"
-                        : "text-supporting-600 hover:text-primary-800 hover:underline"
-                    }`}
+              {/* Action Buttons & Quick Trust */}
+              <div className="mt-4 pt-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Link
+                    href="/produk/paket-home-learning-albarqy"
+                    className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-full bg-primary-950 px-6 text-xs font-semibold text-white shadow-md transition-all hover:bg-primary-900 sm:text-sm"
                   >
-                    {isAdded ? "Ditambah ✓" : "+ Keranjang"}
-                  </button>
-                )}
-                <Link
-                  href="/produk/paket-home-learning-albarqy"
-                  className="inline-flex min-h-10 items-center rounded-full bg-primary-900 px-5 text-sm font-medium text-white transition-colors hover:bg-primary-800"
-                >
-                  Lihat Detail Produk →
-                </Link>
-                <Link
-                  href="/kontak"
-                  className="inline-flex min-h-10 items-center rounded-full border border-supporting-300 px-5 text-sm font-medium text-supporting-700 transition-colors hover:border-primary-700 hover:text-primary-800"
-                >
-                  Tanya CS
-                </Link>
+                    <span>Lihat Detail &amp; Beli</span>
+                    <span aria-hidden="true" className="text-accent-400">
+                      →
+                    </span>
+                  </Link>
+                  {cartContext?.addToCart ? (
+                    <button
+                      type="button"
+                      onClick={handleQuickAdd}
+                      className={`inline-flex min-h-10 items-center justify-center rounded-full border px-5 text-xs font-semibold transition-all sm:text-sm ${
+                        isAdded
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "border-supporting-300 bg-white text-supporting-800 hover:border-primary-700 hover:text-primary-900"
+                      }`}
+                    >
+                      {isAdded ? "✓ Ditambahkan" : "+ Keranjang"}
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-supporting-500 sm:text-[11px]">
+                  <span>✓ Termasuk Bonus Tas · 100% Orisinal</span>
+                  <Link
+                    href="/kontak"
+                    className="underline decoration-supporting-300 underline-offset-4 hover:text-primary-800"
+                  >
+                    Tanya CS via WhatsApp
+                  </Link>
+                </div>
               </div>
-            </Reveal>
+            </div>
           </div>
+        </div>
+
+        {/* Micro footer bar */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-[11px] text-background-300/80 sm:mt-6 sm:text-xs">
+          <span>★★★★★ 4.9/5.0 dari 3.200+ Keluarga</span>
+          <span className="hidden sm:inline">·</span>
+          <span>500+ TPQ &amp; Sekolah Mitra</span>
+          <span className="hidden sm:inline">·</span>
+          <span>30+ Tahun Teruji Sejak 1995</span>
         </div>
       </div>
     </section>

@@ -10,6 +10,7 @@ import {
   SectionHeading,
   Shell,
   Skeleton,
+  buttonClass,
 } from "@/components/ui/primitives";
 
 function formatRupiah(value: number): string {
@@ -111,7 +112,10 @@ export default function CartPage() {
                     key={item.id}
                     className="flex gap-5 border-b border-supporting-200 py-7 sm:gap-7"
                   >
-                    <div className="image-frame h-28 w-24 shrink-0 sm:h-36 sm:w-32">
+                    <Link
+                      href={`/produk/${item.product.slug}`}
+                      className="image-frame image-frame-zoom h-28 w-24 shrink-0 sm:h-36 sm:w-32"
+                    >
                       {item.product.image ? (
                         <Image
                           src={item.product.image}
@@ -121,7 +125,7 @@ export default function CartPage() {
                           className="object-cover"
                         />
                       ) : null}
-                    </div>
+                    </Link>
 
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -208,13 +212,21 @@ export default function CartPage() {
 
                 <Link
                   href="/checkout/address"
-                  className="mt-8 flex min-h-13 w-full items-center justify-center rounded-full bg-primary-900 px-6 text-sm font-medium text-background-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800"
+                  className={buttonClass({
+                    tone: "ink",
+                    size: "lg",
+                    className: "mt-8 w-full",
+                  })}
                 >
                   Lanjut ke Pembayaran
                 </Link>
                 <Link
                   href="/produk"
-                  className="mt-3 flex min-h-11 w-full items-center justify-center text-sm text-supporting-500 transition-colors hover:text-primary-900"
+                  className={buttonClass({
+                    tone: "ghost",
+                    size: "md",
+                    className: "mt-3 w-full",
+                  })}
                 >
                   Lanjut belanja
                 </Link>

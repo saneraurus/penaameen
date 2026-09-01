@@ -14,10 +14,12 @@ import { Reveal } from "@/components/motion/Reveal";
 import {
   ActionLink,
   ErrorState,
+  Price,
   SceneIndex,
   SectionHeading,
   Shell,
   Skeleton,
+  buttonClass,
 } from "@/components/ui/primitives";
 
 interface Product {
@@ -368,9 +370,7 @@ export default function ProductDetailPage() {
                     Harga
                   </p>
                   <div className="mt-3 flex flex-wrap items-baseline gap-4">
-                    <span className="font-serif text-4xl text-supporting-900">
-                      Rp{product.price.toLocaleString("id-ID")}
-                    </span>
+                    <Price value={product.price} size="lg" />
                     {richDetail?.originalPrice && (
                       <span className="text-sm text-supporting-400 line-through">
                         Rp{richDetail.originalPrice.toLocaleString("id-ID")}
@@ -461,7 +461,7 @@ export default function ProductDetailPage() {
                       type="button"
                       onClick={handleAddToCart}
                       disabled={isOutOfStock || isAdding}
-                      className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full border border-supporting-300 px-6 text-sm font-medium text-supporting-800 transition-all duration-200 hover:border-primary-700 hover:text-primary-900 disabled:opacity-50"
+                      className={buttonClass({ tone: "outline", size: "lg" })}
                     >
                       {isAdding ? "Menambahkan..." : "+ Tambah Keranjang"}
                     </button>
@@ -470,7 +470,7 @@ export default function ProductDetailPage() {
                       type="button"
                       onClick={handleBuyNow}
                       disabled={isOutOfStock || isBuyingNow}
-                      className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-primary-900 px-6 text-sm font-medium text-background-50 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-800 disabled:opacity-50"
+                      className={buttonClass({ tone: "ink", size: "lg" })}
                     >
                       {isBuyingNow ? "Menyiapkan..." : "Beli Sekarang"}
                     </button>
@@ -633,7 +633,7 @@ export default function ProductDetailPage() {
                       { label: "Kategori", value: product.category },
                       {
                         label: "Penulis",
-                        value: richDetail?.author ?? "KH. Nursyamsu Muhadi",
+                        value: richDetail?.author ?? "KH. Muhadjir Sulthon",
                       },
                       {
                         label: "Penerbit",
@@ -787,7 +787,7 @@ export default function ProductDetailPage() {
                         &ldquo;{rev.title}&rdquo;
                       </p>
                       <p className="mt-4 text-sm leading-relaxed text-supporting-600">
-                        {rev.content.slice(0, 180)}...
+                        {rev.content}
                       </p>
                     </blockquote>
                     <figcaption className="mt-6 text-xs text-supporting-500">
@@ -874,7 +874,7 @@ export default function ProductDetailPage() {
               type="button"
               onClick={handleAddToCart}
               disabled={isOutOfStock || isAdding}
-              className="min-h-11 rounded-full border border-supporting-300 px-4 text-xs font-medium text-supporting-800 disabled:opacity-50"
+              className={buttonClass({ tone: "outline", size: "sm" })}
             >
               + Keranjang
             </button>
@@ -882,7 +882,7 @@ export default function ProductDetailPage() {
               type="button"
               onClick={handleBuyNow}
               disabled={isOutOfStock || isBuyingNow}
-              className="min-h-11 rounded-full bg-primary-900 px-5 text-xs font-medium text-background-50 disabled:opacity-50"
+              className={buttonClass({ tone: "ink", size: "sm" })}
             >
               Beli Sekarang
             </button>

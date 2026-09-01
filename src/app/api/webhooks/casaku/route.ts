@@ -10,6 +10,7 @@ import { createNotification } from "@/lib/admin/notifications";
 import { auditStore } from "@/infrastructure/audit";
 import { recordSystemAudit } from "@/application/audit/audit-store";
 import { createResourceId } from "@/domain/common/identifiers";
+import { withSystemRLSContext } from "@/middleware/rls-context";
 
 export async function POST(request: Request) {
   // Raw body is required for HMAC verification — never re-serialize JSON.
@@ -43,13 +44,16 @@ export async function POST(request: Request) {
 
   try {
     const payload = parseCasakuWebhookPayload(rawBody);
-    const outcome = await applyCasakuEvent(
-      {
-        transactionId: payload.transactionId,
-        amount: payload.amount,
-        status: payload.status,
-      },
-      "webhook",
+    const outcome = await withSystemRLSContext((_context, tx) =>
+      applyCasakuEvent(
+        {
+          transactionId: payload.transactionId,
+          amount: payload.amount,
+          status: payload.status,
+        },
+        "webhook",
+        tx,
+      ),
     );
 
     return NextResponse.json({ success: true, outcome });

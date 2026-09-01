@@ -28,7 +28,7 @@ export default async function AdminProductDetailPage({
         />
         <Link
           href="/admin/products"
-          className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-supporting-300 px-4 py-2 text-xs font-semibold text-supporting-800 tracking-tight transition-colors hover:bg-supporting-50"
         >
           ← Kembali ke Daftar Produk
         </Link>

@@ -11,6 +11,7 @@ import {
   SectionHeading,
   Shell,
   Skeleton,
+  buttonClass,
 } from "@/components/ui/primitives";
 
 interface Order {
@@ -131,7 +132,7 @@ function SuccessPageInner() {
             </ActionLink>
             <Link
               href="/produk"
-              className="inline-flex min-h-13 items-center justify-center rounded-full border border-supporting-300 px-7 text-sm font-medium text-supporting-800 transition-colors hover:border-primary-700 hover:text-primary-900"
+              className={buttonClass({ tone: "outline", size: "lg" })}
             >
               Lanjut Belanja
             </Link>

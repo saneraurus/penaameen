@@ -68,7 +68,7 @@ export function ProductStatusButton({
           type="button"
           onClick={() => handleStatusChange("published")}
           disabled={isLoading}
-          className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 disabled:opacity-50 transition-colors cursor-pointer"
+          className="px-2.5 py-1 text-[11px] font-semibold tracking-tight rounded-md border border-primary-200 bg-primary-50 text-primary-800 hover:bg-primary-100 disabled:opacity-50 transition-colors cursor-pointer"
           title="Tampilkan produk di katalog toko publik"
         >
           {isLoading ? "..." : "✓ Tampilkan"}
@@ -80,7 +80,7 @@ export function ProductStatusButton({
           type="button"
           onClick={() => handleStatusChange("archived")}
           disabled={isLoading}
-          className="px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition-colors cursor-pointer"
+          className="px-2.5 py-1 text-[11px] font-medium tracking-tight rounded-md border border-accent-200 bg-accent-50 text-accent-800 hover:bg-accent-100 disabled:opacity-50 transition-colors cursor-pointer"
           title="Sembunyikan produk dari katalog toko publik"
         >
           {isLoading ? "..." : "Arsipkan"}
@@ -92,7 +92,7 @@ export function ProductStatusButton({
           type="button"
           onClick={handleDelete}
           disabled={isLoading}
-          className="px-2.5 py-1 text-xs font-medium rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 disabled:opacity-50 transition-colors cursor-pointer"
+          className="px-2.5 py-1 text-[11px] font-medium tracking-tight rounded-md border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 disabled:opacity-50 transition-colors cursor-pointer"
           title="Hapus produk permanen"
         >
           {isLoading ? "..." : "Hapus"}

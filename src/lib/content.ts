@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { articles as staticArticles } from "@/data/articles";
 import type { Article } from "@/data/articles";
 import type { Branch } from "@/data/branches";
 import type { Method } from "@/data/methods";
@@ -6,26 +7,42 @@ import type { HistoryMilestone } from "@/data/history";
 import type { Testimonial } from "@/data/testimonials";
 
 export async function getArticles(): Promise<Article[]> {
-  const rows = await prisma.article.findMany({
-    where: { isActive: true },
-    orderBy: { date: "desc" },
-  });
-  return rows.map(
-    (r) =>
-      ({
-        ...r,
-        date: r.date.toISOString().slice(0, 10),
-      }) as unknown as Article,
-  );
+  try {
+    const rows = await prisma.article.findMany({
+      where: { isActive: true },
+      orderBy: { date: "desc" },
+    });
+    if (rows && rows.length > 0) {
+      return rows.map(
+        (r) =>
+          ({
+            ...r,
+            date: r.date.toISOString().slice(0, 10),
+          }) as unknown as Article,
+      );
+    }
+  } catch {
+    // Graceful fallback to static articles
+  }
+  return staticArticles;
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  const r = await prisma.article.findFirst({ where: { slug, isActive: true } });
-  if (!r) return null;
-  return {
-    ...r,
-    date: r.date.toISOString().slice(0, 10),
-  } as unknown as Article;
+  try {
+    const r = await prisma.article.findFirst({
+      where: { slug, isActive: true },
+    });
+    if (r) {
+      return {
+        ...r,
+        date: r.date.toISOString().slice(0, 10),
+      } as unknown as Article;
+    }
+  } catch {
+    // Graceful fallback
+  }
+  const fallback = staticArticles.find((a) => a.slug === slug);
+  return fallback || null;
 }
 
 export async function getBranches(): Promise<Branch[]> {

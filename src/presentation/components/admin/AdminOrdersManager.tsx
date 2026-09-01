@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { AdminOrder } from "@/lib/admin/orders";
@@ -15,7 +15,9 @@ interface AdminOrdersManagerProps {
 
 export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [orders, setOrders] = useState<AdminOrder[]>(initialOrders);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState<
     "ALL" | "READY_TO_PROCESS" | "UNPAID" | "PACKING" | "SHIPPED" | "COMPLETED"
   >("ALL");
@@ -29,6 +31,42 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
     null,
   );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Sync state when props change (from router.refresh)
+  useEffect(() => {
+    setOrders(initialOrders);
+    setLastRefreshedAt(new Date());
+  }, [initialOrders]);
+
+  const refreshData = useCallback(() => {
+    startTransition(() => {
+      router.refresh();
+    });
+  }, [router]);
+
+  // Real-time auto-polling every 10 seconds + on tab focus
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        refreshData();
+      }
+    }, 10000);
+
+    const onFocus = () => {
+      if (document.visibilityState === "visible") {
+        refreshData();
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
+  }, [refreshData]);
 
   const toggleExpand = (orderId: string) => {
     setExpandedOrderIds((prev) => ({ ...prev, [orderId]: !prev[orderId] }));
@@ -200,34 +238,70 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
     <div className="space-y-5">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs animate-fade-in">
+        <div className="admin-panel border-accent-200 bg-accent-50 px-4 py-3 text-xs font-semibold text-accent-800 flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
-            <span className="text-base">✓</span>
+            <span aria-hidden="true">✓</span>
             <span>{toastMessage}</span>
           </div>
           <button
             type="button"
             onClick={() => setToastMessage(null)}
-            className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+            className="text-accent-700 hover:text-primary-800 cursor-pointer"
           >
             ✕
           </button>
         </div>
       )}
 
+      {/* Live Sync Status Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-xs">
+        <div className="flex items-center gap-2 text-supporting-600">
+          <span className="relative flex h-2 w-2">
+            <span
+              className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPending ? "bg-accent-500" : "bg-emerald-400"}`}
+            />
+            <span
+              className={`relative inline-flex rounded-full h-2 w-2 ${isPending ? "bg-accent-600" : "bg-emerald-500"}`}
+            />
+          </span>
+          <span className="text-[11px] font-medium">
+            {isPending
+              ? "Menyinkronkan data..."
+              : `Live Sync aktif • Update terakhir: ${lastRefreshedAt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={refreshData}
+          disabled={isPending}
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-supporting-700 hover:text-supporting-900 bg-supporting-100 hover:bg-supporting-200 px-2.5 py-1 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+          title="Refresh data pesanan sekarang"
+        >
+          <span className={isPending ? "animate-spin" : ""}>🔄</span>
+          <span>Refresh</span>
+        </button>
+      </div>
+
       {/* Modern Workflow Status Tabs */}
-      <div className="flex overflow-x-auto gap-2 p-1.5 bg-gray-100/80 rounded-2xl border border-gray-200 scrollbar-none text-xs">
+      <div className="flex overflow-x-auto gap-1.5 p-1.5 bg-supporting-50 rounded-lg border border-supporting-200 scrollbar-none text-xs">
         <button
           type="button"
           onClick={() => setActiveTab("ALL")}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+          className={`px-3.5 py-2 rounded-lg font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === "ALL"
-              ? "bg-white text-gray-900 shadow-xs border border-gray-200"
-              : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
+              ? "bg-white text-supporting-900 border border-supporting-200"
+              : "text-supporting-600 hover:text-supporting-800 hover:bg-white"
           }`}
         >
           <span>Semua Pesanan</span>
-          <span className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full text-[11px]">
+          <span
+            className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+              activeTab === "ALL"
+                ? "bg-supporting-100 text-supporting-700"
+                : "bg-supporting-100 text-supporting-600"
+            }`}
+          >
             {orders.length}
           </span>
         </button>
@@ -235,19 +309,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
         <button
           type="button"
           onClick={() => setActiveTab("READY_TO_PROCESS")}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+          className={`px-3.5 py-2 rounded-lg font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === "READY_TO_PROCESS"
-              ? "bg-emerald-600 text-white shadow-xs"
-              : "text-emerald-700 hover:bg-emerald-50"
+              ? "bg-primary-950 text-background-100"
+              : "text-primary-800 hover:bg-primary-50"
           }`}
         >
-          <span>⭐ Siap Diproses (Lunas)</span>
+          <span>Siap Diproses</span>
           {readyToProcessCount > 0 && (
             <span
               className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                 activeTab === "READY_TO_PROCESS"
-                  ? "bg-white text-emerald-700"
-                  : "bg-emerald-200 text-emerald-900"
+                  ? "bg-white/20 text-background-50"
+                  : "bg-primary-100 text-primary-800"
               }`}
             >
               {readyToProcessCount}
@@ -258,19 +332,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
         <button
           type="button"
           onClick={() => setActiveTab("UNPAID")}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+          className={`px-3.5 py-2 rounded-lg font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === "UNPAID"
-              ? "bg-amber-500 text-white shadow-xs"
-              : "text-amber-800 hover:bg-amber-50"
+              ? "bg-accent-600 text-primary-950"
+              : "text-accent-800 hover:bg-accent-50"
           }`}
         >
-          <span>⏳ Menunggu Pembayaran</span>
+          <span>Menunggu Bayar</span>
           {unpaidCount > 0 && (
             <span
               className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                 activeTab === "UNPAID"
-                  ? "bg-white text-amber-800"
-                  : "bg-amber-200 text-amber-950"
+                  ? "bg-primary-950/15 text-primary-950"
+                  : "bg-accent-100 text-accent-900"
               }`}
             >
               {unpaidCount}
@@ -281,19 +355,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
         <button
           type="button"
           onClick={() => setActiveTab("PACKING")}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+          className={`px-3.5 py-2 rounded-lg font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === "PACKING"
-              ? "bg-indigo-600 text-white shadow-xs"
-              : "text-indigo-700 hover:bg-indigo-50"
+              ? "bg-primary-800 text-background-100"
+              : "text-primary-800 hover:bg-primary-50"
           }`}
         >
-          <span>📦 Sedang Dikemas</span>
+          <span>Sedang Dikemas</span>
           {packingCount > 0 && (
             <span
               className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                 activeTab === "PACKING"
-                  ? "bg-white text-indigo-700"
-                  : "bg-indigo-100 text-indigo-900"
+                  ? "bg-white/20 text-background-50"
+                  : "bg-primary-100 text-primary-800"
               }`}
             >
               {packingCount}
@@ -304,19 +378,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
         <button
           type="button"
           onClick={() => setActiveTab("SHIPPED")}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+          className={`px-3.5 py-2 rounded-lg font-semibold tracking-tight transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
             activeTab === "SHIPPED"
-              ? "bg-purple-600 text-white shadow-xs"
-              : "text-purple-700 hover:bg-purple-50"
+              ? "bg-supporting-800 text-background-100"
+              : "text-supporting-700 hover:bg-supporting-100"
           }`}
         >
-          <span>🚚 Dalam Pengiriman</span>
+          <span>Dalam Pengiriman</span>
           {shippedCount > 0 && (
             <span
               className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                 activeTab === "SHIPPED"
-                  ? "bg-white text-purple-700"
-                  : "bg-purple-100 text-purple-900"
+                  ? "bg-white/20 text-background-50"
+                  : "bg-supporting-200 text-supporting-800"
               }`}
             >
               {shippedCount}
@@ -326,14 +400,16 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
       </div>
 
       {/* Orders List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredOrders.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-gray-200 text-gray-500 shadow-xs">
-            <div className="text-3xl mb-2">📋</div>
-            <div className="font-semibold text-sm text-gray-800">
+          <div className="admin-panel p-12 text-center text-supporting-500">
+            <div className="text-2xl mb-2" aria-hidden="true">
+              📋
+            </div>
+            <div className="text-sm font-medium text-supporting-800">
               Tidak ada pesanan pada kategori ini
             </div>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="mt-1 text-xs text-supporting-500">
               Pilih tab status lain untuk melihat daftar pesanan.
             </p>
           </div>
@@ -362,28 +438,19 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
               order.fulfillmentHistory?.[0]?.trackingNumber || null;
 
             return (
-              <div
-                key={order.id}
-                className={`bg-white rounded-3xl border transition-all shadow-xs overflow-hidden ${
-                  isUnpaid
-                    ? "border-amber-200 hover:border-amber-300"
-                    : isPaid && !isPacked
-                      ? "border-emerald-300 ring-2 ring-emerald-500/10"
-                      : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
+              <div key={order.id} className="admin-panel overflow-hidden">
                 {/* Header Banner for Unpaid Orders */}
                 {isUnpaid && (
-                  <div className="bg-amber-500/10 border-b border-amber-200/80 px-5 py-2.5 flex items-center justify-between text-xs text-amber-900 font-medium">
+                  <div className="border-b border-accent-200 bg-accent-50 px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-accent-800">
                     <div className="flex items-center gap-2">
-                      <span className="text-base">⏳</span>
+                      <span aria-hidden="true">⏳</span>
                       <span>
                         <strong>Menunggu Pembayaran:</strong> Pelanggan belum
                         menyelesaikan transfer. Jangan kemas atau kirim paket
                         sebelum pembayaran lunas.
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-bold text-accent-800 bg-accent-100 px-2 py-0.5 rounded-md">
                       Belum Terbayar
                     </span>
                   </div>
@@ -391,17 +458,17 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
                 {/* Header Banner for Paid & Ready to Pack */}
                 {isPaid && !isPacked && (
-                  <div className="bg-emerald-500/10 border-b border-emerald-200/80 px-5 py-2.5 flex items-center justify-between text-xs text-emerald-900 font-medium">
+                  <div className="border-b border-primary-200 bg-primary-50 px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-primary-800">
                     <div className="flex items-center gap-2">
-                      <span className="text-base">⭐</span>
+                      <span aria-hidden="true">✓</span>
                       <span>
                         <strong>Pembayaran Terverifikasi (LUNAS):</strong>{" "}
                         Silakan klik <strong>Print Resi</strong> untuk mencetak
                         label pengiriman dan memulai pengemasan.
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md">
-                      ✓ Siap Diproses
+                    <span className="text-[11px] font-bold text-primary-800 bg-primary-100 px-2.5 py-0.5 rounded-md">
+                      Siap Diproses
                     </span>
                   </div>
                 )}
@@ -412,19 +479,24 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                     <button
                       type="button"
                       onClick={() => toggleExpand(order.id)}
-                      className="mt-1 w-7 h-7 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-700 transition-all cursor-pointer shrink-0"
+                      className="mt-1 h-7 w-7 rounded-lg bg-supporting-100 hover:bg-supporting-200 flex items-center justify-center text-[10px] font-bold text-supporting-700 transition-colors cursor-pointer shrink-0"
                       title="Buka rincian produk"
                     >
                       {isExpanded ? "▲" : "▼"}
                     </button>
 
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs text-gray-900">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-sm font-bold text-supporting-900">
                           {order.orderNumber}
                         </span>
-                        <span className="text-gray-300">•</span>
-                        <span className="text-xs text-gray-500 font-medium">
+                        <span
+                          className="text-supporting-300"
+                          aria-hidden="true"
+                        >
+                          •
+                        </span>
+                        <span className="text-xs text-supporting-500 font-medium">
                           {new Date(order.createdAt).toLocaleDateString(
                             "id-ID",
                             {
@@ -439,10 +511,10 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                       </div>
 
                       <div className="mt-1">
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="text-sm font-bold text-supporting-900">
                           Pesanan dari {order.customerName}
                         </span>
-                        <span className="text-xs text-gray-500 ml-1.5 font-normal">
+                        <span className="text-xs text-supporting-500 ml-1.5 font-normal">
                           ({order.customerEmail})
                         </span>
                       </div>
@@ -451,14 +523,14 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                       <button
                         type="button"
                         onClick={() => toggleExpand(order.id)}
-                        className="inline-flex items-center gap-1.5 mt-2.5 px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-xs font-semibold cursor-pointer transition-all border border-gray-200"
+                        className="inline-flex items-center gap-1.5 mt-2.5 px-3 py-1.5 bg-supporting-100 hover:bg-supporting-200 text-supporting-800 rounded-lg text-xs font-semibold cursor-pointer transition-colors border border-supporting-200"
                       >
-                        <span>📦</span>
+                        <span aria-hidden="true">📦</span>
                         <span>
                           {uniqueProductCount} Macam Produk ({itemCount} item
                           total)
                         </span>
-                        <span className="text-[10px] text-gray-500 font-bold ml-0.5">
+                        <span className="text-[10px] text-supporting-500 font-bold ml-0.5">
                           {isExpanded ? "▴ Tutup" : "▾ Rincian"}
                         </span>
                       </button>
@@ -469,16 +541,16 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                   <div className="flex flex-wrap items-center gap-2.5">
                     {/* Payment Badge */}
                     <span
-                      className={`px-3 py-1 text-xs font-bold rounded-full border ${
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
                         isPaid
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          ? "border-primary-200 bg-primary-50 text-primary-800"
                           : isCancelled
-                            ? "bg-red-50 text-red-700 border-red-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
+                            ? "border-red-200 bg-red-50 text-red-800"
+                            : "border-accent-200 bg-accent-50 text-accent-800"
                       }`}
                     >
                       {isPaid
-                        ? "✓ Lunas / Terbayar"
+                        ? "✓ Terbayar"
                         : isCancelled
                           ? "✕ Dibatalkan"
                           : "⏳ Menunggu Bayar"}
@@ -486,31 +558,31 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
                     {/* Fulfillment Badge */}
                     <span
-                      className={`px-3 py-1 text-xs font-bold rounded-full border ${
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
                         isShipped
-                          ? "bg-purple-50 text-purple-700 border-purple-200"
+                          ? "border-supporting-300 bg-supporting-100 text-supporting-700"
                           : isPacked
-                            ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                            ? "border-primary-300 bg-primary-50 text-primary-800"
                             : isPaid
-                              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                              : "bg-gray-100 text-gray-500 border-gray-200"
+                              ? "border-primary-200 bg-primary-50 text-primary-700"
+                              : "border-supporting-200 bg-supporting-50 text-supporting-500"
                       }`}
                     >
                       {isShipped
-                        ? "🚚 Dalam Pengiriman"
+                        ? "🚚 Dikirim"
                         : isPacked
-                          ? "📦 Sedang Dikemas"
+                          ? "📦 Dikemas"
                           : isPaid
-                            ? "⭐ Siap Dikemas"
+                            ? "✓ Siap Dikemas"
                             : "⛔ Belum Lunas"}
                     </span>
 
                     {/* Total Bill */}
                     <div className="text-right pl-3 pr-1">
-                      <div className="text-[11px] text-gray-400 font-medium">
-                        Total Tagihan
+                      <div className="text-[10px] text-supporting-400 font-medium uppercase tracking-[0.12em]">
+                        Total
                       </div>
-                      <div className="font-mono font-bold text-sm text-gray-900">
+                      <div className="font-mono text-sm font-bold text-supporting-900">
                         {new Intl.NumberFormat("id-ID", {
                           style: "currency",
                           currency: "IDR",
@@ -529,7 +601,7 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                           type="button"
                           onClick={() => handleConfirmPaid(order.id)}
                           disabled={processingOrderId === order.id}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-4 py-2 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-900 cursor-pointer disabled:opacity-50"
                           title="Klik jika pelanggan telah transfer manual ke rekening bank toko"
                         >
                           <span>✓</span>
@@ -544,7 +616,7 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                           type="button"
                           onClick={() => handleCancelOrder(order.id)}
                           disabled={processingOrderId === order.id}
-                          className="px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 tracking-tight transition-colors hover:bg-red-50 cursor-pointer disabled:opacity-50"
                         >
                           Batalkan
                         </button>
@@ -556,9 +628,9 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                       <button
                         type="button"
                         onClick={() => handlePrintLabel(order)}
-                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-4 py-2 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-900 cursor-pointer"
                       >
-                        <span>🖨️</span>
+                        <span aria-hidden="true">🖨️</span>
                         <span>Print Resi</span>
                       </button>
                     )}
@@ -569,16 +641,16 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                         type="button"
                         onClick={() => handleMarkShipped(order.id)}
                         disabled={processingOrderId === order.id}
-                        className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-supporting-800 px-3.5 py-2 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-supporting-900 cursor-pointer disabled:opacity-50"
                       >
-                        <span>🚚</span>
+                        <span aria-hidden="true">🚚</span>
                         <span>Tandai Dikirim</span>
                       </button>
                     )}
 
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="px-3 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-xl transition-all"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-supporting-300 px-3 py-2 text-xs font-semibold text-supporting-800 tracking-tight transition-colors hover:bg-supporting-50"
                     >
                       Detail →
                     </Link>
@@ -587,35 +659,35 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
                 {/* EXPANDABLE ACCORDION: DETAIL PRODUK & PENGIRIMAN */}
                 {isExpanded && (
-                  <div className="p-5 bg-gray-50/70 border-t border-gray-100 space-y-4 animate-fade-in">
+                  <div className="border-t border-supporting-200 bg-supporting-50 p-5 space-y-4 animate-fade-in">
                     <div className="grid gap-6 md:grid-cols-3">
                       {/* Column 1 & 2: Items List */}
                       <div className="md:col-span-2 space-y-3">
-                        <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
-                          <span>📚</span>
+                        <h4 className="text-[11px] font-bold uppercase tracking-[0.12em] text-supporting-700 flex items-center gap-1.5">
+                          <span aria-hidden="true">📚</span>
                           <span>
                             Rincian Produk Dipesan ({uniqueProductCount} Macam)
                           </span>
                         </h4>
 
-                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden divide-y divide-gray-100 shadow-xs">
+                        <div className="admin-panel overflow-hidden divide-y divide-supporting-100">
                           {order.items && order.items.length > 0 ? (
                             order.items.map((item, idx) => (
                               <div
                                 key={item.id || idx}
-                                className="p-3.5 flex items-center justify-between gap-3"
+                                className="flex items-center justify-between gap-3 p-3.5"
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className="w-11 h-11 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl shrink-0">
+                                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-supporting-100 border border-supporting-200 text-lg">
                                     📖
                                   </div>
                                   <div>
-                                    <div className="font-semibold text-xs text-gray-900">
+                                    <div className="text-xs font-semibold text-supporting-900">
                                       {item.productName}
                                     </div>
-                                    <div className="text-[11px] text-gray-500 mt-0.5">
+                                    <div className="text-[11px] text-supporting-500 mt-0.5">
                                       Harga:{" "}
-                                      <span className="font-mono text-gray-700 font-medium">
+                                      <span className="font-mono text-supporting-700 font-medium">
                                         {new Intl.NumberFormat("id-ID", {
                                           style: "currency",
                                           currency: "IDR",
@@ -627,10 +699,10 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                                 </div>
 
                                 <div className="text-right">
-                                  <span className="px-2.5 py-0.5 bg-gray-100 text-gray-800 text-xs font-bold font-mono rounded-lg">
+                                  <span className="inline-flex rounded-lg bg-supporting-100 px-2.5 py-1 text-xs font-bold font-mono text-supporting-800">
                                     x{item.quantity}
                                   </span>
-                                  <div className="font-mono font-bold text-xs text-gray-900 mt-1">
+                                  <div className="font-mono text-xs font-bold text-supporting-900 mt-1">
                                     {new Intl.NumberFormat("id-ID", {
                                       style: "currency",
                                       currency: "IDR",
@@ -641,7 +713,7 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                               </div>
                             ))
                           ) : (
-                            <div className="p-4 text-xs text-gray-500">
+                            <div className="p-4 text-xs text-supporting-500">
                               Tidak ada rincian item.
                             </div>
                           )}
@@ -650,28 +722,28 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
 
                       {/* Column 3: Shipping & Tracking Details */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
-                          <span>📍</span>
-                          <span>Tujuan & Ekspedisi</span>
+                        <h4 className="text-[11px] font-bold uppercase tracking-[0.12em] text-supporting-700 flex items-center gap-1.5">
+                          <span aria-hidden="true">📍</span>
+                          <span>Tujuan &amp; Ekspedisi</span>
                         </h4>
 
-                        <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3 text-xs shadow-xs">
+                        <div className="admin-panel space-y-3 p-4 text-xs">
                           <div>
-                            <span className="text-[10px] text-gray-400 font-semibold block">
+                            <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                               Kurir Pengiriman
                             </span>
-                            <span className="font-bold text-gray-900">
+                            <span className="font-bold text-supporting-900">
                               {carrier || "-"}
                             </span>
                           </div>
 
                           <div>
-                            <span className="text-[10px] text-gray-400 font-semibold block">
+                            <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                               Nomor Resi
                             </span>
                             {trackingNumber ? (
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="font-mono font-bold text-xs text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">
+                                <span className="font-mono text-xs font-bold text-primary-800 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded-md">
                                   {trackingNumber}
                                 </span>
                                 <button
@@ -682,29 +754,29 @@ export function AdminOrdersManager({ initialOrders }: AdminOrdersManagerProps) {
                                     );
                                     alert("Nomor resi berhasil disalin!");
                                   }}
-                                  className="text-[10px] text-gray-500 hover:text-gray-800 font-medium cursor-pointer"
+                                  className="text-[10px] text-supporting-500 hover:text-supporting-800 font-medium cursor-pointer"
                                 >
                                   Salin
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-xs text-gray-500 font-medium block mt-0.5">
+                              <span className="mt-0.5 block text-xs text-supporting-500 font-medium">
                                 Belum ada resi (menunggu data pengiriman
                                 terverifikasi)
                               </span>
                             )}
                           </div>
 
-                          <div className="pt-2 border-t border-gray-100">
-                            <span className="text-[10px] text-gray-400 font-semibold block">
+                          <div className="border-t border-supporting-100 pt-3">
+                            <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                               Alamat Penerima
                             </span>
-                            <div className="font-semibold text-gray-800 mt-0.5">
+                            <div className="font-bold text-supporting-900 mt-0.5">
                               {order.shippingAddress?.name ||
                                 order.customerName}{" "}
                               ({order.shippingAddress?.phone || "-"})
                             </div>
-                            <div className="text-gray-600 mt-0.5 leading-relaxed text-[11px]">
+                            <div className="text-supporting-600 mt-0.5 leading-relaxed text-[11px]">
                               {order.shippingAddress?.address1}
                               {order.shippingAddress?.city
                                 ? `, ${order.shippingAddress.city}`

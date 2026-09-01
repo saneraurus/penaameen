@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import { casakuQrImageUrl } from "@/lib/qr/qr-url";
 
 export interface CasakuPaymentData {
   transactionId: string;
@@ -26,15 +27,6 @@ interface QrisPaymentModalProps {
   isRegenerating: boolean;
   onCheckStatus: () => void;
   onRegenerate: () => void;
-}
-
-function casakuQrImageUrl(data: string): string {
-  const url = new URL("https://larabert-qrgen.hf.space/v1/create-qr-code");
-  url.searchParams.set("size", "300x300");
-  url.searchParams.set("style", "2");
-  url.searchParams.set("color", "111111");
-  url.searchParams.set("data", data);
-  return url.toString();
 }
 
 function formatCountdown(seconds: number): string {

@@ -392,7 +392,7 @@ export default function ProductListPage() {
                         </p>
 
                         <div className="mt-5 flex items-center justify-between gap-4 border-t border-supporting-200 pt-4">
-                          <Price value={product.price} />
+                          <Price value={product.price} size="lg" />
 
                           <button
                             type="button"

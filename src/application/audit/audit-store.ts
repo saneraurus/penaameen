@@ -53,11 +53,16 @@ export function recordSystemAudit(
 }
 
 export async function safeRecordAudit(
-  store: AuditStore,
-  event: AuditEventInput,
+  storeOrEvent: AuditStore | AuditEventInput,
+  maybeEvent?: AuditEventInput,
 ): Promise<void> {
   try {
-    await store.append(event);
+    if (maybeEvent) {
+      await (storeOrEvent as AuditStore).append(maybeEvent);
+    } else {
+      const { auditStore } = await import("@/infrastructure/audit");
+      await auditStore.append(storeOrEvent as AuditEventInput);
+    }
   } catch (error) {
     console.warn("[Audit] Failed to record audit event:", error);
   }

@@ -14,7 +14,7 @@ export default async function AdminNotificationsPage() {
         description="Pesanan baru, webhook gagal, stok menipis, dan sinyal operasional lain"
       />
       <NotificationsPanel />
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+      <div className="admin-panel border-accent-200 bg-accent-50 px-4 py-3 text-xs text-accent-800">
         Notification store: <strong>{health.store.state}</strong>. Email:{" "}
         <strong>{health.email.state}</strong>. {health.email.detail}
       </div>

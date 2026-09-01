@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { mapMidtransStatus } from "@/lib/order-status";
 import crypto from "crypto";
 import { isSystemControlEnabled } from "@/lib/admin/system-controls";
@@ -9,6 +8,7 @@ import { recordSystemAudit } from "@/application/audit/audit-store";
 import { createResourceId } from "@/domain/common/identifiers";
 import { sendOrderConfirmationEmail } from "@/lib/payment/order-email";
 import { getMidtransServerKey } from "@/lib/payment/midtrans-client";
+import { withSystemRLSContext } from "@/middleware/rls-context";
 
 function verifyMidtransSignature(
   orderId: string,
@@ -78,10 +78,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const order = await prisma.order.findUnique({
-      where: { midtransOrderId: order_id },
-      include: { items: { include: { product: true } } },
-    });
+    const order = await withSystemRLSContext(async (_context, tx) =>
+      tx.order.findUnique({
+        where: { midtransOrderId: order_id },
+        include: { items: { include: { product: true } } },
+      }),
+    );
 
     if (!order) {
       console.error("Order not found:", order_id);
@@ -136,7 +138,7 @@ export async function POST(request: Request) {
 
     if (newStatus && newStatus !== order.status) {
       const finalStatus = newStatus;
-      await prisma.$transaction(async (tx) => {
+      await withSystemRLSContext(async (_context, tx) => {
         await tx.order.update({
           where: { id: order.id },
           data: {

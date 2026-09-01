@@ -1,6 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { type ActorId, type CorrelationId } from "@/domain/common/identifiers";
 import { createCorrelationId } from "@/domain/common/identifiers";
+import { getAdminActorFromSession } from "@/lib/admin/auth";
 
 export type ClerkOrgRole =
   | "admin"
@@ -120,37 +121,34 @@ export type StaffActor = {
 };
 
 export async function getStaffActor(): Promise<StaffActor | null> {
-  const { userId, orgRole, sessionClaims } = await auth();
-
-  if (!userId) {
-    return null;
+  // 1. Primary: Database session cookie authentication
+  const dbActor = await getAdminActorFromSession();
+  if (dbActor) {
+    return dbActor;
   }
 
-  let resolvedRole: ClerkOrgRole | null = null;
-  let userEmail = (sessionClaims?.email as string) || "";
-  let userFullName = (sessionClaims?.fullName as string) || null;
+  // 2. Secondary fallback for legacy/external Clerk integrations
+  try {
+    const { userId, orgRole, sessionClaims } = await auth();
 
-  // 1. Check configured ADMIN_EMAILS list (env-only; no invented fallbacks)
-  const configuredAdminEmails = (process.env.ADMIN_EMAILS || "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (userEmail && configuredAdminEmails.includes(userEmail.toLowerCase())) {
-    resolvedRole = "admin";
-  }
-
-  // 2. Check if orgRole is present in active session claims
-  if (!resolvedRole && orgRole) {
-    const rawRole = orgRole.replace(/^org:/, "");
-    if (rawRole in ROLE_CAPABILITY_MAP) {
-      resolvedRole = rawRole as ClerkOrgRole;
+    if (!userId) {
+      return null;
     }
-  }
 
-  // 3. Query Clerk for user emails, organization memberships, and invitations
-  if (!resolvedRole) {
-    try {
+    let resolvedRole: ClerkOrgRole | null = null;
+    let userEmail = (sessionClaims?.email as string) || "";
+    let userFullName = (sessionClaims?.fullName as string) || null;
+
+    // Check if orgRole is present in active session claims
+    if (orgRole) {
+      const rawRole = orgRole.replace(/^org:/, "");
+      if (rawRole in ROLE_CAPABILITY_MAP) {
+        resolvedRole = rawRole as ClerkOrgRole;
+      }
+    }
+
+    // Query Clerk for user organization memberships and roles
+    if (!resolvedRole) {
       const client = await clerkClient();
       const user = await client.users.getUser(userId);
       const userEmails = user.emailAddresses.map((e) =>
@@ -165,22 +163,15 @@ export async function getStaffActor(): Promise<StaffActor | null> {
           `${user.firstName || ""} ${user.lastName || ""}`.trim() || null;
       }
 
-      // Check if any of the user's registered emails match ADMIN_EMAILS
-      if (userEmails.some((ue) => configuredAdminEmails.includes(ue))) {
-        resolvedRole = "admin";
-      }
-
       // Check direct Clerk user metadata
-      if (!resolvedRole) {
-        const metaRole = (
-          (user.publicMetadata?.role as string) ||
-          (user.privateMetadata?.role as string) ||
-          ""
-        ).replace(/^org:/, "");
+      const metaRole = (
+        (user.publicMetadata?.role as string) ||
+        (user.privateMetadata?.role as string) ||
+        ""
+      ).replace(/^org:/, "");
 
-        if (metaRole in ROLE_CAPABILITY_MAP) {
-          resolvedRole = metaRole as ClerkOrgRole;
-        }
+      if (metaRole in ROLE_CAPABILITY_MAP) {
+        resolvedRole = metaRole as ClerkOrgRole;
       }
 
       // Check direct Clerk organization memberships
@@ -199,34 +190,25 @@ export async function getStaffActor(): Promise<StaffActor | null> {
           }
         }
       }
-
-      // Pending invitations are not staff authorization. Only an active
-      // organization membership or explicitly configured metadata may grant
-      // capabilities.
-    } catch (e) {
-      console.warn(
-        "[Clerk Auth] Error during staff resolution for user:",
-        userId,
-        e,
-      );
     }
-  }
 
-  // 4. Strictly reject if user does not match any admin/staff criteria
-  if (!resolvedRole) {
+    if (!resolvedRole) {
+      return null;
+    }
+
+    const capabilities = ROLE_CAPABILITY_MAP[resolvedRole] ?? new Set();
+
+    return {
+      kind: "staff",
+      staffId: userId as ActorId,
+      capabilities,
+      email: userEmail,
+      fullName: userFullName,
+      orgRole: resolvedRole,
+    };
+  } catch {
     return null;
   }
-
-  const capabilities = ROLE_CAPABILITY_MAP[resolvedRole] ?? new Set();
-
-  return {
-    kind: "staff",
-    staffId: userId as ActorId,
-    capabilities,
-    email: userEmail,
-    fullName: userFullName,
-    orgRole: resolvedRole,
-  };
 }
 
 export async function requireStaffActor(

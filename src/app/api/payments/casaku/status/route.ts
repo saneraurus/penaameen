@@ -1,13 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import { CasakuClient } from "@/lib/payment/casaku";
 import {
   applyCasakuEvent,
   buildCasakuConfig,
 } from "@/lib/payment/casaku-service";
 import { getApiSettings } from "@/lib/admin/api-settings";
+import { withRLSContext, withSystemRLSContext } from "@/middleware/rls-context";
 
 const statusSchema = z.object({
   transactionId: z.string().min(1),
@@ -20,23 +19,13 @@ const statusSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { transactionId } = statusSchema.parse(await request.json());
-
-    const order = await prisma.order.findUnique({
-      where: { casakuTransactionId: transactionId },
-      select: {
-        id: true,
-        orderNumber: true,
-        status: true,
-        total: true,
-        casakuTotalAmount: true,
-        userId: true,
-      },
+    const order = await withRLSContext(async (context, tx) => {
+      if (context.actorKind !== "customer") return null;
+      return tx.order.findUnique({
+        where: { casakuTransactionId: transactionId },
+        select: { id: true, orderNumber: true, status: true },
+      });
     });
 
     if (!order) {
@@ -46,13 +35,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const dbUser = await prisma.user.findFirst({ where: { clerkId: userId } });
-    if (!dbUser || dbUser.id !== order.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const settings = getApiSettings();
-    const config = buildCasakuConfig(settings);
+    const config = buildCasakuConfig(getApiSettings());
     if (!config) {
       return NextResponse.json(
         { error: "Casaku belum dikonfigurasi" },
@@ -60,21 +43,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const client = new CasakuClient(config);
-    const status = await client.checkStatus(transactionId);
-
-    const outcome = await applyCasakuEvent(
-      {
-        transactionId,
-        amount: status.amount,
-        status: status.status,
-      },
-      "status_poll",
+    const status = await new CasakuClient(config).checkStatus(transactionId);
+    const outcome = await withSystemRLSContext((_systemContext, systemTx) =>
+      applyCasakuEvent(
+        { transactionId, amount: status.amount, status: status.status },
+        "status_poll",
+        systemTx,
+      ),
     );
-
-    const updatedOrder = await prisma.order.findUnique({
-      where: { id: order.id },
-      select: { id: true, orderNumber: true, status: true },
+    const updatedOrder = await withRLSContext(async (context, tx) => {
+      if (context.actorKind !== "customer") return null;
+      return tx.order.findUnique({
+        where: { id: order.id },
+        select: { status: true },
+      });
     });
 
     return NextResponse.json({

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/generated/prisma";
 import {
   CasakuClient,
   CasakuError,
@@ -151,8 +152,9 @@ export async function applyCasakuEvent(
     status: CasakuPaymentStatus;
   },
   source: CasakuEventSource,
+  client: Prisma.TransactionClient | typeof prisma = prisma,
 ): Promise<CasakuPaymentOutcome> {
-  const order = await prisma.order.findUnique({
+  const order = await client.order.findUnique({
     where: { casakuTransactionId: event.transactionId },
     include: { items: { include: { product: true } } },
   });
@@ -211,7 +213,7 @@ export async function applyCasakuEvent(
       ? "QRIS Casaku kedaluwarsa"
       : "Pembayaran Casaku dibatalkan";
 
-  await prisma.$transaction(async (tx) => {
+  const persist = async (tx: Prisma.TransactionClient) => {
     await tx.order.update({
       where: { id: order.id },
       data: {
@@ -239,8 +241,26 @@ export async function applyCasakuEvent(
           },
         });
       }
+    } else if (finalStatus === "CANCELLED") {
+      // Mirror Midtrans behaviour: a cancelled/expired QRIS payment must
+      // return the reserved stock to inventory. Without this, stock is
+      // permanently lost whenever a Casaku QR expires or is cancelled.
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { increment: item.quantity },
+          },
+        });
+      }
     }
-  });
+  };
+
+  if ("$transaction" in client) {
+    await client.$transaction(persist);
+  } else {
+    await persist(client);
+  }
 
   if (finalStatus === "PAID") {
     await createNotification({
@@ -255,6 +275,15 @@ export async function applyCasakuEvent(
     if (!(await isSystemControlEnabled("disable_outbound_email"))) {
       await sendOrderConfirmationEmail(order.id);
     }
+  } else if (finalStatus === "CANCELLED") {
+    await createNotification({
+      type: "order.cancelled",
+      severity: "info",
+      title: `Pesanan ${order.orderNumber} dibatalkan/kedaluwarsa`,
+      message: `Pembayaran QRIS Casaku ${event.status === "expired" ? "kedaluwarsa" : "dibatalkan"}; stok telah dikembalikan otomatis.`,
+      targetType: "order",
+      targetId: order.id,
+    });
   }
 
   await recordSystemAudit(auditStore, {

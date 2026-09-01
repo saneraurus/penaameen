@@ -30,3 +30,5 @@ penaameen-website-*.json
 .pgdata-*/
 
 /generated/prisma
+.vercel
+.env*

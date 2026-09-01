@@ -27,9 +27,11 @@ import {
   SECRET_MARKER,
   isMaskedSecret,
   maskSecret,
+  isPlaceholderSecret,
   getApiSettings,
   getPublicApiSettings,
   saveApiSettings,
+  validateSecretReadiness,
   type ApiSettings,
 } from "@/lib/admin/api-settings";
 
@@ -76,6 +78,39 @@ describe("api-settings secret handling", () => {
     expect(maskSecret("")).toBe("");
     expect(maskSecret("12345678")).toBe(`12${SECRET_MARKER}`);
     expect(maskSecret("abcdefghijklmno")).toBe(`abcd${SECRET_MARKER}lmno`);
+  });
+
+  it("isPlaceholderSecret detects common placeholder patterns", () => {
+    expect(isPlaceholderSecret("")).toBe(true);
+    expect(isPlaceholderSecret("   ")).toBe(true);
+    expect(isPlaceholderSecret("...")).toBe(true);
+    expect(isPlaceholderSecret("SB-Mid-server-[REDACTED]...")).toBe(true);
+    expect(isPlaceholderSecret("SB-Mid-client-[REDACTED]...")).toBe(true);
+    expect(isPlaceholderSecret("re_[REDACTED]")).toBe(true);
+    expect(isPlaceholderSecret("re_...")).toBe(true);
+    expect(isPlaceholderSecret("nvapi_your_nvidia_api_key")).toBe(true);
+    expect(isPlaceholderSecret("gsk_your_groq_api_key")).toBe(true);
+    expect(isPlaceholderSecret("sk_tes-[REDACTED]")).toBe(true);
+    expect(isPlaceholderSecret("sk_test_-placeholder")).toBe(true);
+    expect(isPlaceholderSecret("your_real_secret_key")).toBe(true);
+    expect(isPlaceholderSecret("MY_PLACEHOLDER_VALUE")).toBe(true);
+  });
+
+  it("isPlaceholderSecret returns false for real credentials", () => {
+    expect(
+      isPlaceholderSecret("non_placeholder_custom_secret_key_1234567890"),
+    ).toBe(false);
+    expect(isPlaceholderSecret("non_placeholder_publishable_key_abcdefghij")).toBe(
+      false,
+    );
+    expect(
+      isPlaceholderSecret("non_placeholder_ai_model_api_key_9876543210"),
+    ).toBe(false);
+    expect(
+      isPlaceholderSecret(
+        "non_placeholder_gateway_license_key_4567891234567890",
+      ),
+    ).toBe(false);
   });
 
   it("getPublicApiSettings never exposes real secret values", () => {
@@ -203,5 +238,130 @@ describe("api-settings casaku group", () => {
   it("disabled by default when no license key is configured", () => {
     setEnv({ CASAKU_LICENSE_KEY: undefined });
     expect(getApiSettings().casaku.enabled).toBe(false);
+  });
+});
+
+describe("api-settings buatqris group", () => {
+  beforeEach(() => {
+    fsMock.mem.clear();
+    setEnv({
+      APP_SETTINGS_ENCRYPTION_KEY: VALID_KEY,
+      BUATQRIS_ACCOUNT_ID: "user_test_account_id",
+      BUATQRIS_SECRET_TOKEN: "sk_live_test_secret_token",
+      BUATQRIS_API_BASE_URL: "https://api.buatqris.site",
+      BUATQRIS_EXPIRY_MINUTES: "20",
+    });
+  });
+
+  afterEach(() => {
+    setEnv({
+      APP_SETTINGS_ENCRYPTION_KEY: undefined,
+      BUATQRIS_ACCOUNT_ID: undefined,
+      BUATQRIS_SECRET_TOKEN: undefined,
+      BUATQRIS_API_BASE_URL: undefined,
+      BUATQRIS_EXPIRY_MINUTES: undefined,
+    });
+  });
+
+  it("reads env defaults into the buatqris group", () => {
+    const settings = getApiSettings();
+    expect(settings.buatqris).toMatchObject({
+      enabled: true,
+      accountId: "user_test_account_id",
+      secretToken: "sk_live_test_secret_token",
+      apiBaseUrl: "https://api.buatqris.site",
+      expiryMinutes: 20,
+    });
+  });
+
+  it("masks buatqris secrets in public settings", () => {
+    const publicSettings = getPublicApiSettings();
+    expect(publicSettings.buatqris?.secretToken).toBe(
+      maskSecret("sk_live_test_secret_token"),
+    );
+    expect(publicSettings.buatqris?.secretToken).not.toContain(
+      "sk_live_test_secret_token",
+    );
+  });
+
+  it("persists buatqris secrets encrypted and decrypts on read", () => {
+    const current = getApiSettings();
+    const updated: ApiSettings = {
+      ...current,
+      buatqris: {
+        ...current.buatqris!,
+        secretToken: "new-buatqris-token",
+      },
+    };
+    saveApiSettings(updated);
+
+    const roundTripped = getApiSettings();
+    expect(roundTripped.buatqris?.secretToken).toBe("new-buatqris-token");
+  });
+
+  it("disabled by default when no account id is configured", () => {
+    setEnv({
+      BUATQRIS_ACCOUNT_ID: undefined,
+      BUATQRIS_SECRET_TOKEN: undefined,
+    });
+    expect(getApiSettings().buatqris?.enabled).toBe(false);
+  });
+});
+
+describe("api-settings placeholder detection", () => {
+  beforeEach(() => {
+    fsMock.mem.clear();
+  });
+
+  it("reports all placeholders and missing as not ready", () => {
+    setEnv({
+      MIDTRANS_SERVER_KEY: "SB-Mid-server-[REDACTED]...",
+      NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: "SB-Mid-client-[REDACTED]...",
+      RAJAONGKIR_API_KEY: "",
+      RESEND_API_KEY: "re_...",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_your_key",
+      CLERK_SECRET_KEY: "sk_tes-[REDACTED]",
+      CASAKU_LICENSE_KEY: "cashify_your_license_key",
+      CASAKU_WEBHOOK_SECRET: "",
+      BUATQRIS_SECRET_TOKEN: "...",
+    });
+
+    const result = validateSecretReadiness();
+
+    expect(result.ready).toBe(false);
+    expect(result.placeholders).toEqual(
+      expect.arrayContaining([
+        "midtrans.serverKey",
+        "midtrans.clientKey",
+        "autoEmail.apiKey",
+        "clerkAuth.publishableKey",
+        "clerkAuth.secretKey",
+        "casaku.licenseKey",
+        "buatqris.secretToken",
+      ]),
+    );
+    expect(result.missing).toEqual(
+      expect.arrayContaining(["rajaongkir.apiKey", "casaku.webhookSecret"]),
+    );
+  });
+
+  it("reports ready when all secrets are non-placeholder", () => {
+    setEnv({
+      MIDTRANS_SERVER_KEY: "real_midtrans_server_key",
+      NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: "real_midtrans_client_key",
+      RAJAONGKIR_API_KEY: "real_rajaongkir_key",
+      RESEND_API_KEY: "re_real_resend_key",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_live_real_publishable_key",
+      CLERK_SECRET_KEY: "sk_live_real_secret_key",
+      CASAKU_LICENSE_KEY: "cashify_real_license_key",
+      CASAKU_WEBHOOK_SECRET: "cashify_real_webhook_secret",
+      BUATQRIS_SECRET_TOKEN: "sk_live_real_buatqris_token",
+    });
+
+    const result = validateSecretReadiness();
+
+    expect(result.ready).toBe(true);
+    expect(result.placeholders).toHaveLength(0);
+    expect(result.missing).toHaveLength(0);
   });
 });

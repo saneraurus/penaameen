@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -10,8 +10,15 @@ import {
   generateQrisForOrder,
 } from "@/lib/payment/casaku-service";
 import { CasakuError } from "@/lib/payment/casaku";
+import {
+  buildBuatQrisConfig,
+  generateBuatQrisForOrder,
+} from "@/lib/payment/buatqris-service";
+import { BuatQrisError } from "@/lib/payment/buatqris";
 import { createMidtransSnapClient } from "@/lib/payment/midtrans-client";
 import { getSheetCatalogProducts } from "@/lib/inventory/sheets-catalog";
+import { withRLSContext } from "@/middleware/rls-context";
+import { createNotification } from "@/lib/admin/notifications";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -50,6 +57,24 @@ const createOrderSchema = z.object({
     postalCode: z.string().trim().min(3),
   }),
 });
+
+function mapBuatQrisFailure(error: string, detail?: string): string {
+  switch (error) {
+    case "not_configured":
+      return "Pembayaran QRIS belum dikonfigurasi oleh admin toko.";
+    case "already_exists":
+      return "QRIS untuk pesanan ini sudah dibuat sebelumnya.";
+    case "db_persist_failed":
+    case "db_read_failed":
+      return "Gagal menyimpan data pembayaran ke database. Silakan coba lagi atau hubungi admin.";
+    case "buatqris_api":
+      return detail || "Penyedia QRIS mengembalikan error. Silakan coba lagi.";
+    case "buatqris_unknown":
+      return "Terjadi gangguan pada layanan QRIS. Silakan coba Transfer Bank Manual.";
+    default:
+      return detail || "Terjadi gangguan pada layanan pembayaran QRIS.";
+  }
+}
 
 function mapCasakuFailure(error: string, detail?: string): string {
   switch (error) {
@@ -417,6 +442,19 @@ export async function POST(request: Request) {
           orderItemsToSave,
         });
         savedOrderId = created.id;
+
+        const recipientName = (
+          addressSnapshot as { recipientName?: string } | undefined
+        )?.recipientName?.trim();
+
+        await createNotification({
+          type: "order.created",
+          severity: "info",
+          title: `Pesanan baru ${orderNumber}`,
+          message: `Pesanan ${orderNumber} dibuat oleh ${recipientName || "pelanggan"} - Total Rp${Number(total).toLocaleString("id-ID")}`,
+          targetType: "order",
+          targetId: created.id,
+        }).catch(() => undefined);
       }
     } catch (dbErr) {
       console.warn("Could not save order to database:", dbErr);
@@ -430,31 +468,81 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Generate payment: Casaku QRIS (primary), Midtrans Snap (backup)
-    let casaku:
-      | (Omit<import("@/lib/payment/casaku").CasakuQrisData, "qrString"> & {
-          qrString?: string;
-          expiresAt: string;
-        })
-      | null = null;
-    let casakuError: string | null = null;
+    // 4. Generate payment: BuatQRIS (primary), Casaku (legacy), Midtrans Snap (backup)
+    let qris: {
+      transactionId: string;
+      qrString?: string | undefined;
+      qrUrl?: string | undefined;
+      qrisImage?: string | undefined;
+      paymentUrl?: string | undefined;
+      originalAmount: number;
+      totalAmount: number;
+      uniqueNominal: number;
+      expiredInMinutes?: number | undefined;
+      expiresAt: string;
+    } | null = null;
+    let qrisError: string | null = null;
     let snapToken: string | undefined = undefined;
     let redirectUrl: string | undefined = undefined;
 
     try {
       const settings = getApiSettings();
-      if (buildCasakuConfig(settings)) {
+      if (buildBuatQrisConfig(settings)) {
         if (!savedOrderId) {
-          // Order was never persisted — cannot generate a Casaku transaction
-          // reference for it. This is a database/order problem, not a QRIS
-          // provider problem, so keep the message truthful.
-          console.error("[CASKU] Skipping QRIS: order not persisted", {
+          console.error("[BuatQRIS] Skipping QRIS: order not persisted", {
             orderId: savedOrderId,
             amount: total,
           });
-          casakuError =
+          qrisError =
             "Pesanan gagal disimpan ke database, sehingga QRIS tidak dapat dibuat. Silakan coba lagi atau hubungi admin.";
         } else {
+          try {
+            const result = await generateBuatQrisForOrder(
+              savedOrderId,
+              total,
+              settings,
+            );
+            if (result.ok) {
+              qris = {
+                transactionId: result.data.transactionId,
+                qrString: result.data.qrUrl || result.data.qrisImage || "",
+                ...(result.data.qrUrl ? { qrUrl: result.data.qrUrl } : {}),
+                ...(result.data.qrisImage
+                  ? { qrisImage: result.data.qrisImage }
+                  : {}),
+                ...(result.data.paymentUrl
+                  ? { paymentUrl: result.data.paymentUrl }
+                  : {}),
+                originalAmount: result.data.amount,
+                totalAmount: result.data.totalAmount,
+                uniqueNominal: result.data.amountUniq,
+                expiresAt: result.expiresAt.toISOString(),
+              };
+            } else {
+              console.error(
+                "[BuatQRIS] generateBuatQrisForOrder returned failure:",
+                {
+                  orderId: savedOrderId,
+                  amount: total,
+                  error: result.error,
+                  detail: result.detail,
+                },
+              );
+              qrisError = mapBuatQrisFailure(result.error, result.detail);
+            }
+          } catch (buatqrisErr) {
+            console.error(
+              "[BuatQRIS] generateBuatQrisForOrder threw:",
+              buatqrisErr,
+            );
+            qrisError =
+              buatqrisErr instanceof BuatQrisError
+                ? buatqrisErr.message
+                : "Terjadi gangguan pada layanan pembayaran QRIS. Silakan coba Transfer Bank Manual.";
+          }
+        }
+      } else if (buildCasakuConfig(settings)) {
+        if (savedOrderId) {
           try {
             const result = await generateQrisForOrder(
               savedOrderId,
@@ -462,37 +550,23 @@ export async function POST(request: Request) {
               settings,
             );
             if (result.ok) {
-              casaku = {
-                ...result.data,
+              qris = {
+                transactionId: result.data.transactionId,
+                qrString: result.data.qrString || "",
+                originalAmount: result.data.originalAmount,
+                totalAmount: result.data.totalAmount,
+                uniqueNominal: result.data.uniqueNominal,
+                expiredInMinutes: result.data.expiredInMinutes,
+                ...(result.data.paymentUrl
+                  ? { paymentUrl: result.data.paymentUrl }
+                  : {}),
                 expiresAt: result.expiresAt.toISOString(),
               };
             } else {
-              console.error("[CASKU] generateQrisForOrder returned failure:", {
-                orderId: savedOrderId,
-                amount: total,
-                error: result.error,
-                detail: result.detail,
-              });
-              casakuError = mapCasakuFailure(result.error, result.detail);
+              qrisError = mapCasakuFailure(result.error, result.detail);
             }
           } catch (casakuErr) {
-            console.error("[CASKU] generateQrisForOrder threw:", {
-              orderId: savedOrderId,
-              amount: total,
-              error:
-                casakuErr instanceof Error
-                  ? {
-                      name: casakuErr.name,
-                      message: casakuErr.message,
-                      status:
-                        "status" in casakuErr
-                          ? (casakuErr as { status?: unknown }).status
-                          : undefined,
-                      stack: casakuErr.stack,
-                    }
-                  : casakuErr,
-            });
-            casakuError =
+            qrisError =
               casakuErr instanceof CasakuError && casakuErr.status === 403
                 ? "Pembayaran QRIS belum diaktifkan oleh admin toko"
                 : casakuErr instanceof CasakuError
@@ -504,11 +578,6 @@ export async function POST(request: Request) {
     } catch {
       // Ignore settings read error
     }
-
-    // NOTE: no fabricated/mock QRIS fallback here. A fake QR string would
-    // render a scannable image that never triggers a real payment — the
-    // order would stay PENDING forever. If Casaku is unavailable, the
-    // client falls back to Midtrans Snap or shows a truthful error.
 
     if (!snapToken) {
       try {
@@ -541,7 +610,6 @@ export async function POST(request: Request) {
         snapToken = midtransResponse.token;
         redirectUrl = midtransResponse.redirect_url;
 
-        // C-2: persist correlation id so the webhook can resolve this order.
         if (savedOrderId) {
           await prisma.order
             .update({
@@ -553,7 +621,7 @@ export async function POST(request: Request) {
             });
         }
       } catch {
-        // C-3 FIX: fail closed. Do NOT fabricate a mock token.
+        // fail closed
       }
     }
 
@@ -561,8 +629,10 @@ export async function POST(request: Request) {
       orderId: savedOrderId,
       orderNumber,
       total,
-      casaku,
-      casakuError,
+      qris,
+      qrisError,
+      casaku: qris,
+      casakuError: qrisError,
       snapToken,
       redirectUrl,
       items: orderItemsToSave,
@@ -581,19 +651,15 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  try {
-    let userId: string | null = null;
-    try {
-      const authObj = await auth();
-      userId = authObj?.userId ?? null;
-    } catch {
-      // Unauthenticated
+  return withRLSContext(async (context, tx) => {
+    if (context.actorKind !== "customer") {
+      return NextResponse.json({ orders: [] });
     }
 
-    let dbOrders: OrderWithRelations[] = [];
     try {
-      if (userId) {
-        dbOrders = await prisma.order.findMany({
+      let dbOrders: OrderWithRelations[] = [];
+      try {
+        dbOrders = await tx.order.findMany({
           include: {
             items: {
               include: { product: true },
@@ -602,63 +668,63 @@ export async function GET() {
           },
           orderBy: { createdAt: "desc" },
         });
+      } catch {
+        // db unavailable - return empty list
       }
-    } catch {
-      // db unavailable - return empty list
+
+      const formattedOrders = dbOrders.map((order) => {
+        const shippingAddress = order.shippingAddress as {
+          recipientName?: string;
+          addressLine1?: string;
+          city?: string;
+          province?: string;
+          postalCode?: string;
+          phone?: string;
+        } | null;
+
+        return {
+          id: order.id,
+          orderNumber: order.orderNumber,
+          trackingNumber:
+            ((order as Record<string, unknown>).trackingNumber as
+              string | null) ?? null,
+          status: order.status,
+          subtotal: order.subtotal.toString(),
+          shippingCost: order.shippingCost.toString(),
+          total: order.total.toString(),
+          shippingMethod: order.shippingMethod,
+          shippingRate: order.shippingRate,
+          createdAt: order.createdAt.toISOString(),
+          items: order.items.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price.toString(),
+            subtotal: item.subtotal.toString(),
+            product: {
+              id: item.product.id,
+              name: item.product.name,
+              slug: item.product.slug,
+              image: item.product.image,
+              price: item.product.price.toString(),
+            },
+          })),
+          shippingAddress: shippingAddress
+            ? {
+                recipientName: shippingAddress.recipientName || "",
+                phone: shippingAddress.phone || "",
+                addressLine1: shippingAddress.addressLine1 || "",
+                city: shippingAddress.city || "",
+                province: shippingAddress.province || "",
+                postalCode: shippingAddress.postalCode || "",
+              }
+            : null,
+        };
+      });
+
+      return NextResponse.json({ orders: formattedOrders });
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      return NextResponse.json({ orders: [] });
     }
-
-    const formattedOrders = dbOrders.map((order) => {
-      const shippingAddress = order.shippingAddress as {
-        recipientName?: string;
-        addressLine1?: string;
-        city?: string;
-        province?: string;
-        postalCode?: string;
-        phone?: string;
-      } | null;
-
-      return {
-        id: order.id,
-        orderNumber: order.orderNumber,
-        trackingNumber:
-          ((order as Record<string, unknown>).trackingNumber as
-            string | null) ?? null,
-        status: order.status,
-        subtotal: order.subtotal.toString(),
-        shippingCost: order.shippingCost.toString(),
-        total: order.total.toString(),
-        shippingMethod: order.shippingMethod,
-        shippingRate: order.shippingRate,
-        createdAt: order.createdAt.toISOString(),
-        items: order.items.map((item) => ({
-          id: item.id,
-          quantity: item.quantity,
-          price: item.price.toString(),
-          subtotal: item.subtotal.toString(),
-          product: {
-            id: item.product.id,
-            name: item.product.name,
-            slug: item.product.slug,
-            image: item.product.image,
-            price: item.product.price.toString(),
-          },
-        })),
-        shippingAddress: shippingAddress
-          ? {
-              recipientName: shippingAddress.recipientName || "",
-              phone: shippingAddress.phone || "",
-              addressLine1: shippingAddress.addressLine1 || "",
-              city: shippingAddress.city || "",
-              province: shippingAddress.province || "",
-              postalCode: shippingAddress.postalCode || "",
-            }
-          : null,
-      };
-    });
-
-    return NextResponse.json({ orders: formattedOrders });
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    return NextResponse.json({ orders: [] });
-  }
+  });
 }

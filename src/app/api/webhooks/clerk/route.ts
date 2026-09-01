@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
-import { prisma } from "@/lib/prisma";
+import { withSystemRLSContext } from "@/middleware/rls-context";
 
 type ClerkUserEventData = {
   id: string;
@@ -53,35 +53,43 @@ export async function POST(request: Request) {
 
     switch (type) {
       case "user.created": {
-        await prisma.user.create({
-          data: {
-            clerkId: data.id,
-            email: data.email_addresses?.[0]?.email_address ?? "",
-            name:
-              `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim() || null,
-            phone: data.phone_numbers?.[0]?.phone_number ?? null,
-          },
-        });
+        await withSystemRLSContext(async (_context, tx) =>
+          tx.user.create({
+            data: {
+              clerkId: data.id,
+              email: data.email_addresses?.[0]?.email_address ?? "",
+              name:
+                `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim() ||
+                null,
+              phone: data.phone_numbers?.[0]?.phone_number ?? null,
+            },
+          }),
+        );
         console.log("User created:", data.id);
         break;
       }
       case "user.updated": {
-        await prisma.user.update({
-          where: { clerkId: data.id },
-          data: {
-            email: data.email_addresses?.[0]?.email_address ?? "",
-            name:
-              `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim() || null,
-            phone: data.phone_numbers?.[0]?.phone_number ?? null,
-          },
-        });
+        await withSystemRLSContext(async (_context, tx) =>
+          tx.user.update({
+            where: { clerkId: data.id },
+            data: {
+              email: data.email_addresses?.[0]?.email_address ?? "",
+              name:
+                `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim() ||
+                null,
+              phone: data.phone_numbers?.[0]?.phone_number ?? null,
+            },
+          }),
+        );
         console.log("User updated:", data.id);
         break;
       }
       case "user.deleted": {
-        await prisma.user.delete({
-          where: { clerkId: data.id },
-        });
+        await withSystemRLSContext(async (_context, tx) =>
+          tx.user.delete({
+            where: { clerkId: data.id },
+          }),
+        );
         console.log("User deleted:", data.id);
         break;
       }

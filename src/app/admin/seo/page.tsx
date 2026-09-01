@@ -13,71 +13,75 @@ export default async function AdminSeoPage() {
         description="Monitor canonical tags, OpenGraph previews, and search indexability"
       />
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
             Indexed Pages
-          </span>
-          <p className="text-2xl font-bold text-emerald-600 mt-1 font-mono">
+          </p>
+          <p className="mt-2.5 font-mono text-lg leading-none tracking-tight text-supporting-900">
             {health.indexedPages.count}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="mt-1.5 text-xs text-supporting-500">
             URL aktif dari product/content source
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
             Schema.org Structured Data
-          </span>
-          <p className="text-2xl font-bold text-blue-600 mt-1 font-mono">
+          </p>
+          <p className="mt-2.5 font-mono text-lg leading-none tracking-tight text-primary-800">
             {health.structuredData.state.toUpperCase()}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="mt-1.5 text-xs text-supporting-500">
             Validasi structured data belum terhubung ke health check
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
             Sitemap Status
-          </span>
-          <p className="text-2xl font-bold text-purple-600 mt-1 font-mono">
+          </p>
+          <p className="mt-2.5 font-mono text-lg leading-none tracking-tight text-accent-700">
             {health.sitemap.state.toUpperCase()}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="mt-1.5 text-xs text-supporting-500">
             {health.sitemap.url} tersedia dari metadata runtime
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
-        <h3 className="text-base font-semibold text-gray-900">
-          SEO Recommendations
-        </h3>
-        <ul className="divide-y divide-gray-100 text-xs">
-          <li className="py-3 flex items-center justify-between">
+      <div className="admin-panel overflow-hidden">
+        <div className="border-b border-supporting-200 px-5 py-4">
+          <h3 className="text-sm font-medium text-supporting-900">
+            SEO Recommendations
+          </h3>
+        </div>
+        <ul className="divide-y divide-supporting-100">
+          <li className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="text-sm font-medium text-supporting-900">
                 Ensure all product images include descriptive alt text
               </p>
-              <p className="text-gray-500">
+              <p className="mt-0.5 text-xs text-supporting-500">
                 {health.products.imagesComplete}/{health.products.total} produk
                 memiliki image source
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
+            <span className="inline-flex rounded-full border border-primary-200 bg-primary-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-800">
               Review
             </span>
           </li>
-          <li className="py-3 flex items-center justify-between">
+          <li className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="text-sm font-medium text-supporting-900">
                 Verify 301 redirects for legacy WordPress URLs
               </p>
-              <p className="text-gray-500">{health.redirects.detail}</p>
+              <p className="mt-0.5 text-xs text-supporting-500">
+                {health.redirects.detail}
+              </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold">
+            <span className="inline-flex rounded-full border border-accent-200 bg-accent-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-800">
               Blocked
             </span>
           </li>

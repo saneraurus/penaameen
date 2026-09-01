@@ -266,12 +266,12 @@ export const methods: Method[] = [
     slug: "al-barqy",
     name: "AL-BARQY (Metode 200 Menit Anti Lupa)",
     tagline:
-      "Metode Cepat Membaca Al-Qur'an 200 Menit Anti Lupa Karya KH. Nursyamsu Muhadi",
+      "Metode Cepat Membaca Al-Qur'an 200 Menit Anti Lupa Karya KH. Muhadjir Sulthon",
     officialReference:
-      "Karya Legendaris KH. Nursyamsu Muhadi Sejak 1965 • Diterbitkan oleh Penerbit Pena Ameen",
+      "Karya Legendaris KH. Muhadjir Sulthon Sejak 1965 • Diterbitkan oleh Penerbit Pena Ameen",
     officialDomain: "https://penaameen.com/metode/al-barqy",
     description:
-      "Metode Al-Barqy adalah metode pembelajaran membaca Al-Qur'an tercepat dan paling sistematis di Indonesia. Ditemukan oleh KH. Nursyamsu Muhadi pada tahun 1965, metode ini mengusung formula kata kunci fonetik 'Anti Lupa' (A-DA-RA-JA, MA-HA-KA-YA) yang mampu mengantarkan pembelajar dari nol hingga mahir membaca Al-Qur'an dalam total durasi belajar 200 menit.",
+      "Metode Al-Barqy adalah metode pembelajaran membaca Al-Qur'an tercepat dan paling sistematis di Indonesia. Ditemukan oleh KH. Muhadjir Sulthon pada tahun 1965, metode ini mengusung formula kata kunci fonetik 'Anti Lupa' (A-DA-RA-JA, MA-HA-KA-YA) yang mampu mengantarkan pembelajar dari nol hingga mahir membaca Al-Qur'an dalam total durasi belajar 200 menit.",
     philosophy:
       "Al-Barqy berarti 'Kilat'. Metode ini memanfaatkan prinsip asosiasi bunyi kata alami bahasa Indonesia yang telah diakrabi oleh lidah pembelajar. Tanpa perlu mengeja harakat dan huruf satu per satu secara rumit, santri diajak mengenali pola nada dan struktur huruf bersambung secara intuitif dan permanen.",
     suitableFor:
@@ -401,14 +401,14 @@ export const methods: Method[] = [
       title:
         "Metode AL-BARQY (Belajar Cepat Membaca Al-Qur'an 200 Menit Anti Lupa) | Pena Ameen",
       description:
-        "Pelajari Metode AL-BARQY resmi Penerbit Pena Ameen. Metode legendaris KH. Nursyamsu Muhadi untuk belajar membaca Al-Qur'an cepat 200 menit anti-lupa untuk anak, remaja, dan dewasa.",
+        "Pelajari Metode AL-BARQY resmi Penerbit Pena Ameen. Metode legendaris KH. Muhadjir Sulthon untuk belajar membaca Al-Qur'an cepat 200 menit anti-lupa untuk anak, remaja, dan dewasa.",
       keywords: [
         "metode albarqy",
         "albarqy 200 menit",
         "belajar membaca alquran cepat",
         "metode albarqy anti lupa",
         "penerbit pena ameen albarqy",
-        "kh nursyamsu muhadi",
+        "kh muhadjir sulthon",
       ],
     },
   },

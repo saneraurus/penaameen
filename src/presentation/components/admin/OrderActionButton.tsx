@@ -31,9 +31,10 @@ export function OrderActionButton({
   const [error, setError] = useState<string | null>(null);
 
   const variantClasses = {
-    primary: "bg-primary-600 text-white hover:bg-primary-700",
-    danger: "border border-red-300 text-red-600 hover:bg-red-50",
-    default: "border border-gray-300 text-gray-700 hover:bg-gray-50",
+    primary: "bg-primary-950 text-background-100 hover:bg-primary-900",
+    danger: "border border-red-200 text-red-700 hover:bg-red-50",
+    default:
+      "border border-supporting-300 text-supporting-800 hover:bg-supporting-50",
   };
 
   async function handleClick() {

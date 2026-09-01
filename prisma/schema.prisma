@@ -328,3 +328,17 @@ model ChatMessage {
 
   @@index([sessionId, createdAt])
 }
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  fullName     String?
+  role         String    @default("admin")
+  isActive     Boolean   @default(true)
+  lastActiveAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([username])
+}

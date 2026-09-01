@@ -61,6 +61,10 @@ export async function POST(request: Request) {
         ...current.casaku,
         ...(body.casaku || {}),
       },
+      buatqris: {
+        ...current.buatqris,
+        ...(body.buatqris || {}),
+      },
     };
 
     const before = getPublicApiSettings();
@@ -78,12 +82,14 @@ export async function POST(request: Request) {
         rajaongkirTier: before.rajaongkir.tier,
         autoEmailProvider: before.autoEmail.provider,
         casakuEnabled: before.casaku.enabled,
+        buatqrisEnabled: before.buatqris?.enabled,
       },
       after: {
         midtransIsProduction: after.midtrans.isProduction,
         rajaongkirTier: after.rajaongkir.tier,
         autoEmailProvider: after.autoEmail.provider,
         casakuEnabled: after.casaku.enabled,
+        buatqrisEnabled: after.buatqris?.enabled,
       },
       reason: "API/integration settings changed (secrets masked in audit)",
     });

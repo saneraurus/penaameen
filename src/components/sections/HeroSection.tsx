@@ -53,7 +53,7 @@ const showcaseTabs: ShowcaseTab[] = [
     badge: "Metode Anti Lupa Revolusioner",
     title: "Lancar Membaca Al-Qur'an dalam 200 Menit",
     description:
-      "Formula fonetik kata kunci (A-DA-RA-JA, MA-HA-KA-YA) karya KH. Nursyamsu Muhadi. Tuntas membaca Al-Qur'an secara tartil tanpa mengeja huruf satu per satu.",
+      "Formula fonetik kata kunci (A-DA-RA-JA, MA-HA-KA-YA) karya KH. Muhadjir Sulthon. Tuntas membaca Al-Qur'an secara tartil tanpa mengeja huruf satu per satu.",
     image: "/images/penaameen/methods/method-albarqy.jpg",
     imageAlt:
       "Santri dan murid belajar membaca Al-Qur'an dengan metode Al-Barqy anti lupa",
@@ -184,8 +184,9 @@ export function HeroSection() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        <div className="absolute inset-0 bg-primary-950/76" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/35 to-primary-950/70" />
+        <div className="absolute inset-0 bg-primary-950/88" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/78 to-primary-950/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-950/55 via-transparent to-primary-950/35" />
       </div>
 
       <div className="container relative z-10 pb-16 pt-20 sm:pb-20 sm:pt-28 lg:pb-24 lg:pt-32">

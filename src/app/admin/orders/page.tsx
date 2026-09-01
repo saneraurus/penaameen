@@ -43,20 +43,20 @@ export default async function AdminOrdersPage({
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+      <div className="admin-panel p-3">
         <form className="flex flex-wrap items-center gap-3">
           <input
             type="search"
             name="search"
             defaultValue={search}
             placeholder="Cari nomor pesanan, nama pelanggan, email..."
-            className="flex-1 min-w-[240px] px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="flex-1 min-w-[200px] rounded-lg border border-supporting-200 bg-supporting-50 px-3.5 py-2 text-xs tracking-tight text-supporting-900 placeholder:text-supporting-400 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
           />
 
           <select
             name="status"
             defaultValue={status}
-            className="px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="rounded-lg border border-supporting-200 bg-supporting-50 px-3 py-2 text-xs font-semibold tracking-tight text-supporting-800 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
           >
             <option value="">Semua Status</option>
             <option value="pending">Menunggu Bayar</option>
@@ -68,7 +68,7 @@ export default async function AdminOrdersPage({
           <select
             name="paymentStatus"
             defaultValue={paymentStatus}
-            className="px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="rounded-lg border border-supporting-200 bg-supporting-50 px-3 py-2 text-xs font-semibold tracking-tight text-supporting-800 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
           >
             <option value="">Semua Pembayaran</option>
             <option value="paid">Terbayar (Paid)</option>
@@ -79,7 +79,7 @@ export default async function AdminOrdersPage({
           <select
             name="fulfillmentStatus"
             defaultValue={fulfillmentStatus}
-            className="px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="rounded-lg border border-supporting-200 bg-supporting-50 px-3 py-2 text-xs font-semibold tracking-tight text-supporting-800 focus:border-primary-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-800 transition-colors"
           >
             <option value="">Semua Pengiriman</option>
             <option value="unfulfilled">Belum Dikemas</option>
@@ -90,7 +90,7 @@ export default async function AdminOrdersPage({
 
           <button
             type="submit"
-            className="px-5 py-2 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-5 py-2 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-900 cursor-pointer"
           >
             Filter
           </button>

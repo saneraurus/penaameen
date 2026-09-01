@@ -10,8 +10,6 @@ import crypto from "crypto";
  */
 
 export const CASAKU_DEFAULT_BASE_URL = "https://api.casaku.id";
-export const CASAKU_QR_IMAGE_URL =
-  "https://larabert-qrgen.hf.space/v1/create-qr-code";
 
 export type CasakuPaymentStatus =
   "pending" | "paid" | "success" | "cancel" | "expired";
@@ -234,19 +232,6 @@ export class CasakuClient {
 
   async getProfile(): Promise<CasakuProfileData> {
     return this.request<CasakuProfileData>("/api/profile", { method: "GET" });
-  }
-
-  /** Official Casaku QR renderer URL for a QRIS string. */
-  qrImageUrl(
-    data: string,
-    size: "200x200" | "300x300" | "500x500" = "300x300",
-  ): string {
-    const url = new URL(CASAKU_QR_IMAGE_URL);
-    url.searchParams.set("size", size);
-    url.searchParams.set("style", "2");
-    url.searchParams.set("color", "111111");
-    url.searchParams.set("data", data);
-    return url.toString();
   }
 }
 

@@ -76,26 +76,6 @@ export default function CheckoutAddressPage() {
   useEffect(() => {
     if (!isSignedIn) return;
 
-    const dynamicName =
-      user?.fullName ||
-      (user?.firstName
-        ? `${user.firstName} ${user.lastName || ""}`.trim()
-        : "");
-
-    const dynamicDefaultAddress: Address = {
-      id: "addr-default-1",
-      label: "Rumah",
-      recipientName: dynamicName,
-      phone: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      province: "",
-      postalCode: "",
-      country: "Indonesia",
-      isDefault: true,
-    };
-
     async function loadAddresses() {
       try {
         const res = await fetch("/api/addresses");
@@ -104,7 +84,6 @@ export default function CheckoutAddressPage() {
           const apiAddrs = data.addresses ?? [];
           if (apiAddrs.length > 0 && apiAddrs[0]) {
             setAddresses(apiAddrs);
-            setSelectedAddressId(apiAddrs[0].id);
             setIsLoadingAddresses(false);
             return;
           }
@@ -120,7 +99,6 @@ export default function CheckoutAddressPage() {
           const parsed: Address[] = JSON.parse(localSaved);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setAddresses(parsed);
-            setSelectedAddressId(parsed[0]?.id || dynamicDefaultAddress.id);
             setIsLoadingAddresses(false);
             return;
           }
@@ -129,9 +107,10 @@ export default function CheckoutAddressPage() {
         // Fallback
       }
 
-      // Default dynamic address for the active user
-      setAddresses([dynamicDefaultAddress]);
-      setSelectedAddressId(dynamicDefaultAddress.id);
+      // No saved addresses: show empty state instead of a fake default.
+      // The user must add a real address before continuing.
+      setAddresses([]);
+      setSelectedAddressId("");
       setIsLoadingAddresses(false);
     }
 
@@ -203,28 +182,63 @@ export default function CheckoutAddressPage() {
   // Handle Add Address
   const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmed = {
+      label: form.label.trim(),
+      recipientName: form.recipientName.trim(),
+      phone: form.phone.trim(),
+      addressLine1: form.addressLine1.trim(),
+      addressLine2: form.addressLine2.trim(),
+      city: form.city.trim(),
+      province: form.province.trim(),
+      postalCode: form.postalCode.trim(),
+    };
+
     if (
-      !form.recipientName ||
-      !form.phone ||
-      !form.addressLine1 ||
-      !form.city ||
-      !form.province ||
-      !form.postalCode
+      !trimmed.recipientName ||
+      !trimmed.phone ||
+      !trimmed.addressLine1 ||
+      !trimmed.city ||
+      !trimmed.province ||
+      !trimmed.postalCode
     ) {
-      setError("Mohon lengkapi semua field alamat wajib.");
+      setError("Lengkapi semua field bertanda * sebelum simpan alamat.");
+      return;
+    }
+
+    if (trimmed.recipientName.split(/\s+/).length < 2) {
+      setError("Nama penerima harus lengkap (minimal 2 kata).");
+      return;
+    }
+
+    if (!/^(\+?62|0)8\d{7,11}$/.test(trimmed.phone)) {
+      setError(
+        "Nomor WhatsApp/HP tidak valid. Gunakan format Indonesia, contoh: 0812xxxxxxx.",
+      );
+      return;
+    }
+
+    if (trimmed.addressLine1.length < 10) {
+      setError(
+        "Alamat terlalu pendek. Cantumkan nama jalan, nomor rumah, RT/RW, kelurahan/kecamatan.",
+      );
+      return;
+    }
+
+    if (!/^\d{5}$/.test(trimmed.postalCode)) {
+      setError("Kode Pos harus 5 digit angka.");
       return;
     }
 
     const newAddr: Address = {
       id: "addr-" + Date.now(),
-      label: form.label || "Alamat Baru",
-      recipientName: form.recipientName,
-      phone: form.phone,
-      addressLine1: form.addressLine1,
-      addressLine2: form.addressLine2 || null,
-      city: form.city,
-      province: form.province,
-      postalCode: form.postalCode,
+      label: trimmed.label || "Alamat Baru",
+      recipientName: trimmed.recipientName,
+      phone: trimmed.phone,
+      addressLine1: trimmed.addressLine1,
+      addressLine2: trimmed.addressLine2 || null,
+      city: trimmed.city,
+      province: trimmed.province,
+      postalCode: trimmed.postalCode,
       country: "Indonesia",
       isDefault: addresses.length === 0,
     };
@@ -333,7 +347,7 @@ export default function CheckoutAddressPage() {
   return (
     <div className="min-h-screen bg-background-50 pb-24">
       {/* Checkout Step Breadcrumb Bar */}
-      <div className="bg-white border-b border-supporting-200/80 sticky top-0 z-30 shadow-2xs">
+      <div className="bg-white border-b border-supporting-200/80 sticky top-0 z-30">
         <div className="container px-4 mx-auto py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -361,7 +375,7 @@ export default function CheckoutAddressPage() {
             {/* Stepper */}
             <div className="flex items-center gap-2 sm:gap-4 text-xs font-semibold">
               <div className="flex items-center gap-2 text-emerald-700">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold shadow-xs">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold">
                   1
                 </span>
                 <span>Alamat &amp; Kurir</span>
@@ -456,7 +470,7 @@ export default function CheckoutAddressPage() {
                         key={addr.id}
                         className={`group relative flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                           isSelected
-                            ? "border-emerald-600 bg-emerald-50/40 shadow-xs ring-1 ring-emerald-500/20"
+                            ? "border-primary-600 bg-primary-50/40 shadow-xs ring-1 ring-primary-500/20"
                             : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
                         }`}
                       >
@@ -466,7 +480,7 @@ export default function CheckoutAddressPage() {
                           value={addr.id}
                           checked={isSelected}
                           onChange={() => setSelectedAddressId(addr.id)}
-                          className="mt-1 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                          className="mt-1 text-primary-600 focus:ring-primary-500 cursor-pointer"
                         />
 
                         <div className="flex-1 min-w-0">
@@ -547,7 +561,7 @@ export default function CheckoutAddressPage() {
                           key={key}
                           className={`relative flex flex-col justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                             isSelected
-                              ? "border-emerald-600 bg-emerald-50/40 shadow-xs ring-2 ring-emerald-500/20"
+                              ? "border-primary-600 bg-primary-50/40 shadow-xs ring-2 ring-primary-500/20"
                               : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
                           }`}
                         >

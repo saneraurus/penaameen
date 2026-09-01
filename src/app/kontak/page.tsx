@@ -1,176 +1,158 @@
-// src/app/kontak/page.tsx
-import Link from "next/link";
+import Image from "next/image";
+import { Reveal, RevealGroup } from "@/components/motion/Reveal";
+import {
+  Section,
+  Shell,
+  SectionHeading,
+  Eyebrow,
+  SceneIndex,
+  TextLink,
+} from "@/components/ui/primitives";
+import { ContactForm } from "./ContactForm";
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background-50">
-      <header className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b border-supporting-200">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-            <Link
-              href="/"
-              className="text-supporting-600 hover:text-primary-600"
-            >
-              ← Kembali ke Beranda
-            </Link>
-            <h1 className="text-2xl font-serif text-primary-600">Kontak</h1>
+      {/* Editorial hero */}
+      <Section tone="none" className="section-y-tight">
+        <Shell>
+          <RevealGroup>
+            <SceneIndex index="01" label="Hubungi Kami" />
+            <SectionHeading>Kontak</SectionHeading>
+            <p className="lede text-measure mt-6">
+              Kami ingin mendengar dari Anda. Baik untuk bertanya, beri masukan,
+              atau memulai percakapan tentang metode belajar Pena Ameen.
+            </p>
+            <div className="mt-8">
+              <TextLink href="/">← Kembali ke Beranda</TextLink>
+            </div>
+          </RevealGroup>
+        </Shell>
+      </Section>
+
+      {/* Story / Image block */}
+      <Section tone="none">
+        <Shell>
+          <div className="grid gap-8 md:grid-cols-12 md:items-center">
+            <div className="md:col-span-7">
+              <Reveal variant="large">
+                <div className="image-frame image-frame-zoom aspect-[4/3] md:aspect-[16/9]">
+                  <Image
+                    src="/images/penaameen/editorial/tentang-hero-family.jpg"
+                    alt="Keluarga yang belajar bersama di rumah"
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 75vw"
+                  />
+                </div>
+              </Reveal>
+            </div>
+            <div className="md:col-span-5 md:pl-8">
+              <Reveal variant="medium" delay={0.12}>
+                <Eyebrow>Pena Ameen</Eyebrow>
+                <SectionHeading level={3} className="mt-4">
+                  Kantor Pusat
+                </SectionHeading>
+                <div className="mt-6 space-y-3 text-sm leading-relaxed text-supporting-700">
+                  <p>
+                    GRAHA AL BARQY
+                    <br />
+                    Jl. Gayungsari 1A
+                    <br />
+                    Surabaya, Jawa Timur – INDONESIA
+                  </p>
+                  <p>Phone: +6231 829 4393</p>
+                  <p>Mobile: +62822 3123 9158</p>
+                  <p>Email: cs.penaameen@yahoo.com</p>
+                </div>
+              </Reveal>
+            </div>
           </div>
-        </div>
-      </header>
+        </Shell>
+      </Section>
 
-      <main className="py-12">
-        <div className="container px-4 mx-auto">
-          <div className="space-y-12">
-            {/* Contact Info */}
-            <section>
-              <h2 className="mb-6 text-3xl font-serif text-primary-600">
-                Hubungi Kami
-              </h2>
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <h3 className="mb-3 text-xl font-semibold text-primary-600">
-                    Kantor Pusat
-                  </h3>
-                  <p className="mb-4">
-                    GRAHA AL BARQY Jl. Gayungsari 1A Surabaya Jawa Timur –
-                    INDONESIA
-                  </p>
-                  <p className="mb-4">Phone: +6231 829 4393</p>
-                  <p className="mb-4">Mobile: +62822 3123 9158</p>
-                  <p className="mb-4">Email: cs.penaameen@yahoo.com</p>
-                </div>
-                <div className="bg-supporting-50 rounded-xl p-6">
-                  <h3 className="mb-4 text-xl font-semibold text-primary-600">
-                    Media Sosial
-                  </h3>
-                  <p className="mb-4 text-supporting-600">
-                    Ikuti kami untuk update terbaru tentang produk dan metode
-                    belajar kami.
-                  </p>
-                  <div className="flex space-x-4">
-                    <span
-                      className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
-                      aria-label="Facebook"
-                    >
-                      <svg
-                        className="h-5 w-5 text-primary-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
-                        />
-                      </svg>
-                    </span>
-                    <span
-                      className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <svg
-                        className="h-5 w-5 text-primary-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4 4v16a2 2 0 002 2h16a2 2 0 002-2V4a2 2 0 00-2-2H4a2 2 0 00-2 2z"
-                        />
-                      </svg>
-                    </span>
-                    <a
-                      href="https://wa.me/6282231239158"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-center w-10 h-10 bg-primary-50 rounded-full hover:bg-primary-100 transition-colors"
-                      aria-label="WhatsApp"
-                    >
-                      <svg
-                        className="h-5 w-5 text-primary-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-3z"
-                        />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Contact Form (placeholder) */}
-            <section>
-              <h2 className="mb-6 text-3xl font-serif text-primary-600">
-                Kirim Pesan
-              </h2>
-              <div className="space-y-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-                Formulir kontak belum terhubung ke kanal penerimaan pesan.
-                Gunakan WhatsApp atau email resmi di atas agar pesan tidak
-                hilang.
-              </div>
-              <div className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-supporting-900"
-                  >
-                    Nama
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    placeholder="Nama Anda"
-                    className="w-full px-4 py-2 border border-supporting-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-supporting-900"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="alamat@email.com"
-                    className="w-full px-4 py-2 border border-supporting-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block mb-2 text-sm font-medium text-supporting-900"
-                  >
-                    Pesan
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={5}
-                    placeholder="Tulis pesan Anda di sini..."
-                    className="w-full px-4 py-2 border border-supporting-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <a
-                  href="mailto:cs.penaameen@yahoo.com"
-                  className="block w-full px-6 py-3 text-center bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors font-medium"
+      {/* Social + minimal form */}
+      <Section tone="canvas">
+        <Shell>
+          <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+            {/* Social */}
+            <div>
+              <Reveal>
+                <Eyebrow>Terhubung</Eyebrow>
+                <SectionHeading level={3} className="mt-4">
+                  Media Sosial
+                </SectionHeading>
+                <p className="lede text-measure-tight mt-4 text-supporting-600">
+                  Ikuti kami untuk update terbaru tentang produk dan metode
+                  belajar kami.
+                </p>
+              </Reveal>
+              <RevealGroup className="mt-8 flex gap-3">
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-950 text-background-100 transition-colors hover:bg-primary-900"
+                  aria-label="Facebook"
                 >
-                  Kirim melalui Email
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                    />
+                  </svg>
+                </span>
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-950 text-background-100 transition-colors hover:bg-primary-900"
+                  aria-label="Instagram"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 4v16a2 2 0 002 2h16a2 2 0 002-2V4a2 2 0 00-2-2H4a2 2 0 00-2 2z"
+                    />
+                  </svg>
+                </span>
+                <a
+                  href="https://wa.me/6282231239158"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-950 text-background-100 transition-colors hover:bg-primary-900"
+                  aria-label="WhatsApp"
+                >
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-3z"
+                    />
+                  </svg>
                 </a>
-              </div>
-            </section>
+              </RevealGroup>
+            </div>
+
+            {/* Minimal form */}
+            <div>
+              <ContactForm />
+            </div>
           </div>
-        </div>
-      </main>
+        </Shell>
+      </Section>
     </div>
   );
 }

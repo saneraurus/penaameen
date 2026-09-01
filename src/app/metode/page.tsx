@@ -2,83 +2,101 @@
 import Link from "next/link";
 import Image from "next/image";
 import { methods } from "@/data/methods";
+import { Reveal } from "@/components/motion/Reveal";
+import { SceneIndex, Lede, Shell } from "@/components/ui/primitives";
+import { SplitScene } from "@/components/story/StoryScene";
 
 export default function MethodListPage() {
+  const heroImage =
+    methods[0]?.image ?? "/images/penaameen/methods/method-albarqy.jpg";
+
   return (
     <div className="min-h-screen bg-background-50">
-      <header className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b border-supporting-200">
-        <div className="container px-4 mx-auto">
-          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-            <Link
-              href="/"
-              className="text-supporting-600 hover:text-primary-600"
-            >
-              ← Kembali ke Beranda
-            </Link>
-            <h1 className="text-2xl font-serif text-primary-600">
-              Program / Metode
-            </h1>
-          </div>
+      {/* Editorial Hero */}
+      <section className="relative overflow-hidden bg-primary-950 text-white">
+        <div className="absolute inset-0">
+          <Image
+            src={heroImage}
+            alt=""
+            fill
+            priority
+            unoptimized
+            className="object-cover opacity-20"
+          />
         </div>
-      </header>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-950 via-primary-950/90 to-primary-950/70" />
+        <Shell className="relative z-10 py-20 md:py-28">
+          <Reveal variant="micro">
+            <SceneIndex index="01" label="Program & Metode" />
+          </Reveal>
+          <Reveal variant="large" delay={0.05}>
+            <h1 className="display-type mt-5 text-[clamp(2.5rem,7vw,5rem)] text-background-50">
+              Program &amp; Metode
+            </h1>
+          </Reveal>
+          <Reveal variant="medium" delay={0.12}>
+            <Lede className="mt-6 max-w-2xl text-background-200">
+              Temukan metode belajar membaca Al-Qur&apos;an dan Latin yang tepat
+              untuk buah hati Anda. Setiap program dirancang dengan riset
+              pedagogik mendalam.
+            </Lede>
+          </Reveal>
+        </Shell>
+      </section>
 
-      <main className="py-12">
-        <div className="container px-4 mx-auto">
-          <h2 className="mb-8 text-3xl font-serif text-center text-primary-600">
-            Temukan Metode Belajar yang Tepat
-          </h2>
-          <div className="grid gap-8 md:grid-cols-2">
-            {methods.map((method) => (
-              <Link
-                key={method.id}
-                href={`/metode/${method.slug}`}
-                className="group block bg-white rounded-xl p-8 shadow-sm border border-supporting-200 hover:shadow-md transition-all"
-              >
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={method.image}
-                      alt={method.name}
-                      width={96}
-                      height={96}
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div className="ml-6 flex-1">
-                    <h3 className="mb-2 text-xl font-serif text-primary-600">
-                      {method.name}
-                    </h3>
-                    <p className="mb-4 text-supporting-600">
-                      {method.description}
-                    </p>
-                    <div className="mb-4 space-y-2 text-sm text-supporting-500">
-                      {method.benefits.map((benefit, index) => (
-                        <div key={index} className="flex items-start">
-                          <svg
-                            className="mt-0.5 h-4 w-4 text-primary-400 flex-shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 00-1.947 1.947"
-                            />
-                          </svg>
-                          <span className="ml-2">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <span className="inline-flex items-center px-3 py-1 bg-primary-50 text-primary-600 text-sm rounded-md">
-                      Untuk: {method.suitableFor}
+      {/* Methods — Split compositions */}
+      <main className="section-y">
+        <Shell>
+          <div className="space-y-24 md:space-y-32">
+            {methods.map((method, index) => (
+              <Reveal key={method.id} variant="medium" delay={index * 0.05}>
+                <SplitScene
+                  image={method.image}
+                  imageAlt={method.name}
+                  eyebrow={
+                    <span className="text-xs font-bold uppercase tracking-wider text-primary-300">
+                      Metode {index + 1} dari {methods.length}
                     </span>
+                  }
+                  headline={method.name}
+                  tone="canvas"
+                  reverse={index % 2 === 1}
+                  caption={method.tagline}
+                  actions={
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Link
+                        href={`/metode/${method.slug}`}
+                        className="inline-flex items-center gap-2 rounded-full bg-background-100 text-primary-950 px-6 py-3 text-sm font-bold hover:bg-white transition-colors"
+                      >
+                        <span>Pelajari Metode Ini</span>
+                        <span>→</span>
+                      </Link>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-300 bg-primary-800/50 px-3 py-1.5 rounded-full border border-primary-700/50">
+                        Untuk: {method.suitableFor}
+                      </span>
+                    </div>
+                  }
+                >
+                  <p className="text-measure text-base leading-relaxed text-supporting-600">
+                    {method.description}
+                  </p>
+                  <div className="mt-6 space-y-3">
+                    {method.benefits.slice(0, 3).map((benefit, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex-shrink-0">
+                          ✓
+                        </span>
+                        <span className="text-sm text-supporting-700">
+                          {benefit}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </Link>
+                </SplitScene>
+              </Reveal>
             ))}
           </div>
-        </div>
+        </Shell>
       </main>
     </div>
   );

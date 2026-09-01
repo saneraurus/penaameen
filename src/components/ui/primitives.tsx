@@ -164,13 +164,13 @@ const buttonBase =
   "inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-tight transition-all duration-200 ease-out active:translate-y-0 disabled:pointer-events-none disabled:opacity-45";
 
 const buttonTone: Record<ButtonTone, string> = {
-  ink: "bg-primary-900 text-background-50 hover:bg-primary-800 hover:-translate-y-0.5",
-  clay: "bg-accent-600 text-white hover:bg-accent-700 hover:-translate-y-0.5",
+  ink: "bg-primary-950 text-secondary-100 hover:bg-primary-900 hover:-translate-y-0.5",
+  clay: "bg-accent-500 text-primary-950 hover:bg-accent-600 hover:-translate-y-0.5",
   outline:
     "border border-supporting-300 text-supporting-800 hover:border-primary-700 hover:text-primary-800",
   ghost: "text-supporting-700 hover:text-primary-800",
   inverse:
-    "bg-background-50 text-primary-950 hover:bg-white hover:-translate-y-0.5",
+    "bg-background-100 text-primary-950 hover:bg-white hover:-translate-y-0.5",
 };
 
 const buttonSize: Record<ButtonSize, string> = {

@@ -10,7 +10,7 @@ describe("LearningJourneySection Component", () => {
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
       "Perjalanan Belajar Bersama PENA AMEEN",
     );
-    expect(screen.getByText("ALUR PENDAMPINGAN EFEKTIF")).toBeInTheDocument();
+    expect(screen.getByText(/Alur Pendampingan Efektif/i)).toBeInTheDocument();
   });
 
   it("renders all 5 steps and switches active step on click", () => {

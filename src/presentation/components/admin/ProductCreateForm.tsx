@@ -93,10 +93,7 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 shadow-xs space-y-6"
-    >
+    <form onSubmit={handleSubmit} className="admin-panel p-6 md:p-8 space-y-6">
       {errorMessage && (
         <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm font-medium flex items-center justify-between shadow-xs">
           <span>⚠️ {errorMessage}</span>
@@ -112,7 +109,7 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Nama Produk *
           </label>
           <input
@@ -122,12 +119,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleNameChange}
             placeholder="cth: Paket Buku Belajar Membaca Cepat"
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Slug URL *
           </label>
           <input
@@ -137,12 +134,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             placeholder="paket-buku-belajar-membaca-cepat"
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             SKU / Kode Produk
           </label>
           <input
@@ -151,12 +148,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             value={formData.sku}
             onChange={handleChange}
             placeholder="cth: PA-0020"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Kategori *
           </label>
           <input
@@ -166,7 +163,7 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             list="category-options"
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
           <datalist id="category-options">
             {categories.map((c) => (
@@ -180,14 +177,14 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Status Publikasi *
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           >
             <option value="published">
               ✓ Published (Langsung Tampil di Toko)
@@ -198,7 +195,7 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Harga Produk (IDR) *
           </label>
           <input
@@ -208,12 +205,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             placeholder="cth: 125000"
             required
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Jumlah Stok Awal
           </label>
           <input
@@ -222,12 +219,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             value={formData.stockQuantity}
             onChange={handleChange}
             placeholder="50"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Path / URL Gambar Produk
           </label>
           <input
@@ -236,12 +233,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             value={formData.image}
             onChange={handleChange}
             placeholder="/images/penaameen/products/home-learning.jpg"
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Deskripsi Ringkas (Cuplikan)
           </label>
           <textarea
@@ -250,12 +247,12 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             rows={2}
             placeholder="Ringkasan singkat produk untuk kartu katalog..."
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
             Deskripsi Lengkap Produk
           </label>
           <textarea
@@ -264,15 +261,15 @@ export function ProductCreateForm({ categories }: ProductCreateFormProps) {
             onChange={handleChange}
             rows={5}
             placeholder="Rincian lengkap isi buku, metodologi pembelajaran, dan keunggulan produk..."
-            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
           />
         </div>
       </div>
 
-      <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">
+      <div className="pt-4 border-t border-supporting-100 flex items-center justify-end gap-3">
         <Link
           href="/admin/products"
-          className="px-5 py-2.5 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+          className="px-5 py-2.5 border border-supporting-300 text-supporting-700 text-xs font-semibold rounded-xl hover:bg-supporting-50 transition-colors"
         >
           Batal
         </Link>

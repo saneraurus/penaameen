@@ -15,7 +15,7 @@ export function ProductsTabs() {
     <div
       role="tablist"
       aria-label="Navigasi kelola produk"
-      className="inline-flex items-center gap-1 p-1 bg-gray-100 border border-gray-200 rounded-xl"
+      className="inline-flex items-center gap-1 p-1 bg-supporting-50 border border-supporting-200 rounded-lg"
     >
       {tabs.map((tab) => {
         const isActive =
@@ -27,10 +27,10 @@ export function ProductsTabs() {
             href={tab.href}
             role="tab"
             aria-selected={isActive}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+            className={`px-3.5 py-1.5 text-xs font-semibold tracking-tight rounded-md transition-colors ${
               isActive
-                ? "bg-white text-primary-700 shadow-sm border border-gray-200"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-primary-800 border border-supporting-200 shadow-xs"
+                : "text-supporting-600 hover:text-supporting-800"
             }`}
           >
             {tab.name}

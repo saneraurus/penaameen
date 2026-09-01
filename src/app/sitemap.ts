@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getArticles, getBranches, getMethods } from "@/lib/content";
 
+// Generated at request time: it queries the database, so it must not be
+// statically prerendered at build (which would require a live DB during build).
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.APP_BASE_URL || "http://localhost:3000";
   const [articles, branches, methods] = await Promise.all([

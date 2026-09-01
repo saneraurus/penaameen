@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
+import { casakuQrImageUrl } from "@/lib/qr/qr-url";
 
 declare global {
   interface Window {
@@ -55,15 +56,6 @@ interface Order {
   casakuTotalAmount?: string | number | null;
   casakuQrString?: string | null;
   casakuExpiresAt?: string | null;
-}
-
-function casakuQrImageUrl(data: string): string {
-  const url = new URL("https://larabert-qrgen.hf.space/v1/create-qr-code");
-  url.searchParams.set("size", "300x300");
-  url.searchParams.set("style", "2");
-  url.searchParams.set("color", "111111");
-  url.searchParams.set("data", data);
-  return url.toString();
 }
 
 const statusConfig: Record<
@@ -228,11 +220,18 @@ function OrderDetailInner() {
     setCasakuError(null);
 
     try {
-      const res = await fetch("/api/payments/casaku/status", {
+      let res = await fetch("/api/payments/buatqris/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transactionId: order.casakuTransactionId }),
       });
+      if (!res.ok) {
+        res = await fetch("/api/payments/casaku/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transactionId: order.casakuTransactionId }),
+        });
+      }
       const data = await res.json();
 
       if (!res.ok) {
@@ -243,17 +242,25 @@ function OrderDetailInner() {
         return;
       }
 
-      if (data?.order?.status === "PAID") {
+      if (
+        data?.order?.status === "PAID" ||
+        data?.status === "success" ||
+        data?.status === "paid"
+      ) {
         setOrder((prev) => (prev ? { ...prev, status: "PAID" } : prev));
         router.refresh();
         setCheckingCasaku(false);
         return;
       }
 
-      if (data?.order?.status === "CANCELLED") {
+      if (
+        data?.order?.status === "CANCELLED" ||
+        data?.status === "failed" ||
+        data?.status === "expired"
+      ) {
         setOrder((prev) => (prev ? { ...prev, status: "CANCELLED" } : prev));
         setCasakuError(
-          "Pembayaran QRIS tidak ditemukan atau dibatalkan. Silakan hubungi CS.",
+          "Pembayaran QRIS tidak ditemukan atau kedaluwarsa. Silakan buat pesanan baru.",
         );
         setCheckingCasaku(false);
         return;
@@ -451,7 +458,7 @@ function OrderDetailInner() {
   return (
     <div className="min-h-screen bg-background-50 pb-24">
       {/* Top Header Breadcrumb */}
-      <section className="bg-white border-b border-supporting-200/80 py-6 shadow-2xs">
+      <section className="bg-white border-b border-supporting-200/80 py-6">
         <div className="container px-4 mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -482,7 +489,7 @@ function OrderDetailInner() {
                   href={waConfirmUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-colors shadow-2xs"
+                  className="px-4 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 text-xs font-semibold rounded-xl border border-primary-200 flex items-center gap-1.5 transition-colors"
                 >
                   <span>💬 Bantuan CS WhatsApp</span>
                 </a>

@@ -59,117 +59,131 @@ export default function HistoryPage() {
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 items-center">
             <div className="lg:col-span-7">
-              <span className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-200/80 text-xs font-semibold uppercase tracking-wider text-primary-800">
-                <span
-                  className="flex h-2 w-2 rounded-full bg-primary-500"
-                  aria-hidden="true"
-                />
-                Sejarah Perusahaan
-              </span>
-
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-primary-900 tracking-tight leading-[1.15] mb-5">
-                Sejarah PENA AMEEN
-                <span className="block text-primary-600">
-                  Dari PENA SUCI 1995 hingga Hari Ini
+              <Reveal>
+                <span className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-50 border border-primary-200/80 text-xs font-semibold uppercase tracking-wider text-primary-800">
+                  <span
+                    className="flex h-2 w-2 rounded-full bg-primary-500"
+                    aria-hidden="true"
+                  />
+                  Sejarah Perusahaan
                 </span>
-              </h1>
+              </Reveal>
 
-              <p className="text-base sm:text-lg text-supporting-600 leading-relaxed mb-6 max-w-2xl">
-                PENA AMEEN tumbuh dari PENA SUCI, perusahaan printing &amp;
-                publishing yang berdiri tahun 1995, dan dari kerja sama jangka
-                panjang dengan Al Ameen Serve Holding di Malaysia. Dua metode
-                pembelajaran, ACM dan Al-Barqy, menjadi benang merah sepanjang
-                perjalanan ini.
-              </p>
+              <Reveal delay={0.05}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-primary-900 tracking-tight leading-[1.15] mb-5">
+                  Sejarah PENA AMEEN
+                  <span className="block text-primary-600">
+                    Dari PENA SUCI 1995 hingga Hari Ini
+                  </span>
+                </h1>
+              </Reveal>
+
+              <Reveal delay={0.1}>
+                <p className="text-base sm:text-lg text-supporting-600 leading-relaxed mb-6 max-w-2xl">
+                  PENA AMEEN tumbuh dari PENA SUCI, perusahaan printing &amp;
+                  publishing yang berdiri tahun 1995, dan dari kerja sama jangka
+                  panjang dengan Al Ameen Serve Holding di Malaysia. Dua metode
+                  pembelajaran, ACM dan Al-Barqy, menjadi benang merah sepanjang
+                  perjalanan ini.
+                </p>
+              </Reveal>
 
               {/* Compact arc: 1995 → 2013 → now */}
-              <ol className="flex flex-wrap items-center gap-2 mb-8 list-none p-0">
-                {[
-                  { period: "1995", label: "PENA SUCI" },
-                  { period: "2013", label: "PENA AMEEN" },
-                  { period: "Kini", label: "Literasi & pelatihan" },
-                ].map((step, index) => (
-                  <li key={step.period} className="flex items-center gap-2">
-                    {index > 0 && (
-                      <span className="text-supporting-400" aria-hidden="true">
-                        →
+              <Reveal delay={0.12}>
+                <ol className="flex flex-wrap items-center gap-2 mb-8 list-none p-0">
+                  {[
+                    { period: "1995", label: "PENA SUCI" },
+                    { period: "2013", label: "PENA AMEEN" },
+                    { period: "Kini", label: "Literasi & pelatihan" },
+                  ].map((step, index) => (
+                    <li key={step.period} className="flex items-center gap-2">
+                      {index > 0 && (
+                        <span
+                          className="text-supporting-400"
+                          aria-hidden="true"
+                        >
+                          →
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-2 bg-white/90 border border-supporting-200 rounded-xl px-3 py-1.5 shadow-2xs">
+                        <span className="text-xs font-bold text-primary-700 tabular-nums">
+                          {step.period}
+                        </span>
+                        <span className="text-xs font-medium text-supporting-700">
+                          {step.label}
+                        </span>
                       </span>
-                    )}
-                    <span className="inline-flex items-center gap-2 bg-white/90 border border-supporting-200 rounded-xl px-3 py-1.5 shadow-2xs">
-                      <span className="text-xs font-bold text-primary-700 tabular-nums">
-                        {step.period}
-                      </span>
-                      <span className="text-xs font-medium text-supporting-700">
-                        {step.label}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+                    </li>
+                  ))}
+                </ol>
+              </Reveal>
 
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="#garis-waktu"
-                  className="px-5 py-3 bg-primary-700 text-white rounded-xl hover:bg-primary-800 transition-colors font-medium text-sm inline-flex items-center gap-2"
-                >
-                  Lihat Garis Waktu
-                  <svg
-                    className="h-4 w-4"
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <Reveal delay={0.14}>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="#garis-waktu"
+                    className="px-5 py-3 bg-primary-700 text-white rounded-xl hover:bg-primary-800 transition-colors font-medium text-sm inline-flex items-center gap-2"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </Link>
-                <Link
-                  href="/metode"
-                  className="px-5 py-3 border border-primary-300 text-primary-700 rounded-xl hover:bg-primary-50 transition-colors font-medium text-sm"
-                >
-                  Kenali Metode
-                </Link>
-              </div>
+                    Lihat Garis Waktu
+                    <svg
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </Link>
+                  <Link
+                    href="/metode"
+                    className="px-5 py-3 border border-primary-300 text-primary-700 rounded-xl hover:bg-primary-50 transition-colors font-medium text-sm"
+                  >
+                    Kenali Metode
+                  </Link>
+                </div>
+              </Reveal>
             </div>
 
             <div className="lg:col-span-5">
-              <figure className="relative m-0">
-                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-supporting-100">
-                  <Image
-                    src="/images/penaameen/editorial/anak-belajar-mengaji.jpg"
-                    alt="Anak belajar mengaji dengan pendampingan"
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover"
-                  />
-                </div>
-                <figcaption className="mt-3 text-caption text-supporting-500 text-center">
-                  Metode ACM dan Al-Barqy menemani pembelajar sejak 1995
-                </figcaption>
-              </figure>
+              <Reveal delay={0.1}>
+                <figure className="relative m-0">
+                  <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-supporting-100">
+                    <Image
+                      src="/images/penaameen/editorial/anak-belajar-mengaji.jpg"
+                      alt="Anak belajar mengaji dengan pendampingan"
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <figcaption className="mt-3 text-caption text-supporting-500 text-center">
+                    Metode ACM dan Al-Barqy menemani pembelajar sejak 1995
+                  </figcaption>
+                </figure>
+              </Reveal>
             </div>
           </div>
 
           {/* Headline facts */}
           <dl className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {historyFacts.map((fact) => (
-              <div
-                key={fact.value}
-                className="bg-white/90 border border-supporting-200 rounded-2xl p-4 shadow-2xs"
-              >
-                <dt className="text-xl sm:text-2xl font-serif font-bold text-primary-700 tabular-nums">
-                  {fact.value}
-                </dt>
-                <dd className="mt-1 text-xs sm:text-sm text-supporting-600 leading-snug">
-                  {fact.label}
-                </dd>
-              </div>
+              <Reveal key={fact.value} variant="small" delay={0.1}>
+                <div className="bg-white/90 border border-supporting-200 rounded-2xl p-4 shadow-2xs">
+                  <dt className="text-xl sm:text-2xl font-serif font-bold text-primary-700 tabular-nums">
+                    {fact.value}
+                  </dt>
+                  <dd className="mt-1 text-xs sm:text-sm text-supporting-600 leading-snug">
+                    {fact.label}
+                  </dd>
+                </div>
+              </Reveal>
             ))}
           </dl>
         </div>

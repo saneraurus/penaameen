@@ -17,51 +17,6 @@ function formatIDR(value: number) {
   }).format(value);
 }
 
-/** Compact operational metric. Value first, label second. */
-function Metric({
-  label,
-  value,
-  detail,
-  emphasis = false,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-  emphasis?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-lg border p-5 ${
-        emphasis
-          ? "border-primary-800 bg-primary-950 text-background-100"
-          : "border-supporting-200 bg-white"
-      }`}
-    >
-      <p
-        className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
-          emphasis ? "text-background-300" : "text-supporting-400"
-        }`}
-      >
-        {label}
-      </p>
-      <p
-        className={`mt-3 font-serif text-2xl leading-none ${
-          emphasis ? "text-background-50" : "text-supporting-900"
-        }`}
-      >
-        {value}
-      </p>
-      <p
-        className={`mt-2.5 text-xs ${
-          emphasis ? "text-background-300" : "text-supporting-500"
-        }`}
-      >
-        {detail}
-      </p>
-    </div>
-  );
-}
-
 export default async function AdminDashboardPage() {
   void (await requireStaffActor("orders:read"));
   const counts = await getOrderStatusCounts();
@@ -76,35 +31,74 @@ export default async function AdminDashboardPage() {
       />
 
       {/* Revenue — real data only */}
-      <RevenueChartHero analytics={analytics} />
+      <section
+        aria-labelledby="revenue-heading"
+        className="admin-panel overflow-hidden"
+      >
+        <div className="border-b border-supporting-200 px-5 py-4">
+          <h2
+            id="revenue-heading"
+            className="text-[11px] font-semibold uppercase tracking-[0.18em] text-supporting-400"
+          >
+            Omzet Masuk
+          </h2>
+        </div>
+        <RevenueChartHero analytics={analytics} />
+      </section>
 
       {/* Operational metrics */}
       <section aria-labelledby="metrics-heading">
-        <h2 id="metrics-heading" className="sr-only">
-          Ringkasan metrik
+        <h2
+          id="metrics-heading"
+          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-supporting-400"
+        >
+          Ringkasan Metrik
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric
-            emphasis
-            label="Total Omzet Masuk"
-            value={formatIDR(counts.totalRevenue)}
-            detail={`Dari ${counts.totalOrders} total transaksi tercatat`}
-          />
-          <Metric
-            label="Perlu Diproses / Dikemas"
-            value={String(counts.fulfillmentReady)}
-            detail="Siap dikemas di gudang"
-          />
-          <Metric
-            label="Menunggu Pembayaran"
-            value={String(counts.paymentPending)}
-            detail="QRIS / VA / Konfirmasi CS"
-          />
-          <Metric
-            label="Pesanan Bermasalah"
-            value={String(counts.blocked)}
-            detail="Dibatalkan atau gagal"
-          />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="admin-panel p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+              Total Omzet Masuk
+            </p>
+            <p className="mt-3 font-mono text-xl leading-none tracking-tight text-supporting-900">
+              {formatIDR(counts.totalRevenue)}
+            </p>
+            <p className="mt-2 text-xs text-supporting-500">
+              {counts.totalOrders} total transaksi tercatat
+            </p>
+          </div>
+          <div className="admin-panel p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+              Perlu Diproses / Dikemas
+            </p>
+            <p className="mt-3 font-mono text-xl leading-none tracking-tight text-supporting-900">
+              {String(counts.fulfillmentReady)}
+            </p>
+            <p className="mt-2 text-xs text-supporting-500">
+              Siap dikemas di gudang
+            </p>
+          </div>
+          <div className="admin-panel p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+              Menunggu Pembayaran
+            </p>
+            <p className="mt-3 font-mono text-xl leading-none tracking-tight text-supporting-900">
+              {String(counts.paymentPending)}
+            </p>
+            <p className="mt-2 text-xs text-supporting-500">
+              QRIS / VA / Konfirmasi CS
+            </p>
+          </div>
+          <div className="admin-panel p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+              Pesanan Bermasalah
+            </p>
+            <p className="mt-3 font-mono text-xl leading-none tracking-tight text-supporting-900">
+              {String(counts.blocked)}
+            </p>
+            <p className="mt-2 text-xs text-supporting-500">
+              Dibatalkan atau gagal
+            </p>
+          </div>
         </div>
       </section>
 
@@ -116,7 +110,7 @@ export default async function AdminDashboardPage() {
         >
           Antrean Kerja &amp; Verifikasi
         </h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <WorkQueueCard
             title="Perlu Pengemasan & Pengiriman"
             count={counts.fulfillmentReady}
@@ -146,7 +140,7 @@ export default async function AdminDashboardPage() {
       {/* Recent orders */}
       <section
         aria-labelledby="recent-heading"
-        className="overflow-hidden rounded-lg border border-supporting-200 bg-white"
+        className="admin-panel overflow-hidden"
       >
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-supporting-200 px-5 py-4">
           <div>
@@ -184,7 +178,7 @@ export default async function AdminDashboardPage() {
             {recentOrders.map((ord) => (
               <li
                 key={ord.id}
-                className="flex flex-wrap items-start justify-between gap-5 border-b border-supporting-100 px-5 py-5 transition-colors last:border-b-0 hover:bg-supporting-50"
+                className="flex flex-wrap items-start justify-between gap-5 border-b border-supporting-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-supporting-50"
               >
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2.5">
@@ -192,7 +186,7 @@ export default async function AdminDashboardPage() {
                       {ord.orderNumber}
                     </span>
                     <span
-                      className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${
                         ord.paymentStatus === "paid"
                           ? "border-primary-200 bg-primary-50 text-primary-800"
                           : "border-accent-200 bg-accent-50 text-accent-800"
@@ -248,9 +242,9 @@ export default async function AdminDashboardPage() {
                   </div>
                   <Link
                     href={`/admin/orders/${ord.id}`}
-                    className="rounded-full bg-primary-900 px-4 py-2 text-xs font-medium text-background-50 transition-colors hover:bg-primary-800"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-4 py-2 text-xs font-medium text-background-100 transition-colors hover:bg-primary-900"
                   >
-                    Detail &amp; Proses →
+                    Detail &amp; Proceso →
                   </Link>
                 </div>
               </li>
@@ -267,7 +261,7 @@ export default async function AdminDashboardPage() {
         >
           Aksi Cepat
         </h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
           {[
             {
               href: "/admin/products/new",
@@ -288,7 +282,7 @@ export default async function AdminDashboardPage() {
             <Link
               key={action.href}
               href={action.href}
-              className="group rounded-lg border border-supporting-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-supporting-300 hover:shadow-[0_12px_40px_-12px_rgba(25,22,18,0.16)]"
+              className="group admin-panel p-5 transition-all duration-200 hover:-translate-y-0.5"
             >
               <span className="text-[10px] font-semibold tracking-[0.2em] text-accent-600">
                 {`0${index + 1}`}

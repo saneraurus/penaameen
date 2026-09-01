@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Images, ZoomIn } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Images } from "lucide-react";
 
 type GalleryCategory = "semua" | "pelatihan" | "komunitas" | "dokumentasi";
 
@@ -297,7 +297,7 @@ export default function GaleriKegiatanPage() {
             </h1>
             <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
               Dokumentasi perjalanan kami dalam menyebarkan metode belajar
-              Al-Qur&#x27;an — pelatihan guru, workshop nasional, dan kegiatan
+              Al-Qur&apos;an — pelatihan guru, workshop nasional, dan kegiatan
               komunitas di seluruh Indonesia.
             </p>
 
@@ -366,11 +366,11 @@ export default function GaleriKegiatanPage() {
               foto
             </p>
 
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filtered.map((item, idx) => (
                 <div
                   key={item.id}
-                  className="break-inside-avoid group relative overflow-hidden rounded-2xl bg-supporting-100 cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-2xl bg-supporting-100 cursor-pointer shadow-sm hover:shadow-lg transition-all duration-300"
                   onClick={() => openLightbox(idx)}
                   role="button"
                   tabIndex={0}
@@ -383,7 +383,7 @@ export default function GaleriKegiatanPage() {
                       alt={item.alt}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
 
                     {/* Hover overlay */}
@@ -395,11 +395,6 @@ export default function GaleriKegiatanPage() {
                         <p className="text-emerald-300 text-[10px] mt-1 font-medium">
                           {item.year}
                         </p>
-                      </div>
-                      <div className="absolute top-3 right-3">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm text-white">
-                          <ZoomIn className="h-4 w-4" />
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -434,7 +429,7 @@ export default function GaleriKegiatanPage() {
             </h2>
             <p className="text-white/80 text-sm leading-relaxed mb-6 max-w-lg mx-auto">
               Temukan cabang terdekat dan jadilah bagian dari gerakan belajar
-              Al-Qur&#x27;an bersama PENA AMEEN di kota Anda.
+              Al-Qur&apos;an bersama PENA AMEEN di kota Anda.
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
               <Link

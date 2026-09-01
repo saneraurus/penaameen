@@ -8,39 +8,45 @@ describe("FeaturedProductSection Component", () => {
     render(<FeaturedProductSection />);
 
     expect(
-      screen.getByRole("heading", { name: "Paket Home Learning ALBARQY" }),
+      screen.getByRole("heading", { name: /Paket Home Learning/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText("PILIHAN BELAJAR UTAMA")).toBeInTheDocument();
+    expect(screen.getByText(/Pilihan Belajar Utama/i)).toBeInTheDocument();
     expect(screen.getByText("Rp966.000")).toBeInTheDocument();
     expect(screen.getByText(/Hemat Rp284.000/i)).toBeInTheDocument();
   });
 
-  it("switches between Isi Paket and Keunggulan tabs", () => {
+  it("toggles Isi Paket and Keunggulan dropdowns", () => {
     render(<FeaturedProductSection />);
 
-    // Default tab is "Isi Paket"
+    // Initially collapsed
+    expect(
+      screen.queryByText("Buku Utama & Modul Praktik AL-BARQY"),
+    ).not.toBeInTheDocument();
+
+    // Click "Isi Paket Box" dropdown
+    const isiBtn = screen.getByRole("button", {
+      name: /Isi Paket Box/i,
+    });
+    fireEvent.click(isiBtn);
+
     expect(
       screen.getByText("Buku Utama & Modul Praktik AL-BARQY"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Bonus Tas Eksklusif PENA AMEEN"),
+      screen.getByText("Bonus Tas Kanvas Eksklusif PENA AMEEN"),
     ).toBeInTheDocument();
 
-    // Click "Keunggulan Metode" tab
-    const keunggulanTab = screen.getByRole("button", {
+    // Click "Keunggulan Metode" dropdown
+    const keunggulanBtn = screen.getByRole("button", {
       name: /Keunggulan Metode/i,
     });
-    fireEvent.click(keunggulanTab);
-
-    expect(screen.getByText("Sistem Cepat 200 Menit")).toBeInTheDocument();
-    expect(screen.getByText("Formula Kata Anti-Lupa")).toBeInTheDocument();
-
-    // Click back to "Isi Paket" tab
-    const isiTab = screen.getByRole("button", { name: /Isi Paket Box/i });
-    fireEvent.click(isiTab);
+    fireEvent.click(keunggulanBtn);
 
     expect(
-      screen.getByText("Flashcard Hijaiyah Interaktif"),
+      screen.getByText(/Sistem Cepat 200 Menit Tuntas/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Formula Kata Kunci Anti Lupa/i),
     ).toBeInTheDocument();
   });
 
@@ -48,7 +54,7 @@ describe("FeaturedProductSection Component", () => {
     render(<FeaturedProductSection />);
 
     const productLink = screen.getByRole("link", {
-      name: /Lihat Detail Produk/i,
+      name: /Lihat Detail/i,
     });
     expect(productLink).toHaveAttribute(
       "href",

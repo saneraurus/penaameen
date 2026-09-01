@@ -63,20 +63,22 @@ export function SystemControlsPanel() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">Memuat...</div>
+      <div className="py-12 text-center text-xs text-supporting-500">
+        Memuat...
+      </div>
     );
   }
 
   if (error && controls.length === 0) {
     return (
-      <div className="py-12 text-center text-sm text-red-600">{error}</div>
+      <div className="py-12 text-center text-xs text-red-700">{error}</div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg px-3 py-2">
+        <div className="admin-panel border-red-200 bg-red-50 px-4 py-3 text-xs text-red-800">
           {error}
         </div>
       )}
@@ -84,17 +86,17 @@ export function SystemControlsPanel() {
       {controls.map((control) => (
         <div
           key={control.key}
-          className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs flex items-center justify-between gap-4"
+          className="admin-panel flex items-center justify-between gap-4 p-5"
         >
           <div>
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-sm font-medium text-supporting-900">
               {control.label}
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5 font-mono">
+            <p className="text-xs text-supporting-500 mt-0.5 font-mono">
               {control.key}
             </p>
             {control.updatedAt && (
-              <p className="text-[11px] text-gray-400 mt-1">
+              <p className="mt-1 text-[11px] text-supporting-400">
                 Diubah: {new Date(control.updatedAt).toLocaleString("id-ID")}
               </p>
             )}
@@ -103,10 +105,10 @@ export function SystemControlsPanel() {
             type="button"
             onClick={() => handleToggle(control)}
             disabled={busyKey === control.key}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 ${
+            className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold tracking-tight transition-colors cursor-pointer disabled:opacity-50 ${
               control.value
-                ? "bg-red-600 hover:bg-red-700 text-white"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                ? "border border-red-200 bg-red-50 text-red-800 hover:bg-red-100"
+                : "border border-supporting-300 bg-supporting-50 text-supporting-800 hover:bg-supporting-100"
             }`}
           >
             {busyKey === control.key
@@ -118,7 +120,7 @@ export function SystemControlsPanel() {
         </div>
       ))}
 
-      <p className="text-[11px] text-gray-400">
+      <p className="text-[11px] text-supporting-400">
         Kontrol darurat membutuhkan izin khusus (system:control) dan konfirmasi
         eksplisit. Setiap perubahan tercatat di audit log.
       </p>

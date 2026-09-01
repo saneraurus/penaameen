@@ -317,3 +317,32 @@ export const productWeights: ProductWeight[] = [
     sourceWeight: "7000gr/buku",
   },
 ];
+
+/**
+ * Resolves a product's package weight in grams from its known name.
+ *
+ * - Exact (case/space-insensitive) name match → trusted weight.
+ * - No exact match → falls back to the median weight of the same product
+ *   group (ACM/ABQ), derived solely from the weights already declared in
+ *   this file. This keeps the shipping route from hard-failing (HTTP 400)
+ *   when a product name drifts from the canonical catalogue name, while
+ *   never inventing a weight from outside sources. Callers should surface
+ *   `estimated: true` to the client/audit trail.
+ */
+export function resolveProductWeightGrams(name: string): {
+  grams: number;
+  estimated: boolean;
+} {
+  const key = name.trim().toLowerCase();
+  const exact = productWeights.find((w) => w.name.trim().toLowerCase() === key);
+  if (exact) return { grams: exact.weightGrams, estimated: false };
+
+  const group: ProductWeightGroup = key.includes("abq") ? "ABQ" : "ACM";
+  const groupWeights = productWeights
+    .filter((w) => w.group === group)
+    .map((w) => w.weightGrams)
+    .sort((a, b) => a - b);
+  const midpoint = groupWeights[Math.floor(groupWeights.length / 2)];
+  const median = midpoint ?? 200;
+  return { grams: median, estimated: true };
+}

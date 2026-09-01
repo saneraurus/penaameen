@@ -43,24 +43,24 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
   return (
     <div className="space-y-6">
       {/* Top Action Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+      <div className="admin-panel p-5">
         <div>
-          <span className="text-xs font-bold text-primary-700 bg-primary-50 px-2.5 py-1 rounded-lg border border-primary-200">
+          <span className="inline-flex rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-1 text-[11px] font-bold text-primary-800 tracking-tight">
             {order.orderNumber}
           </span>
-          <h2 className="text-lg font-bold text-gray-900 mt-2">
+          <h2 className="mt-2 text-lg font-semibold text-supporting-900">
             Pesanan dari {order.customerName}
           </h2>
-          <p className="text-xs text-gray-500">{order.customerEmail}</p>
+          <p className="text-xs text-supporting-500">{order.customerEmail}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             onClick={() => setShowPrintModal(true)}
-            className="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-950 px-4 py-2.5 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-900 cursor-pointer"
           >
-            <span>🖨️</span>
+            <span aria-hidden="true">🖨️</span>
             <span>Print Resi Pengiriman</span>
           </button>
 
@@ -70,7 +70,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                 type="button"
                 onClick={() => handleUpdateStatus("mark_fulfilled")}
                 disabled={isUpdating}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary-800 px-4 py-2.5 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-primary-950 cursor-pointer disabled:opacity-50"
               >
                 ✓ Tandai Sedang Dikemas
               </button>
@@ -81,7 +81,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
               type="button"
               onClick={() => handleUpdateStatus("mark_shipped")}
               disabled={isUpdating}
-              className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-supporting-800 px-4 py-2.5 text-xs font-semibold text-background-100 tracking-tight transition-colors hover:bg-supporting-900 cursor-pointer disabled:opacity-50"
             >
               🚚 Tandai Sudah Dikirim
             </button>
@@ -89,7 +89,7 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
 
           <Link
             href="/admin/orders"
-            className="px-4 py-2.5 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-supporting-300 px-4 py-2.5 text-xs font-semibold text-supporting-800 tracking-tight transition-colors hover:bg-supporting-50"
           >
             ← Kembali
           </Link>
@@ -100,31 +100,33 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column: Products in this single order */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-              <span>📚</span>
-              <span>
-                Daftar Produk ({order.items?.length || 1} Macam Produk)
-              </span>
-            </h3>
+          <div className="admin-panel overflow-hidden">
+            <div className="border-b border-supporting-200 px-5 py-4">
+              <h3 className="text-sm font-medium text-supporting-900 flex items-center gap-2">
+                <span aria-hidden="true">📚</span>
+                <span>
+                  Daftar Produk ({order.items?.length || 1} Macam Produk)
+                </span>
+              </h3>
+            </div>
 
-            <div className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+            <div className="divide-y divide-supporting-100">
               {order.items?.map((item, idx) => (
                 <div
                   key={item.id || idx}
-                  className="p-4 flex items-center justify-between gap-4 hover:bg-gray-50/50"
+                  className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-supporting-50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl shrink-0">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-supporting-100 border border-supporting-200 text-xl">
                       📖
                     </div>
                     <div>
-                      <div className="font-semibold text-xs text-gray-900">
+                      <div className="text-xs font-semibold text-supporting-900">
                         {item.productName}
                       </div>
-                      <div className="text-[11px] text-gray-500 mt-0.5">
+                      <div className="text-[11px] text-supporting-500 mt-0.5">
                         Harga Satuan:{" "}
-                        <span className="font-mono text-gray-700 font-medium">
+                        <span className="font-mono text-supporting-700 font-medium">
                           {new Intl.NumberFormat("id-ID", {
                             style: "currency",
                             currency: "IDR",
@@ -136,10 +138,10 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                   </div>
 
                   <div className="text-right">
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-800 text-xs font-bold font-mono rounded-lg">
+                    <span className="inline-flex rounded-lg bg-supporting-100 px-2.5 py-1 text-xs font-bold font-mono text-supporting-800">
                       x{item.quantity}
                     </span>
-                    <div className="font-mono font-bold text-xs text-gray-900 mt-1">
+                    <div className="font-mono text-xs font-bold text-supporting-900 mt-1">
                       {new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR",
@@ -152,8 +154,8 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
             </div>
 
             {/* Total Calculation Summary */}
-            <div className="pt-4 border-t border-gray-100 space-y-2 text-xs">
-              <div className="flex justify-between text-gray-600">
+            <div className="border-t border-supporting-200 px-5 py-4 space-y-2 text-xs">
+              <div className="flex justify-between text-supporting-600">
                 <span>Subtotal Produk</span>
                 <span className="font-mono">
                   {new Intl.NumberFormat("id-ID", {
@@ -166,9 +168,9 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
                   )}
                 </span>
               </div>
-              <div className="flex justify-between font-bold text-sm text-gray-900 pt-2 border-t border-gray-100">
+              <div className="flex justify-between border-t border-supporting-200 pt-2 text-sm font-bold text-supporting-900">
                 <span>Total Akhir</span>
-                <span className="font-mono text-primary-700">
+                <span className="font-mono text-primary-800">
                   {new Intl.NumberFormat("id-ID", {
                     style: "currency",
                     currency: "IDR",
@@ -182,44 +184,44 @@ export function OrderDetailView({ order: initialOrder }: OrderDetailViewProps) {
 
         {/* Right Column: Customer & Shipping Address */}
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-xs space-y-4 text-xs">
-            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-              <span>📍</span>
+          <div className="admin-panel space-y-4 p-5 text-xs">
+            <h3 className="text-sm font-medium text-supporting-900 flex items-center gap-2">
+              <span aria-hidden="true">📍</span>
               <span>Informasi Pengiriman</span>
             </h3>
 
             <div className="space-y-3">
               <div>
-                <span className="text-[10px] text-gray-400 font-semibold uppercase block">
+                <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                   Kurir Ekspedisi
                 </span>
-                <span className="font-bold text-gray-900 text-xs">
+                <span className="font-bold text-supporting-900 text-xs">
                   {carrier || "-"}
                 </span>
               </div>
 
               <div>
-                <span className="text-[10px] text-gray-400 font-semibold uppercase block">
+                <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                   Nomor Resi
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="font-mono font-bold text-xs text-primary-700 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">
+                  <span className="font-mono text-xs font-bold text-primary-800 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded-md">
                     {trackingNumber || "-"}
                   </span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-gray-100">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase block">
+              <div className="border-t border-supporting-200 pt-3">
+                <span className="text-[10px] text-supporting-400 font-semibold uppercase block">
                   Alamat Lengkap Tujuan
                 </span>
-                <div className="font-bold text-gray-900 mt-1">
+                <div className="font-bold text-supporting-900 mt-1">
                   {order.shippingAddress?.name || order.customerName}
                 </div>
-                <div className="text-gray-600 font-mono">
+                <div className="font-mono text-supporting-600">
                   {order.shippingAddress?.phone || "-"}
                 </div>
-                <div className="text-gray-700 mt-1 leading-relaxed">
+                <div className="text-supporting-700 mt-1 leading-relaxed text-[11px]">
                   {order.shippingAddress?.address1}
                   {order.shippingAddress?.city
                     ? `, ${order.shippingAddress.city}`

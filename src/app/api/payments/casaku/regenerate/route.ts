@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getApiSettings } from "@/lib/admin/api-settings";
 import {
   buildCasakuConfig,
   generateQrisForOrder,
 } from "@/lib/payment/casaku-service";
 import { CasakuError } from "@/lib/payment/casaku";
+import { withRLSContext } from "@/middleware/rls-context";
+import { createNotification } from "@/lib/admin/notifications";
 
 /**
  * Regenerates a Casaku QRIS for an existing PENDING_PAYMENT order
@@ -15,11 +15,6 @@ import { CasakuError } from "@/lib/payment/casaku";
  */
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await request.json();
     const { orderId } = body as { orderId: string };
 
@@ -30,18 +25,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: { items: { include: { product: true } } },
+    const order = await withRLSContext(async (context, tx) => {
+      if (context.actorKind !== "customer") return null;
+      return tx.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, orderNumber: true, status: true, total: true },
+      });
     });
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    }
-
-    const dbUser = await prisma.user.findFirst({ where: { clerkId: userId } });
-    if (!dbUser || dbUser.id !== order.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (order.status !== "PENDING_PAYMENT") {
@@ -73,6 +66,15 @@ export async function POST(request: Request) {
           { status: 502 },
         );
       }
+
+      await createNotification({
+        type: "payment.qr_regenerated",
+        severity: "info",
+        title: `QRIS baru di-generate (${order.orderNumber})`,
+        message: `Pelanggan memperbarui kode QRIS untuk pesanan ${order.orderNumber} (Rp${Number(order.total).toLocaleString("id-ID")}).`,
+        targetType: "order",
+        targetId: order.id,
+      }).catch(() => undefined);
 
       return NextResponse.json({
         ok: true,

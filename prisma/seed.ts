@@ -8,6 +8,7 @@ import { branches } from "../src/data/branches";
 import { methods } from "../src/data/methods";
 import { historyMilestones } from "../src/data/history";
 import { testimonials } from "../src/data/testimonials";
+import { hashPassword } from "../src/lib/admin/auth";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg(new Pool({ connectionString: process.env["DATABASE_URL"] })),
@@ -15,6 +16,26 @@ const prisma = new PrismaClient({
 
 async function main() {
   console.log("Seeding database...");
+
+  // --- Seed default administrator account ---
+  console.log("Seeding default admin...");
+  await prisma.adminUser.upsert({
+    where: { username: "ihsan" },
+    update: {
+      passwordHash: hashPassword("AdminPena123"),
+      role: "admin",
+      fullName: "Ihsan (Admin)",
+      isActive: true,
+    },
+    create: {
+      username: "ihsan",
+      passwordHash: hashPassword("AdminPena123"),
+      role: "admin",
+      fullName: "Ihsan (Admin)",
+      isActive: true,
+    },
+  });
+  console.log("Upserted default admin: ihsan");
 
   const categoryNames = Array.from(new Set(products.map((p) => p.category)));
 
@@ -216,7 +237,7 @@ async function main() {
         content: t.content,
         highlight: t.highlight,
         verifiedBuyer: t.verifiedBuyer,
-        image: t.image,
+        image: t.image ?? "",
         label: t.label,
         isActive: true,
       },
@@ -234,7 +255,7 @@ async function main() {
         content: t.content,
         highlight: t.highlight,
         verifiedBuyer: t.verifiedBuyer,
-        image: t.image,
+        image: t.image ?? "",
         label: t.label,
         isActive: true,
       },

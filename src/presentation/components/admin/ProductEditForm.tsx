@@ -106,13 +106,13 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Product Info Form */}
         <div className="lg:col-span-2 space-y-6">
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-xs">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">
+          <section className="admin-panel p-6 space-y-4">
+            <h2 className="text-base font-semibold text-supporting-900 border-b border-supporting-100 pb-3">
               Informasi Utama Produk
             </h2>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                 Nama Produk *
               </label>
               <input
@@ -121,13 +121,13 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                   Slug URL *
                 </label>
                 <input
@@ -136,12 +136,12 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                   value={formData.slug}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                   SKU / Kode Produk
                 </label>
                 <input
@@ -149,13 +149,13 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                   name="sku"
                   value={formData.sku}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                 Kategori
               </label>
               <input
@@ -164,7 +164,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 value={formData.category}
                 onChange={handleChange}
                 list="category-options"
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               />
               <datalist id="category-options">
                 {categories.map((c) => (
@@ -178,7 +178,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                 Deskripsi Lengkap Produk
               </label>
               <textarea
@@ -186,12 +186,12 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 value={formData.description}
                 onChange={handleChange}
                 rows={6}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                 Deskripsi Ringkas (Cuplikan)
               </label>
               <textarea
@@ -199,20 +199,20 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 value={formData.shortDescription}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               />
             </div>
           </section>
 
           {/* Pricing & Stock */}
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-xs">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">
+          <section className="admin-panel p-6 space-y-4">
+            <h2 className="text-base font-semibold text-supporting-900 border-b border-supporting-100 pb-3">
               Harga & Inventaris
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                   Harga Pokok (IDR) *
                 </label>
                 <input
@@ -221,12 +221,12 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                   value={formData.price}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                   Harga Coret / Promo (IDR)
                 </label>
                 <input
@@ -235,12 +235,12 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                   value={formData.salePrice}
                   onChange={handleChange}
                   placeholder="Opsional"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                   Jumlah Stok
                 </label>
                 <input
@@ -248,7 +248,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                   name="stockQuantity"
                   value={formData.stockQuantity}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                  className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                 />
               </div>
             </div>
@@ -257,20 +257,20 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
 
         {/* Sidebar Status & Media Controls */}
         <div className="space-y-6">
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-xs">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">
+          <section className="admin-panel p-6 space-y-4">
+            <h2 className="text-base font-semibold text-supporting-900 border-b border-supporting-100 pb-3">
               Status Publikasi
             </h2>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-2">
                 Visibilitas Produk
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-2.5 bg-supporting-50 border border-supporting-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               >
                 <option value="published">✓ Published (Tampil di Toko)</option>
                 <option value="draft">⏳ Draft (Disimpan Belum Tampil)</option>
@@ -280,7 +280,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
               </select>
             </div>
 
-            <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
+            <div className="pt-3 border-t border-supporting-100 flex flex-col gap-2">
               <button
                 type="submit"
                 disabled={isSaving}
@@ -291,19 +291,19 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
 
               <Link
                 href="/admin/products"
-                className="w-full py-2.5 text-center text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors"
+                className="w-full py-2.5 text-center text-xs font-semibold text-supporting-600 hover:text-supporting-900 bg-supporting-50 hover:bg-supporting-100 rounded-xl border border-supporting-200 transition-colors"
               >
                 Kembali ke Daftar Produk
               </Link>
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-xs">
-            <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">
+          <section className="admin-panel p-6 space-y-4">
+            <h2 className="text-base font-semibold text-supporting-900 border-b border-supporting-100 pb-3">
               Gambar Produk
             </h2>
 
-            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-supporting-100 border border-supporting-200">
               <Image
                 src={
                   formData.image ||
@@ -317,7 +317,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-supporting-700 uppercase tracking-wider mb-1.5">
                 Path / URL Gambar
               </label>
               <input
@@ -325,7 +325,7 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 name="image"
                 value={formData.image}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-3 py-2 bg-supporting-50 border border-supporting-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
               />
             </div>
           </section>

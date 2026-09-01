@@ -15,78 +15,78 @@
   /* ---------------------------------------------------------------
      Colour — Ink (primary): deep, calm, scholarly green-black
      --------------------------------------------------------------- */
-  --color-primary-50: #f1f5f2;
-  --color-primary-100: #dde7e0;
-  --color-primary-200: #bccec3;
-  --color-primary-300: #92ae9c;
-  --color-primary-400: #688a76;
-  --color-primary-500: #4a6b57;
-  --color-primary-600: #375343;
-  --color-primary-700: #2a4034;
-  --color-primary-800: #1e2f27;
-  --color-primary-900: #14201b;
-  --color-primary-950: #0b1310;
+  --color-primary-50: #e8f0eb;
+  --color-primary-100: #c5d9cd;
+  --color-primary-200: #9bb8a7;
+  --color-primary-300: #719782;
+  --color-primary-400: #47785d;
+  --color-primary-500: #2d5942;
+  --color-primary-600: #244935;
+  --color-primary-700: #1b3a2a;
+  --color-primary-800: #122b1f;
+  --color-primary-900: #091c14;
+  --color-primary-950: #07110d;
 
-  /* Parchment (secondary): warm paper tones */
-  --color-secondary-50: #fdfbf7;
-  --color-secondary-100: #f8f4ec;
-  --color-secondary-200: #f0e9dc;
-  --color-secondary-300: #e5dac6;
-  --color-secondary-400: #d8c9ae;
-  --color-secondary-500: #c9b694;
-  --color-secondary-600: #a89571;
-  --color-secondary-700: #7f7055;
-  --color-secondary-800: #564b39;
-  --color-secondary-900: #2d271e;
+  /* Ivory (secondary): warm paper tones */
+  --color-secondary-50: #fdfcf9;
+  --color-secondary-100: #f5f1e8;
+  --color-secondary-200: #ebe5d8;
+  --color-secondary-300: #e0d9c8;
+  --color-secondary-400: #d4ccb5;
+  --color-secondary-500: #c9c0a5;
+  --color-secondary-600: #b3aa91;
+  --color-secondary-700: #9d947d;
+  --color-secondary-800: #877f69;
+  --color-secondary-900: #716a55;
 
   /* Clay (accent): warm terracotta-amber for narrative emphasis */
   --color-accent-50: #fdf5ee;
   --color-accent-100: #f9e7d6;
   --color-accent-200: #f2cdab;
   --color-accent-300: #e8ae7c;
-  --color-accent-400: #db8d51;
-  --color-accent-500: #c9743a;
-  --color-accent-600: #a95c2d;
-  --color-accent-700: #834626;
-  --color-accent-800: #5a3120;
-  --color-accent-900: #331d14;
+  --color-accent-400: #e0905a;
+  --color-accent-500: #e8b894;
+  --color-accent-600: #d09a78;
+  --color-accent-700: #b8825e;
+  --color-accent-800: #a06c44;
+  --color-accent-900: #885630;
 
   /* Supporting: warm neutral greys (never cold blue-grey) */
-  --color-supporting-50: #faf9f6;
-  --color-supporting-100: #f2f0ea;
-  --color-supporting-200: #e5e1d8;
-  --color-supporting-300: #cfc9bc;
-  --color-supporting-400: #a49d8e;
-  --color-supporting-500: #7a7365;
-  --color-supporting-600: #5c564b;
-  --color-supporting-700: #423d35;
-  --color-supporting-800: #2b2721;
-  --color-supporting-900: #191612;
+  --color-supporting-50: #f8f7f4;
+  --color-supporting-100: #efede7;
+  --color-supporting-200: #e5e2d9;
+  --color-supporting-300: #d4d0c4;
+  --color-supporting-400: #a9a595;
+  --color-supporting-500: #7d7968;
+  --color-supporting-600: #615e50;
+  --color-supporting-700: #45433a;
+  --color-supporting-800: #2e2c26;
+  --color-supporting-900: #181712;
 
   /* Background: page canvas ramp */
   --color-background-50: #fdfcf9;
-  --color-background-100: #faf8f3;
-  --color-background-200: #f4f1e9;
-  --color-background-300: #ece7db;
-  --color-background-400: #ded7c6;
-  --color-background-500: #cac1ac;
-  --color-background-600: #a49b87;
-  --color-background-700: #7a7365;
-  --color-background-800: #4c473f;
-  --color-background-900: #26231e;
+  --color-background-100: #f5f1e8;
+  --color-background-200: #ebe5d8;
+  --color-background-300: #e0d9c8;
+  --color-background-400: #d4ccb5;
+  --color-background-500: #c9c0a5;
+  --color-background-600: #b3aa91;
+  --color-background-700: #9d947d;
+  --color-background-800: #877f69;
+  --color-background-900: #716a55;
 
   /* Component tokens consumed by existing primitives */
   --color-popover: #ffffff;
-  --color-popover-foreground: #191612;
-  --color-border: #e5e1d8;
-  --color-input: #cfc9bc;
-  --color-ring: #4a6b57;
+  --color-popover-foreground: #181712;
+  --color-border: #e5e2d9;
+  --color-input: #d4d0c4;
+  --color-ring: #2d5942;
   --color-background: #fdfcf9;
-  --color-foreground: #191612;
-  --color-muted: #f2f0ea;
-  --color-muted-foreground: #7a7365;
+  --color-foreground: #181712;
+  --color-muted: #efede7;
+  --color-muted-foreground: #7d7968;
   --color-accent: #f9e7d6;
-  --color-accent-foreground: #191612;
+  --color-accent-foreground: #181712;
 
   /* ---------------------------------------------------------------
      Typography — editorial scale with dramatic range
@@ -134,25 +134,25 @@
 :root {
   --surface-canvas: #fdfcf9;
   --surface-default: #ffffff;
-  --surface-subtle: #f4f1e9;
-  --surface-ink: #0b1310;
+  --surface-subtle: #f5f1e8;
+  --surface-ink: #07110d;
 
-  --text-primary: #191612;
+  --text-primary: #181712;
   --text-secondary: #5c564b;
-  --text-muted: #7a7365;
+  --text-muted: #7d7968;
   --text-inverse: #fdfcf9;
 
-  --border-hairline: #e5e1d8;
-  --border-strong: #cfc9bc;
+  --border-hairline: rgba(229, 226, 217, 0.6);
+  --border-strong: rgba(212, 208, 196, 0.8);
 
-  --status-success: #375343;
-  --status-warning: #a95c2d;
+  --status-success: #244935;
+  --status-warning: #b8825e;
   --status-error: #9c3f37;
-  --status-info: #42605a;
+  --status-info: #47785d;
 
-  --shadow-raise: 0 1px 2px rgba(25, 22, 18, 0.04);
-  --shadow-soft: 0 12px 40px -12px rgba(25, 22, 18, 0.16);
-  --shadow-lifted: 0 32px 80px -24px rgba(25, 22, 18, 0.28);
+  --shadow-raise: 0 1px 2px rgba(24, 23, 18, 0.04);
+  --shadow-soft: 0 12px 40px -12px rgba(24, 23, 18, 0.16);
+  --shadow-lifted: 0 32px 80px -24px rgba(24, 23, 18, 0.28);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
@@ -277,13 +277,13 @@
 }
 
 .section-y {
-  padding-top: clamp(4rem, 10vw, 9rem);
-  padding-bottom: clamp(4rem, 10vw, 9rem);
+  padding-top: clamp(2rem, 5vw, 5.5rem);
+  padding-bottom: clamp(2rem, 5vw, 5.5rem);
 }
 
 .section-y-tight {
-  padding-top: clamp(2.5rem, 6vw, 5rem);
-  padding-bottom: clamp(2.5rem, 6vw, 5rem);
+  padding-top: clamp(1.5rem, 3.5vw, 3.5rem);
+  padding-bottom: clamp(1.5rem, 3.5vw, 3.5rem);
 }
 
 .text-measure {
@@ -404,16 +404,21 @@
   transform: scale(1.04);
 }
 
-/* Ink scrim for text placed over photography. */
+/* Ink scrim for text placed over photography. Dark across the upper
+   and mid zones where headlines sit; lifts at the bottom so the image
+   still breathes at the base of the frame. */
 .image-scrim::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(11, 19, 16, 0.86) 0%,
-    rgba(11, 19, 16, 0.45) 42%,
-    rgba(11, 19, 16, 0.05) 78%
+    rgba(11, 19, 16, 0.92) 0%,
+    rgba(11, 19, 16, 0.78) 30%,
+    rgba(11, 19, 16, 0.62) 55%,
+    rgba(11, 19, 16, 0.42) 72%,
+    rgba(11, 19, 16, 0.22) 85%,
+    rgba(11, 19, 16, 0.08) 100%
   );
   pointer-events: none;
 }
@@ -424,9 +429,11 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(11, 19, 16, 0.62) 0%,
-    rgba(11, 19, 16, 0.18) 55%,
-    transparent 85%
+    rgba(11, 19, 16, 0.72) 0%,
+    rgba(11, 19, 16, 0.48) 45%,
+    rgba(11, 19, 16, 0.28) 68%,
+    rgba(11, 19, 16, 0.1) 84%,
+    transparent 100%
   );
   pointer-events: none;
 }
@@ -642,4 +649,19 @@
   .image-frame-zoom:hover img {
     transform: none;
   }
+}
+
+/* ---------------------------------------------------------------
+   Clerk branding & development mode overrides
+   --------------------------------------------------------------- */
+.cl-footer__branding,
+.cl-internal-b3fm6y,
+.cl-development-badge,
+[data-localization-key="developmentMode"],
+.cl-footerAction + div,
+.cl-footerAction + .cl-internal-b3fm6y,
+.cl-rootBox [class*="footerBranding"],
+.cl-rootBox [class*="developmentBadge"],
+.cl-rootBox [class*="development-badge"] {
+  display: none !important;
 }

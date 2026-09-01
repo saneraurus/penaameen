@@ -50,6 +50,14 @@ export interface ApiSettings {
     apiBaseUrl: string;
     webhookUrl: string;
   };
+  buatqris: {
+    enabled: boolean;
+    accountId: string;
+    secretToken: string;
+    apiBaseUrl: string;
+    webhookUrl: string;
+    expiryMinutes: number;
+  };
 }
 
 const SETTINGS_FILE = path.join(process.cwd(), "src/data/api_settings.json");
@@ -63,6 +71,7 @@ const SECRET_FIELDS: Record<keyof ApiSettings, readonly string[]> = {
   emailForwarding: [],
   clerkAuth: ["secretKey", "publishableKey"],
   casaku: ["licenseKey", "webhookSecret"],
+  buatqris: ["secretToken"],
 };
 
 export function isMaskedSecret(value: string): boolean {
@@ -73,6 +82,14 @@ export function maskSecret(value: string): string {
   if (!value) return "";
   if (value.length <= 8) return `${value.slice(0, 2)}${SECRET_MARKER}`;
   return `${value.slice(0, 4)}${SECRET_MARKER}${value.slice(-4)}`;
+}
+
+const PLACEHOLDER_PATTERN =
+  /^(?:\.\.\.|.*REDACTED.*|.*your_.*|.*placeholder.*|re_.*\.\.\.|SB-Mid-.*\.\.\.|nvapi_your_.*|gsk_your_.*|sk_tes-.*|sk_test_-.*)$/i;
+
+export function isPlaceholderSecret(value: string): boolean {
+  if (!value || value.trim() === "") return true;
+  return PLACEHOLDER_PATTERN.test(value);
 }
 
 function getEncryptionKey(): Buffer | null {
@@ -125,7 +142,7 @@ function isEncryptedPayload(value: string): boolean {
 
 function resolveEnvSecrets(): ApiSettings {
   const adminEmails = process.env.ADMIN_EMAILS || "";
-  return {
+  const settings: ApiSettings = {
     midtrans: {
       isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
       serverKey: process.env.MIDTRANS_SERVER_KEY || "",
@@ -166,7 +183,10 @@ function resolveEnvSecrets(): ApiSettings {
       adminEmails,
     },
     casaku: {
-      enabled: Boolean(process.env.CASAKU_LICENSE_KEY),
+      enabled: Boolean(
+        process.env.CASAKU_LICENSE_KEY &&
+        !isPlaceholderSecret(process.env.CASAKU_LICENSE_KEY),
+      ),
       licenseKey: process.env.CASAKU_LICENSE_KEY || "",
       webhookSecret: process.env.CASAKU_WEBHOOK_SECRET || "",
       qrId: process.env.CASAKU_QR_ID || "",
@@ -180,7 +200,50 @@ function resolveEnvSecrets(): ApiSettings {
         ? `${process.env.APP_BASE_URL}/api/webhooks/casaku`
         : "",
     },
+    buatqris: {
+      enabled: Boolean(
+        process.env.BUATQRIS_SECRET_TOKEN &&
+        !isPlaceholderSecret(process.env.BUATQRIS_SECRET_TOKEN),
+      ),
+      accountId: process.env.BUATQRIS_ACCOUNT_ID || "",
+      secretToken: process.env.BUATQRIS_SECRET_TOKEN || "",
+      apiBaseUrl:
+        process.env.BUATQRIS_API_BASE_URL || "https://api.buatqris.site",
+      expiryMinutes: Number(process.env.BUATQRIS_EXPIRY_MINUTES) || 15,
+      webhookUrl: process.env.APP_BASE_URL
+        ? `${process.env.APP_BASE_URL}/api/webhooks/buatqris`
+        : "",
+    },
   };
+
+  const placeholderSecrets: string[] = [];
+  const checkPlaceholder = (label: string, value: string) => {
+    if (isPlaceholderSecret(value)) {
+      placeholderSecrets.push(label);
+    }
+  };
+  checkPlaceholder("midtrans.serverKey", settings.midtrans.serverKey);
+  checkPlaceholder("midtrans.clientKey", settings.midtrans.clientKey);
+  checkPlaceholder("rajaongkir.apiKey", settings.rajaongkir.apiKey);
+  checkPlaceholder("autoEmail.apiKey", settings.autoEmail.apiKey);
+  checkPlaceholder("autoEmail.smtpPass", settings.autoEmail.smtpPass);
+  checkPlaceholder(
+    "clerkAuth.publishableKey",
+    settings.clerkAuth.publishableKey,
+  );
+  checkPlaceholder("clerkAuth.secretKey", settings.clerkAuth.secretKey);
+  checkPlaceholder("casaku.licenseKey", settings.casaku.licenseKey);
+  checkPlaceholder("casaku.webhookSecret", settings.casaku.webhookSecret);
+  checkPlaceholder("buatqris.secretToken", settings.buatqris.secretToken);
+
+  if (placeholderSecrets.length > 0) {
+    console.warn(
+      `[ApiSettings] Placeholder or missing secrets detected: ${placeholderSecrets.join(", ")}. ` +
+        "These must be replaced with real credentials before production deployment.",
+    );
+  }
+
+  return settings;
 }
 
 function readStoredSettings(): Partial<ApiSettings> | null {
@@ -242,11 +305,50 @@ function normalizeStoredSettings(
     emailForwarding: mergeGroup("emailForwarding"),
     clerkAuth: mergeGroup("clerkAuth"),
     casaku: mergeGroup("casaku"),
+    buatqris: mergeGroup("buatqris"),
   };
 }
 
 export function getApiSettings(): ApiSettings {
   return normalizeStoredSettings(readStoredSettings());
+}
+
+export type SecretReadiness = {
+  readonly ready: boolean;
+  readonly placeholders: readonly string[];
+  readonly missing: readonly string[];
+};
+
+export function validateSecretReadiness(): SecretReadiness {
+  const settings = getApiSettings();
+  const placeholders: string[] = [];
+  const missing: string[] = [];
+
+  const checks: ReadonlyArray<[string, string]> = [
+    ["midtrans.serverKey", settings.midtrans.serverKey],
+    ["midtrans.clientKey", settings.midtrans.clientKey],
+    ["rajaongkir.apiKey", settings.rajaongkir.apiKey],
+    ["autoEmail.apiKey", settings.autoEmail.apiKey],
+    ["clerkAuth.publishableKey", settings.clerkAuth.publishableKey],
+    ["clerkAuth.secretKey", settings.clerkAuth.secretKey],
+    ["casaku.licenseKey", settings.casaku.licenseKey],
+    ["casaku.webhookSecret", settings.casaku.webhookSecret],
+    ["buatqris.secretToken", settings.buatqris?.secretToken || ""],
+  ];
+
+  for (const [label, value] of checks) {
+    if (!value || value.trim() === "") {
+      missing.push(label);
+    } else if (isPlaceholderSecret(value)) {
+      placeholders.push(label);
+    }
+  }
+
+  return {
+    ready: placeholders.length === 0 && missing.length === 0,
+    placeholders,
+    missing,
+  };
 }
 
 export function getPublicApiSettings(): ApiSettings {

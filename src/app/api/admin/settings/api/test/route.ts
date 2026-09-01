@@ -205,13 +205,72 @@ async function testCasaku(
   }
 }
 
+async function testBuatQris(
+  accountId: string,
+  secretToken: string,
+  baseUrl: string,
+): Promise<TestResult> {
+  const started = Date.now();
+  if (!accountId || !secretToken) {
+    return {
+      success: false,
+      message: "Account ID atau Secret Token BuatQRIS belum dikonfigurasi.",
+      latencyMs: Date.now() - started,
+    };
+  }
+
+  try {
+    const response = await fetch(baseUrl.replace(/\/+$/, ""), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        action: "api_create_qris",
+        account_id: accountId,
+        secret_token: secretToken,
+        amount: 1000,
+        description: "Test Koneksi Admin",
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    const body = (await response.json().catch(() => null)) as {
+      success?: boolean;
+      message?: string;
+      data?: { umkm_name?: string; transaction_id?: string } | null;
+    } | null;
+
+    if (response.ok && body?.success) {
+      return {
+        success: true,
+        message: `Koneksi BuatQRIS terverifikasi (${body.data?.umkm_name ?? "Akun Aktif"}).`,
+        latencyMs: Date.now() - started,
+      };
+    }
+    return {
+      success: false,
+      message: `BuatQRIS merespons: ${body?.message ?? `HTTP ${response.status}`}. Periksa Account ID dan Secret Token.`,
+      latencyMs: Date.now() - started,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Gagal menghubungi BuatQRIS: ${
+        error instanceof Error ? error.message : "unknown error"
+      }`,
+      latencyMs: Date.now() - started,
+    };
+  }
+}
+
 export async function POST(request: Request) {
   try {
     requireRequestOrigin(request);
     await requireStaffActor("access:write");
     const body = await request.json();
     const service = body.service as
-      "midtrans" | "rajaongkir" | "email" | "casaku";
+      "midtrans" | "rajaongkir" | "email" | "casaku" | "buatqris";
     const settings = getApiSettings();
 
     if (service === "midtrans") {
@@ -236,6 +295,15 @@ export async function POST(request: Request) {
       const result = await testCasaku(
         settings.casaku.licenseKey,
         settings.casaku.apiBaseUrl,
+      );
+      return NextResponse.json(result);
+    }
+
+    if (service === "buatqris") {
+      const result = await testBuatQris(
+        settings.buatqris.accountId,
+        settings.buatqris.secretToken,
+        settings.buatqris.apiBaseUrl,
       );
       return NextResponse.json(result);
     }

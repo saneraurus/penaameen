@@ -1,7 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { withRLSContext } from "@/middleware/rls-context";
 
 const updateAddressSchema = z.object({
   label: z.string().min(1).max(50).optional(),
@@ -20,77 +19,85 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
+  return withRLSContext(async (context, tx) => {
+    if (context.actorKind !== "customer") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
-    const body = await request.json();
-    const data = updateAddressSchema.parse(body);
+    try {
+      const { id } = await params;
+      const body = await request.json();
+      const data = updateAddressSchema.parse(body);
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId },
-    });
-
-    if (!address) {
-      return NextResponse.json({ error: "Address not found" }, { status: 404 });
-    }
-
-    if (data.isDefault) {
-      await prisma.address.updateMany({
-        where: { userId, isDefault: true },
-        data: { isDefault: false },
+      const address = await tx.address.findUnique({
+        where: { id },
       });
-    }
 
-    const updated = await prisma.address.update({
-      where: { id },
-      data: data as Record<string, unknown>,
-    });
+      if (!address) {
+        return NextResponse.json(
+          { error: "Address not found" },
+          { status: 404 },
+        );
+      }
 
-    return NextResponse.json({ address: updated });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues }, { status: 400 });
+      if (data.isDefault) {
+        await tx.address.updateMany({
+          where: { isDefault: true },
+          data: { isDefault: false },
+        });
+      }
+
+      const updated = await tx.address.update({
+        where: { id },
+        data: data as Record<string, unknown>,
+      });
+
+      return NextResponse.json({ address: updated });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json({ error: error.issues }, { status: 400 });
+      }
+      console.error("Error updating address:", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 },
+      );
     }
-    console.error("Error updating address:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
+  });
 }
 
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
+  return withRLSContext(async (context, tx) => {
+    if (context.actorKind !== "customer") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
+    try {
+      const { id } = await params;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId },
-    });
+      const address = await tx.address.findUnique({
+        where: { id },
+      });
 
-    if (!address) {
-      return NextResponse.json({ error: "Address not found" }, { status: 404 });
+      if (!address) {
+        return NextResponse.json(
+          { error: "Address not found" },
+          { status: 404 },
+        );
+      }
+
+      await tx.address.delete({ where: { id } });
+
+      return NextResponse.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting address:", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 },
+      );
     }
-
-    await prisma.address.delete({ where: { id } });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error deleting address:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
+  });
 }

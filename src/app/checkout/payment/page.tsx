@@ -6,6 +6,8 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import { buttonClass } from "@/components/ui/primitives";
+import { casakuQrImageUrl } from "@/lib/qr/qr-url";
 
 declare global {
   interface Window {
@@ -37,15 +39,6 @@ interface CasakuPaymentData {
   expiredInMinutes: number;
   paymentUrl?: string;
   expiresAt: string;
-}
-
-function casakuQrImageUrl(data: string): string {
-  const url = new URL("https://larabert-qrgen.hf.space/v1/create-qr-code");
-  url.searchParams.set("size", "300x300");
-  url.searchParams.set("style", "2");
-  url.searchParams.set("color", "111111");
-  url.searchParams.set("data", data);
-  return url.toString();
 }
 
 async function loadSnapScript(): Promise<void> {
@@ -385,11 +378,18 @@ function CheckoutPaymentPage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/payments/casaku/status", {
+      let res = await fetch("/api/payments/buatqris/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transactionId: casakuData.transactionId }),
       });
+      if (!res.ok) {
+        res = await fetch("/api/payments/casaku/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transactionId: casakuData.transactionId }),
+        });
+      }
       const data = await res.json();
 
       if (!res.ok) {
@@ -400,14 +400,27 @@ function CheckoutPaymentPage() {
         return;
       }
 
-      if (data?.order?.status === "PAID") {
-        saveOrderToLocalHistory(data.order.orderNumber, "PAID");
+      if (
+        data?.order?.status === "PAID" ||
+        data?.status === "success" ||
+        data?.status === "paid"
+      ) {
+        saveOrderToLocalHistory(
+          data.order?.orderNumber || casakuData.transactionId,
+          "PAID",
+        );
         clearCart();
-        router.push(`/checkout/success?order_id=${data.order.orderNumber}`);
+        router.push(
+          `/checkout/success?order_id=${data.order?.orderNumber || casakuData.transactionId}`,
+        );
         return;
       }
 
-      if (data?.order?.status === "CANCELLED") {
+      if (
+        data?.order?.status === "CANCELLED" ||
+        data?.status === "failed" ||
+        data?.status === "expired"
+      ) {
         setError(
           "Pembayaran QRIS tidak ditemukan atau dibatalkan. Silakan buat pesanan ulang.",
         );
@@ -529,7 +542,7 @@ function CheckoutPaymentPage() {
   return (
     <div className="min-h-screen bg-background-50 pb-24">
       {/* Checkout Step Breadcrumb Bar */}
-      <div className="bg-white border-b border-supporting-200/80 sticky top-0 z-30 shadow-2xs">
+      <div className="bg-white border-b border-supporting-200/80 sticky top-0 z-30">
         <div className="container px-4 mx-auto py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -557,14 +570,14 @@ function CheckoutPaymentPage() {
             {/* Stepper */}
             <div className="flex items-center gap-2 sm:gap-4 text-xs font-semibold">
               <div className="flex items-center gap-2 text-supporting-400">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-primary-700 text-[11px] font-bold">
                   ✓
                 </span>
                 <span>Alamat & Kurir</span>
               </div>
               <div className="w-6 sm:w-10 h-[2px] bg-primary-500" />
               <div className="flex items-center gap-2 text-primary-700">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white text-[11px] font-bold shadow-xs">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white text-[11px] font-bold">
                   2
                 </span>
                 <span>Pembayaran</span>
@@ -666,7 +679,7 @@ function CheckoutPaymentPage() {
               </div>
 
               <div className="space-y-4">
-                {/* Option 1: Casaku QRIS (primary) */}
+                {/* Option 1: BuatQRIS (primary) */}
                 <label
                   className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                     paymentMethod === "qris"
@@ -686,17 +699,17 @@ function CheckoutPaymentPage() {
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                         <span className="text-sm font-bold text-primary-950">
-                          QRIS (Casaku)
+                          QRIS (Scan Semua E-Wallet & Bank)
                         </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                          Verifikasi Otomatis 24/7
+                          ✓ Otomatis & Cepat (Utama)
                         </span>
                       </div>
 
                       <p className="text-xs text-supporting-600 leading-relaxed mb-3">
                         Scan QRIS dengan aplikasi mana pun (GoPay, OVO,
-                        ShopeePay, Dana, Livin&apos;, BRImo, MyBCA, dan
-                        lainnya). Nominal QR menyesuaikan total pesanan Anda.
+                        ShopeePay, Dana, Livin&apos;, BRImo, MyBCA, BCA Mobile,
+                        dan lainnya). Nominal QR otomatis dan verifikasi instan.
                       </p>
 
                       {/* Payment Badges Icons */}
@@ -710,6 +723,7 @@ function CheckoutPaymentPage() {
                           "Livin'",
                           "BRImo",
                           "MyBCA",
+                          "BCA",
                         ].map((badge) => (
                           <span
                             key={badge}
@@ -723,63 +737,7 @@ function CheckoutPaymentPage() {
                   </div>
                 </label>
 
-                {/* Option 2: Midtrans Online Payment (backup) */}
-                <label
-                  className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
-                    paymentMethod === "midtrans"
-                      ? "border-primary-600 bg-primary-50/40 shadow-xs ring-1 ring-primary-500/20"
-                      : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
-                  }`}
-                >
-                  <div className="flex items-start gap-3.5">
-                    <input
-                      type="radio"
-                      name="paymentOption"
-                      checked={paymentMethod === "midtrans"}
-                      onChange={() => setPaymentMethod("midtrans")}
-                      className="mt-1 text-primary-600 focus:ring-primary-500"
-                    />
-
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                        <span className="text-sm font-bold text-primary-950">
-                          Pembayaran Otomatis (Midtrans Snap)
-                        </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-supporting-100 text-supporting-600">
-                          Opsi Cadangan
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-supporting-600 leading-relaxed mb-3">
-                        Bayar instan dengan QRIS (GoPay, OVO, ShopeePay, Dana)
-                        atau Transfer Virtual Account (BCA, Mandiri, BNI, BRI,
-                        Permata).
-                      </p>
-
-                      {/* Payment Badges Icons */}
-                      <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-supporting-100">
-                        {[
-                          "QRIS",
-                          "BCA VA",
-                          "Mandiri",
-                          "BNI",
-                          "BRI",
-                          "GoPay",
-                          "ShopeePay",
-                        ].map((badge) => (
-                          <span
-                            key={badge}
-                            className="px-2 py-0.5 bg-supporting-100/90 text-supporting-700 text-[10px] font-semibold rounded"
-                          >
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </label>
-
-                {/* Option 3: Manual Bank Transfer */}
+                {/* Option 2: Manual Bank Transfer & WA Confirmation (Backup 1) */}
                 <label
                   className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
                     paymentMethod === "manual"
@@ -799,25 +757,64 @@ function CheckoutPaymentPage() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="text-sm font-bold text-primary-950">
-                          Transfer Bank Manual / Konfirmasi WhatsApp
+                          Transfer Bank Manual & Konfirmasi WhatsApp
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-primary-100 text-primary-800">
+                          Cadangan Utama
                         </span>
                       </div>
 
                       <p className="text-xs text-supporting-600 leading-relaxed mb-3">
                         Transfer langsung ke rekening resmi Pena Ameen dan
                         konfirmasi bukti transfer via CS WhatsApp. Detail
-                        rekening resmi dikonfirmasi melalui WhatsApp.
+                        rekening resmi dikonfirmasi langsung melalui WhatsApp
+                        admin.
                       </p>
 
                       {paymentMethod === "manual" && (
                         <div className="mt-3 p-3.5 bg-white rounded-xl border border-supporting-200 text-xs">
                           <p className="text-supporting-600 leading-relaxed">
-                            Setelah pembayaran dibuat, pesanan dicatat sebagai
-                            <strong> menunggu verifikasi</strong> hingga admin
-                            mengonfirmasi transfer.
+                            Setelah tombol diklik, sistem akan membuat pesanan
+                            dan membuka chat WhatsApp ke admin secara otomatis
+                            untuk memproses info rekening & konfirmasi.
                           </p>
                         </div>
                       )}
+                    </div>
+                  </div>
+                </label>
+
+                {/* Option 3: Midtrans Online Payment (Backup 2) */}
+                <label
+                  className={`block p-5 rounded-2xl border cursor-pointer transition-all duration-200 ${
+                    paymentMethod === "midtrans"
+                      ? "border-primary-600 bg-primary-50/40 shadow-xs ring-1 ring-primary-500/20"
+                      : "border-supporting-200 hover:border-supporting-300 hover:bg-supporting-50/30"
+                  }`}
+                >
+                  <div className="flex items-start gap-3.5">
+                    <input
+                      type="radio"
+                      name="paymentOption"
+                      checked={paymentMethod === "midtrans"}
+                      onChange={() => setPaymentMethod("midtrans")}
+                      className="mt-1 text-primary-600 focus:ring-primary-500"
+                    />
+
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                        <span className="text-sm font-bold text-primary-950">
+                          Pembayaran Lainnya (Midtrans Snap)
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-supporting-100 text-supporting-600">
+                          Opsi Tambahan
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-supporting-600 leading-relaxed mb-3">
+                        Bayar dengan Virtual Account (BCA, Mandiri, BNI, BRI,
+                        Permata) atau kartu kredit melalui Midtrans.
+                      </p>
                     </div>
                   </div>
                 </label>
@@ -877,15 +874,15 @@ function CheckoutPaymentPage() {
                   </div>
 
                   <div className="flex-1 w-full space-y-3 text-sm">
-                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 mb-0.5">
+                    <div className="p-4 rounded-2xl bg-primary-50 border border-primary-200">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-primary-700 mb-0.5">
                         Nominal yang Harus Dibayar
                       </p>
-                      <p className="text-2xl font-bold text-emerald-800">
+                      <p className="text-2xl font-bold text-primary-800">
                         Rp{casakuData.totalAmount.toLocaleString("id-ID")}
                       </p>
                       {casakuData.uniqueNominal > 0 && (
-                        <p className="text-[11px] text-emerald-700/80 mt-0.5">
+                        <p className="text-[11px] text-primary-700/80 mt-0.5">
                           Termasuk kode unik Rp
                           {casakuData.uniqueNominal.toLocaleString(
                             "id-ID",
@@ -914,7 +911,7 @@ function CheckoutPaymentPage() {
                         type="button"
                         onClick={handleCheckCasakuStatus}
                         disabled={checkingPayment}
-                        className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center gap-2"
+                        className={buttonClass({ tone: "ink", size: "sm" })}
                       >
                         {checkingPayment ? (
                           <>
@@ -930,7 +927,10 @@ function CheckoutPaymentPage() {
                           href={casakuData.paymentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-5 py-2.5 bg-white border border-supporting-300 hover:bg-supporting-50 text-supporting-700 text-xs font-bold rounded-xl transition-all"
+                          className={buttonClass({
+                            tone: "outline",
+                            size: "sm",
+                          })}
                         >
                           Buka Halaman Pembayaran ↗
                         </a>
@@ -944,7 +944,10 @@ function CheckoutPaymentPage() {
                             );
                             alert("Kode QRIS berhasil disalin!");
                           }}
-                          className="px-5 py-2.5 bg-white border border-supporting-300 hover:bg-supporting-50 text-supporting-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          className={buttonClass({
+                            tone: "outline",
+                            size: "sm",
+                          })}
                         >
                           Salin Kode QR
                         </button>
@@ -1108,7 +1111,11 @@ function CheckoutPaymentPage() {
                   type="button"
                   onClick={handleManualWhatsAppConfirmation}
                   disabled={isProcessing}
-                  className="w-full mt-6 py-4 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-bold text-sm rounded-2xl transition-all shadow-md shadow-emerald-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                  className={buttonClass({
+                    tone: "clay",
+                    size: "lg",
+                    className: "w-full mt-6",
+                  })}
                 >
                   {isProcessing ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />

@@ -11,13 +11,15 @@ export default async function AdminRedirectsPage() {
         title="Redirect Governance"
         description="Migration-safe old-to-new URL review."
       />
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <div className="admin-panel border-accent-200 bg-accent-50 px-4 py-3 text-xs text-accent-800">
         <strong>BLOCKED:</strong> {inventory.detail} Tidak ada redirect yang
         dibuat otomatis dan URL existing tidak diubah.
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <p className="text-xs uppercase text-gray-500">Validated redirects</p>
-        <p className="mt-2 font-mono text-2xl">
+      <div className="admin-panel p-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+          Validated redirects
+        </p>
+        <p className="mt-2.5 font-mono text-lg leading-none tracking-tight text-supporting-900">
           {inventory.validated}/{inventory.total}
         </p>
       </div>

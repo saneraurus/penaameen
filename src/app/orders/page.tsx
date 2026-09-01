@@ -12,6 +12,7 @@ import {
   SectionHeading,
   Shell,
   Skeleton,
+  buttonClass,
 } from "@/components/ui/primitives";
 
 interface OrderItem {
@@ -370,13 +371,19 @@ export default function OrdersPage() {
                             <>
                               <Link
                                 href={`/orders/${order.id}`}
-                                className="inline-flex min-h-10 items-center rounded-full bg-accent-600 px-5 text-xs font-medium text-white transition-colors hover:bg-accent-700"
+                                className={buttonClass({
+                                  tone: "clay",
+                                  size: "sm",
+                                })}
                               >
                                 Bayar Sekarang
                               </Link>
                               <Link
                                 href={`/orders/${order.id}`}
-                                className="inline-flex min-h-10 items-center rounded-full border border-supporting-300 px-4 text-xs font-medium text-supporting-700 transition-colors hover:border-primary-700 hover:text-primary-900"
+                                className={buttonClass({
+                                  tone: "outline",
+                                  size: "sm",
+                                })}
                               >
                                 Detail
                               </Link>

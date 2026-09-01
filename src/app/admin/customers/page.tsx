@@ -15,40 +15,44 @@ export default async function AdminCustomersPage({
     <div className="space-y-6">
       <AdminHeader
         title="Customers"
-        description="Customer context terbatas untuk operasi dan support."
+        description="Data pelanggan hanya ditampilkan untuk kebutuhan operasional. Password, payment credential, dan data sensitif tidak tersedia."
       />
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-        Data pelanggan hanya ditampilkan untuk kebutuhan operasional. Password,
-        payment credential, dan data yang tidak diperlukan tidak tersedia.
+
+      <div className="admin-panel border-accent-200 bg-accent-50 px-4 py-3 text-xs text-accent-800">
+        Data pelanggan hanya ditampilkan untuk kebutuhan operasional.
       </div>
-      <form className="rounded-2xl border border-gray-200 bg-white p-4">
-        <input
-          name="search"
-          defaultValue={search}
-          placeholder="Cari nama, email, atau telepon"
-          className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm"
-        />
-      </form>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+
+      <div className="admin-panel overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b text-xs uppercase text-gray-500">
-              <th className="p-4">Customer</th>
-              <th className="p-4">Orders</th>
-              <th className="p-4">Addresses</th>
-              <th className="p-4">Created</th>
+            <tr className="border-b border-supporting-200 text-[11px] uppercase tracking-[0.12em] text-supporting-400">
+              <th className="px-5 py-3 font-semibold">Customer</th>
+              <th className="px-5 py-3 font-semibold">Orders</th>
+              <th className="px-5 py-3 font-semibold">Addresses</th>
+              <th className="px-5 py-3 font-semibold">Created</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-supporting-100">
             {customers.map((customer) => (
-              <tr key={customer.id} className="border-b last:border-0">
-                <td className="p-4">
-                  <div className="font-semibold">{customer.name}</div>
-                  <div className="text-xs text-gray-500">{customer.email}</div>
+              <tr
+                key={customer.id}
+                className="transition-colors hover:bg-supporting-50"
+              >
+                <td className="px-5 py-3.5">
+                  <div className="text-sm font-medium text-supporting-900">
+                    {customer.name}
+                  </div>
+                  <div className="text-xs text-supporting-500">
+                    {customer.email}
+                  </div>
                 </td>
-                <td className="p-4">{customer.orderCount}</td>
-                <td className="p-4">{customer.addressCount}</td>
-                <td className="p-4 text-xs text-gray-500">
+                <td className="px-5 py-3.5 text-sm text-supporting-800">
+                  {customer.orderCount}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-supporting-800">
+                  {customer.addressCount}
+                </td>
+                <td className="px-5 py-3.5 text-xs text-supporting-500">
                   {new Date(customer.createdAt).toLocaleDateString("id-ID")}
                 </td>
               </tr>

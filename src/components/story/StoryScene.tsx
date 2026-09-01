@@ -71,7 +71,6 @@ export function CinematicScene({
           className="object-cover"
         />
       </div>
-
       <Shell
         className={cn(
           "relative z-10 pb-16 pt-28 sm:pb-24",

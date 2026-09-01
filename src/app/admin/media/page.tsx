@@ -11,29 +11,37 @@ export default async function AdminMediaPage() {
         title="Media Health"
         description="Validasi asset lokal, metadata aksesibilitas, dan rights review."
       />
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <div className="admin-panel border-accent-200 bg-accent-50 px-4 py-3 text-xs text-accent-800">
         Publish dan upload media baru belum tersedia. Rights ownership masih
         `UNKNOWN` dan tidak boleh dianggap approved.
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border bg-white p-5">
-          <p className="text-xs uppercase text-gray-500">Source</p>
-          <p className="mt-2 font-semibold">{gallery.source}</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+            Source
+          </p>
+          <p className="mt-2.5 text-sm font-medium text-supporting-900">
+            {gallery.source}
+          </p>
         </div>
-        <div className="rounded-2xl border bg-white p-5">
-          <p className="text-xs uppercase text-gray-500">Files</p>
-          <p className="mt-2 font-mono text-2xl">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+            Files
+          </p>
+          <p className="mt-2.5 font-mono text-lg leading-none tracking-tight text-supporting-900">
             {gallery.filesPresent}/{gallery.total}
           </p>
         </div>
-        <div className="rounded-2xl border bg-white p-5">
-          <p className="text-xs uppercase text-gray-500">Rights</p>
-          <p className="mt-2 font-semibold">
+        <div className="admin-panel p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-supporting-400">
+            Rights
+          </p>
+          <p className="mt-2.5 text-sm font-medium text-supporting-900">
             {gallery.rightsState.toUpperCase()}
           </p>
         </div>
       </div>
-      <p className="text-sm text-gray-600">{gallery.detail}</p>
+      <p className="text-xs text-supporting-500">{gallery.detail}</p>
     </div>
   );
 }
