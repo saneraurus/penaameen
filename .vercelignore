@@ -1,8 +1,7 @@
-﻿# Local database and data archives
+# Local database and data archives
 .pgdata/
 .pgdata-*/
 OLD WEBSITE FILES/
-PRODUK/
 .worktrees/
 
 # Dependencies and build
