@@ -34,3 +34,6 @@ sb-*.tmp.mjs
 /generated/prisma
 .vercel
 .env*
+
+# Git worktrees (don't upload to deploys)
+.worktrees/
