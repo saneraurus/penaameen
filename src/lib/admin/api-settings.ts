@@ -154,10 +154,15 @@ function resolveEnvSecrets(): ApiSettings {
     },
     rajaongkir: {
       apiKey: process.env.RAJAONGKIR_API_KEY || "",
-      tier: "starter",
-      originCityId: "",
-      originCityName: "",
-      enabledCouriers: [],
+      tier:
+        (process.env.RAJAONGKIR_TIER as "starter" | "basic" | "pro") ||
+        "starter",
+      originCityId: process.env.RAJAONGKIR_ORIGIN_CITY_ID || "",
+      originCityName: process.env.RAJAONGKIR_ORIGIN_CITY_NAME || "Surabaya",
+      enabledCouriers: (process.env.RAJAONGKIR_ENABLED_COURIERS || "")
+        .split(",")
+        .map((c) => c.trim().toLowerCase())
+        .filter(Boolean),
     },
     autoEmail: {
       provider: "resend",
